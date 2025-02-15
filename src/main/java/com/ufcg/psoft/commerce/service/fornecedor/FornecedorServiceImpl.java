@@ -1,6 +1,6 @@
 package com.ufcg.psoft.commerce.service.fornecedor;
 
-import com.ufcg.psoft.commerce.exception.ClienteNaoExisteException;
+import com.ufcg.psoft.commerce.exception.FornecedorNaoExisteException;
 import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
 import com.ufcg.psoft.commerce.repository.FornecedorRepository;
 import com.ufcg.psoft.commerce.dto.fornecedor.*;
@@ -22,7 +22,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 
     @Override
     public FornecedorResponseDTO alterar(Long id, String codigoAcesso, FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO) {
-        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(ClienteNaoExisteException::new);
+        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(FornecedorNaoExisteException::new);
         if (!fornecedor.getCodigo().equals(codigoAcesso)) {
             throw new CodigoDeAcessoInvalidoException();
         }
@@ -40,7 +40,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 
     @Override
     public void remover(Long id, String codigoAcesso) {
-        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(ClienteNaoExisteException::new);
+        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(FornecedorNaoExisteException::new);
         if (!fornecedor.getCodigo().equals(codigoAcesso)) {
             throw new CodigoDeAcessoInvalidoException();
         }
@@ -65,7 +65,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 
     @Override
     public FornecedorResponseDTO recuperar(Long id) {
-        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(ClienteNaoExisteException::new);
+        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(FornecedorNaoExisteException::new);
         return new FornecedorResponseDTO(fornecedor);
     }
 }
