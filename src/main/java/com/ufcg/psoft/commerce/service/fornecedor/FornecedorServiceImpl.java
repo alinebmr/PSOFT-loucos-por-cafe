@@ -49,7 +49,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 
     @Override
     public List<FornecedorResponseDTO> listarPorNome(String nomeEmpresa) {
-        List<Fornecedor> fornecedores = fornecedorRepository.findByNomeContaining(nomeEmpresa);
+        List<Fornecedor> fornecedores = fornecedorRepository.findByNomeEmpresaContaining(nomeEmpresa);
         return fornecedores.stream()
                 .map(FornecedorResponseDTO::new)
                 .collect(Collectors.toList());
