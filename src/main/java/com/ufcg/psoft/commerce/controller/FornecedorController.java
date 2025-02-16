@@ -43,10 +43,11 @@ public class FornecedorController {
 
     @PostMapping()
     public ResponseEntity<?> criarFornecedor(
+            @RequestParam Long adminId,
             @RequestBody @Valid FornecedorPostPutRequestDTO fornecedorPostPutRequestDto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(fornecedorService.criar(fornecedorPostPutRequestDto));
+                .body(fornecedorService.criar(adminId, fornecedorPostPutRequestDto));
     }
 
     @PutMapping("/{id}")

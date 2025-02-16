@@ -2,7 +2,9 @@ package com.ufcg.psoft.commerce.service.fornecedor;
 
 import com.ufcg.psoft.commerce.exception.FornecedorNaoExisteException;
 import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
+import com.ufcg.psoft.commerce.exception.AdminInvalidoException;
 import com.ufcg.psoft.commerce.repository.FornecedorRepository;
+import com.ufcg.psoft.commerce.repository.AdminRepository;
 import com.ufcg.psoft.commerce.dto.fornecedor.*;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 import org.modelmapper.ModelMapper;
@@ -18,6 +20,8 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Autowired
     FornecedorRepository fornecedorRepository;
     @Autowired
+    AdminRepository adminRepository;
+    @Autowired
     ModelMapper modelMapper;
 
     @Override
@@ -32,7 +36,10 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
-    public FornecedorResponseDTO criar(FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO) {
+    public FornecedorResponseDTO criar(Long adminId, FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO) {
+        if(!adminRepository.existsById(adminId)) {
+            throw new AdminInvalidoException();
+        }
         Fornecedor fornecedor = modelMapper.map(fornecedorPostPutRequestDTO, Fornecedor.class);
         fornecedorRepository.save(fornecedor);
         return modelMapper.map(fornecedor, FornecedorResponseDTO.class);

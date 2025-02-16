@@ -12,7 +12,7 @@ public interface FornecedorService {
 
     FornecedorResponseDTO recuperar(Long id);
 
-    FornecedorResponseDTO criar(FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO);
+    FornecedorResponseDTO criar(Long adminId, FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO);
 
     void remover(Long id, String codigoAcesso);
 
