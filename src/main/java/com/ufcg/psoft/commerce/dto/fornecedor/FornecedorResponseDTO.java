@@ -31,6 +31,7 @@ public class FornecedorResponseDTO {
     private String cnpj;
 
     public FornecedorResponseDTO(Fornecedor fornecedor) {
+        this.id = fornecedor.getId();
         this.nomeEmpresa = fornecedor.getNomeEmpresa();
         this.cnpj = fornecedor.getCnpj();
     }

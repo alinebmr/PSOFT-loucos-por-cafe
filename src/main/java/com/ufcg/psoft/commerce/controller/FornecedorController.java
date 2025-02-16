@@ -28,7 +28,7 @@ public class FornecedorController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> listarClientes(
+    public ResponseEntity<?> listarFornecedores(
             @RequestParam(required = false, defaultValue = "") String nomeEmpresa) {
 
         if (nomeEmpresa != null && !nomeEmpresa.isEmpty()) {
@@ -42,7 +42,7 @@ public class FornecedorController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> criarCliente(
+    public ResponseEntity<?> criarFornecedor(
             @RequestBody @Valid FornecedorPostPutRequestDTO fornecedorPostPutRequestDto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -50,7 +50,7 @@ public class FornecedorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizarCliente(
+    public ResponseEntity<?> atualizarFornecedor(
             @PathVariable Long id,
             @RequestParam String codigo,
             @RequestBody @Valid FornecedorPostPutRequestDTO fornecedorPostPutRequestDto) {
@@ -60,7 +60,7 @@ public class FornecedorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluirCliente(
+    public ResponseEntity<?> excluirFornecedor(
             @PathVariable Long id,
             @RequestParam String codigo) {
         fornecedorService.remover(id, codigo);
