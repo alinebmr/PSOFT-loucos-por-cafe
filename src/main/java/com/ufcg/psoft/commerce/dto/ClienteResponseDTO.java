@@ -28,11 +28,11 @@ public class ClienteResponseDTO {
 
     @JsonProperty("endereco")
     @NotBlank(message = "Endereco obrigatorio")
-    private String endereco;
+    private EnderecoDTO endereco;
 
     public ClienteResponseDTO(Cliente cliente) {
         this.id = cliente.getId();
         this.nome = cliente.getNome();
-        this.endereco = cliente.getEndereco();
+        this.endereco = new EnderecoDTO(cliente.getEndereco());
     }
 }
