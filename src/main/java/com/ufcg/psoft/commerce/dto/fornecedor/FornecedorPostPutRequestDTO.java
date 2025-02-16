@@ -26,6 +26,6 @@ public class FornecedorPostPutRequestDTO {
 
     @JsonProperty("cnpj")
     @NotNull(message = "CNPJ obrigatorio")
-    @Pattern(regexp = "^\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}$")
+    @Pattern(regexp = "^\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}$", message = "O CNPJ deve conter digitos e ter o seguinte formato XX.XXX.XXX/XXXX-XX")
     private String cnpj;
 }
