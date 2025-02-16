@@ -23,7 +23,7 @@ public class ClientePostPutRequestDTO {
 
     @JsonProperty("endereco")
     @Valid
-    @NotNull(message = "Endereço obrigatorio")
+    @NotNull(message = "Endereco obrigatorio")
     private EnderecoDTO endereco;
 
     @JsonProperty("codigo")

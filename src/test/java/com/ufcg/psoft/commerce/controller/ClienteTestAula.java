@@ -3,7 +3,9 @@ package com.ufcg.psoft.commerce.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ufcg.psoft.commerce.dto.ClienteResponseDTO;
+import com.ufcg.psoft.commerce.dto.EnderecoDTO;
 import com.ufcg.psoft.commerce.model.Cliente;
+import com.ufcg.psoft.commerce.model.Endereco;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,21 +45,29 @@ public class ClienteTestAula {
         objectMapper.registerModule(new JavaTimeModule());
         Cliente cliente1 = clienteRepository.save(Cliente.builder()
                 .nome("Cliente")
-                .endereco("Rua 123")
+                .endereco(Endereco.builder()
+                        .cep("12345000")
+                        .cidade("Campina")
+                        .bairro("Centro")
+                        .rua("Rua das azeitonas")
+                        .numero("123").build())
                 .codigo("123456")
-                .build()
-        );
+                .build());
 
         Cliente cliente2 = clienteRepository.save(Cliente.builder()
                 .nome("Clienta")
-                .endereco("Rua 234")
+                .endereco(Endereco.builder()
+                        .cep("12345000")
+                        .cidade("Campina")
+                        .bairro("Centro")
+                        .rua("Rua das azeitonas")
+                        .numero("123").build())
                 .codigo("123456")
-                .build()
-        );
+                .build());
 
         ClienteResponseDTO r1 = ClienteResponseDTO.builder()
                 .nome(cliente1.getNome())
-                .endereco(cliente1.getEndereco())
+                .endereco(new EnderecoDTO(cliente1.getEndereco()))
                 .id(cliente1.getId())
                 .build();
 
@@ -80,7 +90,7 @@ public class ClienteTestAula {
             String stringBusca = "Cliente";
             // Act
             String responseJsonString = driver.perform(get(URI_CLIENTES)
-                            .param("nome", stringBusca))
+                    .param("nome", stringBusca))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -96,5 +106,3 @@ public class ClienteTestAula {
 
     }
 }
-
-
