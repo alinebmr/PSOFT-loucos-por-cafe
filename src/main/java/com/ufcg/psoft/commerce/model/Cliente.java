@@ -1,12 +1,7 @@
 package com.ufcg.psoft.commerce.model;
 
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ufcg.psoft.commerce.dto.EnderecoDTO;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 
 import jakarta.persistence.*;

@@ -1,6 +1,7 @@
-package com.ufcg.psoft.commerce.dto;
+package com.ufcg.psoft.commerce.dto.cliente;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ufcg.psoft.commerce.dto.EnderecoDTO;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
