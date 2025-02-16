@@ -409,6 +409,71 @@ public class ClienteControllerTests {
         }
 
         @Test
+        @DisplayName("Quando buscamos clientes por nome")
+        void quandoBuscamosClientesPorNome() throws Exception {
+            // Arrange
+            // Vamos ter 3 clientes no banco
+            Cliente cliente1 = Cliente.builder()
+                    .nome("Josefino Dantas")
+                    .endereco(Endereco.builder()
+                            .cep("12345000")
+                            .cidade("Campina")
+                            .bairro("Centro")
+                            .rua("Av. da Pits A")
+                            .numero("100").build())
+                    .codigo("246810")
+                    .build();
+            Cliente cliente2 = Cliente.builder()
+                    .nome("Rosana Silva")
+                    .endereco(Endereco.builder()
+                            .cep("12345000")
+                            .cidade("Campina")
+                            .bairro("Centro")
+                            .rua("Distrito dos Testadores")
+                            .numero("200").build())
+                    .codigo("135790")
+                    .build();
+            clienteRepository.saveAll(Arrays.asList(cliente1, cliente2));
+
+            // Act
+            String responseJsonString = driver.perform(get(URI_CLIENTES)
+                            .param("nome", "Silva")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(clientePostPutRequestDTO)))
+                    .andExpect(status().isOk()) // Codigo 200
+                    .andReturn().getResponse().getContentAsString();
+
+            List<Cliente> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            // Assert
+            assertAll(
+                    () -> assertEquals(2, resultado.size())
+            );
+        }
+
+        @Test
+        @DisplayName("Quando buscamos clientes por nome inexistente")
+        void quandoBuscamosClientesPorNomeInexistente() throws Exception {
+            // Arrange
+            // nada alem do setup()
+
+            // Act
+            String responseJsonString = driver.perform(get(URI_CLIENTES)
+                            .param("nome", "Marcos")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(clientePostPutRequestDTO)))
+                    .andExpect(status().isOk()) // Codigo 200
+                    .andReturn().getResponse().getContentAsString();
+
+            List<Cliente> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            // Assert
+            assertAll(
+                    () -> assertEquals(0, resultado.size())
+            );
+        }
+
+        @Test
         @DisplayName("Quando buscamos um cliente salvo pelo id")
         void quandoBuscamosPorUmClienteSalvo() throws Exception {
             // Arrange
