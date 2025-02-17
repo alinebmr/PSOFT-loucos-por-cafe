@@ -3,10 +3,12 @@ package com.ufcg.psoft.commerce.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ufcg.psoft.commerce.dto.ClientePostPutRequestDTO;
-import com.ufcg.psoft.commerce.dto.ClienteResponseDTO;
+import com.ufcg.psoft.commerce.dto.EnderecoDTO;
+import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
+import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
 import com.ufcg.psoft.commerce.exception.CustomErrorType;
 import com.ufcg.psoft.commerce.model.Cliente;
+import com.ufcg.psoft.commerce.model.Endereco;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +50,18 @@ public class ClienteControllerTests {
         objectMapper.registerModule(new JavaTimeModule());
         cliente = clienteRepository.save(Cliente.builder()
                 .nome("Cliente Um da Silva")
-                .endereco("Rua dos Testes, 123")
+                .endereco(Endereco.builder()
+                        .cep("12345000")
+                        .cidade("Campina")
+                        .bairro("Centro")
+                        .rua("Rua dos Testes")
+                        .numero("123").build())
                 .codigo("123456")
                 .build()
         );
         clientePostPutRequestDTO = ClientePostPutRequestDTO.builder()
                 .nome(cliente.getNome())
-                .endereco(cliente.getEndereco())
+                .endereco(new EnderecoDTO(cliente.getEndereco()))
                 .codigo(cliente.getCodigo())
                 .build();
     }
@@ -162,7 +169,7 @@ public class ClienteControllerTests {
         @DisplayName("Quando alteramos o endereço do cliente com dados válidos")
         void quandoAlteramosEnderecoDoClienteValido() throws Exception {
             // Arrange
-            clientePostPutRequestDTO.setEndereco("Endereco Alterado");
+            clientePostPutRequestDTO.getEndereco().setRua("Endereco Alterado");
 
             // Act
             String responseJsonString = driver.perform(put(URI_CLIENTES + "/" + cliente.getId())
@@ -176,7 +183,7 @@ public class ClienteControllerTests {
             ClienteResponseDTO resultado = objectMapper.readValue(responseJsonString, ClienteResponseDTO.ClienteResponseDTOBuilder.class).build();
 
             // Assert
-            assertEquals("Endereco Alterado", resultado.getEndereco());
+            assertEquals("Endereco Alterado", resultado.getEndereco().getRua());
         }
 
         @Test
@@ -207,7 +214,7 @@ public class ClienteControllerTests {
         @DisplayName("Quando alteramos o endereço do cliente vazio")
         void quandoAlteramosEnderecoDoClienteVazio() throws Exception {
             // Arrange
-            clientePostPutRequestDTO.setEndereco("");
+            clientePostPutRequestDTO.getEndereco().setRua("");
 
             // Act
             String responseJsonString = driver.perform(put(URI_CLIENTES + "/" + cliente.getId())
@@ -223,7 +230,31 @@ public class ClienteControllerTests {
             // Assert
             assertAll(
                     () -> assertEquals("Erros de validacao encontrados", resultado.getMessage()),
-                    () -> assertEquals("Endereco obrigatorio", resultado.getErrors().get(0))
+                    () -> assertEquals("Rua obrigatorio", resultado.getErrors().get(0))
+            );
+        }
+
+        @Test
+        @DisplayName("Quando alteramos o endereço do cliente com cep invalido")
+        void quandoAlteramosCepDoClienteInvalido() throws Exception {
+            // Arrange
+            clientePostPutRequestDTO.getEndereco().setCep("123");
+
+            // Act
+            String responseJsonString = driver.perform(put(URI_CLIENTES + "/" + cliente.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", cliente.getCodigo())
+                            .content(objectMapper.writeValueAsString(clientePostPutRequestDTO)))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+            // Assert
+            assertAll(
+                    () -> assertEquals("Erros de validacao encontrados", resultado.getMessage()),
+                    () -> assertEquals("CEP deve ter exatamente 8 digitos numericos", resultado.getErrors().get(0))
             );
         }
     }
@@ -340,12 +371,22 @@ public class ClienteControllerTests {
             // Vamos ter 3 clientes no banco
             Cliente cliente1 = Cliente.builder()
                     .nome("Cliente Dois Almeida")
-                    .endereco("Av. da Pits A, 100")
+                    .endereco(Endereco.builder()
+                            .cep("12345000")
+                            .cidade("Campina")
+                            .bairro("Centro")
+                            .rua("Av. da Pits A")
+                            .numero("100").build())
                     .codigo("246810")
                     .build();
             Cliente cliente2 = Cliente.builder()
                     .nome("Cliente Três Lima")
-                    .endereco("Distrito dos Testadores, 200")
+                    .endereco(Endereco.builder()
+                            .cep("12345000")
+                            .cidade("Campina")
+                            .bairro("Centro")
+                            .rua("Distrito dos Testadores")
+                            .numero("200").build())
                     .codigo("135790")
                     .build();
             clienteRepository.saveAll(Arrays.asList(cliente1, cliente2));
@@ -364,6 +405,71 @@ public class ClienteControllerTests {
             // Assert
             assertAll(
                     () -> assertEquals(3, resultado.size())
+            );
+        }
+
+        @Test
+        @DisplayName("Quando buscamos clientes por nome")
+        void quandoBuscamosClientesPorNome() throws Exception {
+            // Arrange
+            // Vamos ter 3 clientes no banco
+            Cliente cliente1 = Cliente.builder()
+                    .nome("Josefino Dantas")
+                    .endereco(Endereco.builder()
+                            .cep("12345000")
+                            .cidade("Campina")
+                            .bairro("Centro")
+                            .rua("Av. da Pits A")
+                            .numero("100").build())
+                    .codigo("246810")
+                    .build();
+            Cliente cliente2 = Cliente.builder()
+                    .nome("Rosana Silva")
+                    .endereco(Endereco.builder()
+                            .cep("12345000")
+                            .cidade("Campina")
+                            .bairro("Centro")
+                            .rua("Distrito dos Testadores")
+                            .numero("200").build())
+                    .codigo("135790")
+                    .build();
+            clienteRepository.saveAll(Arrays.asList(cliente1, cliente2));
+
+            // Act
+            String responseJsonString = driver.perform(get(URI_CLIENTES)
+                            .param("nome", "Silva")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(clientePostPutRequestDTO)))
+                    .andExpect(status().isOk()) // Codigo 200
+                    .andReturn().getResponse().getContentAsString();
+
+            List<Cliente> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            // Assert
+            assertAll(
+                    () -> assertEquals(2, resultado.size())
+            );
+        }
+
+        @Test
+        @DisplayName("Quando buscamos clientes por nome inexistente")
+        void quandoBuscamosClientesPorNomeInexistente() throws Exception {
+            // Arrange
+            // nada alem do setup()
+
+            // Act
+            String responseJsonString = driver.perform(get(URI_CLIENTES)
+                            .param("nome", "Marcos")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(clientePostPutRequestDTO)))
+                    .andExpect(status().isOk()) // Codigo 200
+                    .andReturn().getResponse().getContentAsString();
+
+            List<Cliente> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            // Assert
+            assertAll(
+                    () -> assertEquals(0, resultado.size())
             );
         }
 
