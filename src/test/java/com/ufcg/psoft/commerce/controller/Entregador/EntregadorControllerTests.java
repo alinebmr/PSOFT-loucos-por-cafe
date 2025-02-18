@@ -245,7 +245,7 @@ public class EntregadorControllerTests {
         @DisplayName("Quando alteramos o tipo do veiculo do entregador com dados válidos")
         void quandoAlteramosPlacaVeiculoEntregadorValido() throws Exception {
             // Arrange
-            entregadorPostPutRequestDTO.setTipoVeiculo("Carro");
+            entregadorPostPutRequestDTO.setTipoVeiculo("Moto");
 
             // Act
             String responseJsonString = driver.perform(put(URI_ENTREGADORES + "/" + entregador.getId())
@@ -260,7 +260,7 @@ public class EntregadorControllerTests {
                     EntregadorResponseDTO.EntregadorResponseDTOBuilder.class).build();
 
             // Assert
-            assertEquals("Carro", resultado.getTipoVeiculo());
+            assertEquals("Moto", resultado.getTipoVeiculo());
         }
 
 
@@ -319,7 +319,7 @@ public class EntregadorControllerTests {
         @DisplayName("Quando alteramos o tipo do veiculo do entregador com dados válidos")
         void quandoAlteramosCorVeiculoEntregadorValido() throws Exception {
             // Arrange
-            entregadorPostPutRequestDTO.setCorVeiculo("Branco");
+            entregadorPostPutRequestDTO.setCorVeiculo("Preto");
 
             // Act
             String responseJsonString = driver.perform(put(URI_ENTREGADORES + "/" + entregador.getId())
@@ -334,7 +334,7 @@ public class EntregadorControllerTests {
                     EntregadorResponseDTO.EntregadorResponseDTOBuilder.class).build();
 
             // Assert
-            assertEquals("Branco", resultado.getCorVeiculo());
+            assertEquals("Preto", resultado.getCorVeiculo());
         }
 
 

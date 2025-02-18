@@ -65,7 +65,7 @@ public class EntregadorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluirCliente(
+    public ResponseEntity<?> excluirEntregador(
             @PathVariable Long id,
             @RequestParam String codigo) {
         entregadorService.remover(id, codigo);
