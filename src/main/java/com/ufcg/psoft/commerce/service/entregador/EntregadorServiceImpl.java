@@ -31,18 +31,16 @@ public class EntregadorServiceImpl implements EntregadorService {
     }
 
     @Override
-    public EntregadorResponseDTO alterar(Long id, String codigoAcesso,
-            EntregadorPostPutRequestDTO entregadorPostPutRequestDTO) {
+    public EntregadorResponseDTO alterar(Long id, String codigoAcesso, EntregadorPostPutRequestDTO entregadorPostPutRequestDTO) {
         Entregador entregador = entregadorRespository.findById(id).orElseThrow(EntregadorNaoExisteException::new);
-
         if (!entregador.getCodigo().equals(codigoAcesso)) {
             throw new CodigoDeAcessoInvalidoException();
         }
-
-        modelMapper.map(entregadorPostPutRequestDTO, getClass());
+        modelMapper.map(entregadorPostPutRequestDTO, entregador);
         entregadorRespository.save(entregador);
         return modelMapper.map(entregador, EntregadorResponseDTO.class);
     }
+
 
     @Override
     public EntregadorResponseDTO criar(EntregadorPostPutRequestDTO entregadorPostPutRequestDTO) {
