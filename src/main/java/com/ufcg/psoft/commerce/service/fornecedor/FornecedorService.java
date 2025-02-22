@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface FornecedorService {
 
-    FornecedorResponseDTO alterar(Long id, String codigoAcesso, FornecedorPostPutRequestDTO clientePostPutRequestDTO);
+    FornecedorResponseDTO alterar(Long id, String codigoAcesso, FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO);
 
     List<FornecedorResponseDTO> listar();
 
