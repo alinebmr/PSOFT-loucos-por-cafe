@@ -8,7 +8,9 @@ import com.ufcg.psoft.commerce.model.Cafe;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +28,7 @@ public class CafeResponseDTO {
     private Long id;
 
     @JsonProperty("idFornecedor")
-    @NotBlank(message = "Id do fornecedor obrigatorio")
+    @NotNull(message = "Id do fornecedor obrigatorio")
     private Long idFornecedor;
 
     @JsonProperty("nome")
@@ -41,12 +43,13 @@ public class CafeResponseDTO {
     @NotBlank(message = "Tipo obrigatorio")
     private TipoGraoCafe tipo;
     
-    @JsonProperty("perfi")
+    @JsonProperty("perfil")
     @NotBlank(message = "Perfil sensorial obrigatorio")
     private String perfil;
 
     @JsonProperty("preco")
-    @NotBlank(message = "Preço obrigatorio")
+    @NotNull(message = "Preço obrigatorio")
+    @Min(value = 0L, message = "Preco deve ser maior que zero")
     private double preco;
 
     @JsonProperty("qualidade")

@@ -40,4 +40,38 @@ public class CafeController {
                 .status(HttpStatus.NO_CONTENT)
                 .body("");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizarCafe(
+            @PathVariable Long id,
+            @RequestParam Long idFornecedor,
+            @RequestParam String codigo,
+            @RequestBody @Valid CafePostPutRequestDTO cafePostPutRequestDto) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(cafeService.alterar(idFornecedor, codigo, id, cafePostPutRequestDto));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> recuperarCafe(
+            @PathVariable Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(cafeService.recuperar(id));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> listarCafePorFornecedores(
+            @RequestParam(required = false, defaultValue = "") Long idFornecedor, 
+            @RequestParam(required = false, defaultValue = "") String codigoAcesso) {
+
+        if (idFornecedor != null && idFornecedor != 0) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(cafeService.listarPorFornecedor(idFornecedor, codigoAcesso));
+        }
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(cafeService.listar());
+    }
 }

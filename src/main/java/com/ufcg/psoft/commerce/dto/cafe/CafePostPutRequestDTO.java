@@ -5,6 +5,7 @@ import com.ufcg.psoft.commerce.enums.QualidadeCafe;
 import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class CafePostPutRequestDTO {
 
     @JsonProperty("idFornecedor")
-    @NotBlank(message = "Id do fornecedor obrigatorio")
+    @NotNull(message = "Id do fornecedor obrigatorio")
     private Long idFornecedor;
 
     @JsonProperty("nome")
@@ -28,7 +29,7 @@ public class CafePostPutRequestDTO {
 
     @JsonProperty("origem")
     @Valid
-    @NotNull(message = "Origem obrigatoria")
+    @NotBlank(message = "Origem obrigatoria")
     private String origem;
     
     @JsonProperty("tipo")
@@ -36,19 +37,20 @@ public class CafePostPutRequestDTO {
     @NotNull(message = "Tipo obrigatorio")
     private TipoGraoCafe tipo;
     
-    @JsonProperty("perfi")
+    @JsonProperty("perfil")
     @Valid
-    @NotNull(message = "Perfil sensorial obrigatorio")
+    @NotBlank(message = "Perfil sensorial obrigatorio")
     private String perfil;
 
     @JsonProperty("preco")
     @Valid
+    @Min(value = 0L, message = "Preco deve ser maior que 0")
     @NotNull(message = "Preço obrigatorio")
     private double preco;
     
     @JsonProperty("qualidade")
     @Valid
-    @NotNull(message = "Qualidade obrigatorio")
+    @NotBlank(message = "Qualidade obrigatorio")
     private QualidadeCafe qualidade;
 
     @JsonProperty("tamanhoEmbalagem")
