@@ -33,6 +33,7 @@ public class Cliente {
     @Column(nullable = false)
     private String codigo;
 
+    @JsonProperty("assinatura")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
