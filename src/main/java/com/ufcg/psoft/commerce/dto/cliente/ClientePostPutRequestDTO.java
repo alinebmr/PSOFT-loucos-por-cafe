@@ -2,7 +2,9 @@ package com.ufcg.psoft.commerce.dto.cliente;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.dto.EnderecoDTO;
+import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +28,10 @@ public class ClientePostPutRequestDTO {
     @Valid
     @NotNull(message = "Endereco obrigatorio")
     private EnderecoDTO endereco;
+
+    @JsonProperty("assinatura")
+    @Nullable
+    private TipoAssinatura assinatura;
 
     @JsonProperty("codigo")
     @NotNull(message = "Codigo de acesso obrigatorio")
