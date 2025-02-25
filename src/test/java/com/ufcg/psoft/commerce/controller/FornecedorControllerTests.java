@@ -3,11 +3,14 @@ package com.ufcg.psoft.commerce.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ufcg.psoft.commerce.dto.entregador.EntregadorResponseDTO;
 import com.ufcg.psoft.commerce.dto.fornecedor.*;
 import com.ufcg.psoft.commerce.exception.CustomErrorType;
 import com.ufcg.psoft.commerce.model.Admin;
+import com.ufcg.psoft.commerce.model.Entregador;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 import com.ufcg.psoft.commerce.repository.AdminRepository;
+import com.ufcg.psoft.commerce.repository.EntregadorRespository;
 import com.ufcg.psoft.commerce.repository.FornecedorRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("Testes do controller de fornecedores")
 public class FornecedorControllerTests {
-    
+
     final String URI_FORNECEDORES = "/fornecedores";
 
     @Autowired
@@ -40,6 +43,9 @@ public class FornecedorControllerTests {
     @Autowired
     AdminRepository adminRepository;
 
+    @Autowired
+    EntregadorRespository entregadorRespository;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
     Fornecedor fornecedor;
@@ -47,6 +53,8 @@ public class FornecedorControllerTests {
     FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO;
 
     Admin admin;
+
+    Entregador entregador;
 
     @BeforeEach
     void setup() {
@@ -56,6 +64,14 @@ public class FornecedorControllerTests {
                 .nome("adm")
                 .codigo("222222")
                 .build());
+
+        entregador = entregadorRespository.save(Entregador.builder()
+            .nome("Jose Freitas Fretes")
+            .placaVeiculo("QJXDVQ")
+            .tipoVeiculo("Caminhão")
+            .corVeiculo("Rosa")
+            .codigo("123123")
+            .build());
 
         fornecedor = fornecedorRepository.save(Fornecedor.builder()
                         .nomeEmpresa("MicroCoffee")
@@ -81,7 +97,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Ao recuperar um fornecedor com dados válidos")
         void nomeFornecedorValido() throws Exception {
-            
+
             String response = driver.perform(get(URI_FORNECEDORES + "/" + fornecedor.getId()))
                                 .andExpect(status().isOk())
                                 .andDo(print())
@@ -162,7 +178,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Ao recuperar um fornecedor com dados válidos")
         void cnpjFornecedorValido() throws Exception {
-            
+
             String response = driver.perform(get(URI_FORNECEDORES + "/" + fornecedor.getId()))
                                 .andExpect(status().isOk())
                                 .andDo(print())
@@ -379,7 +395,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando buscamos por todos fornecedores salvos")
         void buscaTodosFornecedoresSalvos() throws Exception {
-            
+
             Fornecedor fornecedor1 = Fornecedor.builder()
                     .nomeEmpresa("Cofflee")
                     .cnpj("12.395.678/0001-23")
@@ -410,7 +426,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando buscamos um fornecedor salvo pelo id")
         void buscaUmFornecedorSalvo() throws Exception {
-            
+
             String response = driver.perform(get(URI_FORNECEDORES + "/" + fornecedor.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(fornecedorPostPutRequestDTO)))
@@ -429,7 +445,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando buscamos um fornecedor inexistente")
         void buscaPorUmFornecedorInexistente() throws Exception {
-            
+
             String responseJsonString = driver.perform(get(URI_FORNECEDORES + "/" + 999999999)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(fornecedorPostPutRequestDTO)))
@@ -447,7 +463,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando criamos um novo fornecedor com dados válidos")
         void criarFornecedorValido() throws Exception {
-            
+
             String responseJsonString = driver.perform(post(URI_FORNECEDORES)
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("adminId", String.valueOf(admin.getId()))
@@ -468,7 +484,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando alteramos o fornecedor com dados válidos")
         void alteraFornecedorValido() throws Exception {
-            
+
             Long fornecedorId = fornecedor.getId();
             fornecedorPostPutRequestDTO.setNomeEmpresa("MicroCoffee2");
 
@@ -491,7 +507,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando alteramos o fornecedor inexistente")
         void alteramosFornecedorInexistente() throws Exception {
-            
+
             String response = driver.perform(put(URI_FORNECEDORES + "/" + 99999L)
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("codigo", fornecedor.getCodigo())
@@ -510,7 +526,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando alteramos o forncedor passando código de acesso inválido")
         void alteraFornecedorCodigoAcessoInvalido() throws Exception {
-            
+
             Long fornecedorId = fornecedor.getId();
 
             String response = driver.perform(put(URI_FORNECEDORES + "/" + fornecedorId)
@@ -532,7 +548,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando excluímos um fornecedor salvo")
         void excluiFornecedorValido() throws Exception {
-            
+
             String response = driver.perform(delete(URI_FORNECEDORES + "/" + fornecedor.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("codigo", fornecedor.getCodigo()))
@@ -546,7 +562,7 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando excluímos um fornecedor inexistente")
         void excluiFornecedorInexistente() throws Exception {
-            
+
             String response = driver.perform(delete(URI_FORNECEDORES + "/" + 999999)
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("codigo", fornecedor.getCodigo()))
@@ -564,7 +580,6 @@ public class FornecedorControllerTests {
         @Test
         @DisplayName("Quando excluímos um fornecedor salvo passando código de acesso inválido")
         void excluiFornecedorCodigoAcessoInvalido() throws Exception {
-            
             String response = driver.perform(delete(URI_FORNECEDORES + "/" + fornecedor.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("codigo", "invalido"))
@@ -576,6 +591,64 @@ public class FornecedorControllerTests {
 
             assertAll(
                     () -> assertEquals("Codigo de acesso invalido!", resultado.getMessage())
+            );
+        }
+
+        @Test
+        @DisplayName("Quando o fornecedor aprova um entregador valido")
+        void aprovaEntregadorValido() throws Exception {
+            String response = driver.perform(patch(URI_FORNECEDORES + "/" + fornecedor.getId() + "/aprovaEntregador")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", fornecedor.getCodigo())
+                            .param("entregadorId", entregador.getId().toString())
+                            .param("aprovado", "true"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            EntregadorResponseDTO resultado = objectMapper.readValue(response,
+                EntregadorResponseDTO.EntregadorResponseDTOBuilder.class).build();
+
+            assertAll(
+                () -> assertEquals(true, resultado.isAprovado())
+            );
+        }
+
+        @Test
+        @DisplayName("Quando o fornecedor aprova um entregador invalido")
+        void aprovaEntregadorInvalido() throws Exception {
+            String response = driver.perform(patch(URI_FORNECEDORES + "/" + fornecedor.getId() + "/aprovaEntregador")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", fornecedor.getCodigo())
+                            .param("entregadorId", "9999")
+                            .param("aprovado", "true"))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
+
+            assertAll(
+                () -> assertEquals("O entregador consultado nao existe!", resultado.getMessage())
+            );
+        }
+
+        @Test
+        @DisplayName("Quando o fornecedor aprova um entregador com codigo invalido")
+        void aprovaEntregadorCodigoAcessoInvalido() throws Exception {
+            String response = driver.perform(patch(URI_FORNECEDORES + "/" + fornecedor.getId() + "/aprovaEntregador")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", "invalido")
+                            .param("entregadorId", entregador.getId().toString())
+                            .param("aprovado", "true"))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
+
+            assertAll(
+                () -> assertEquals("Codigo de acesso invalido!", resultado.getMessage())
             );
         }
     }

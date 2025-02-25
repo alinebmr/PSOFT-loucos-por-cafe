@@ -72,4 +72,11 @@ public class EntregadorServiceImpl implements EntregadorService {
 
     }
 
+    @Override
+    public EntregadorResponseDTO alterarAprovacao(Long id, boolean aprovado) {
+        Entregador entregador = entregadorRespository.findById(id).orElseThrow(EntregadorNaoExisteException::new);
+        entregador.setAprovado(aprovado);
+        entregador = entregadorRespository.save(entregador);
+        return new EntregadorResponseDTO(entregador);
+    }
 }

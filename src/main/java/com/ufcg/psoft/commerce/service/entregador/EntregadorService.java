@@ -20,4 +20,5 @@ public interface EntregadorService {
 
     List<EntregadorResponseDTO> listarPorNome(String nome);
 
+    EntregadorResponseDTO alterarAprovacao(Long id, boolean aprovado);
 }

@@ -40,12 +40,16 @@ public class EntregadorResponseDTO {
     @NotBlank(message = "Cor do veiculo obrigatoria")
     private String corVeiculo;
 
+    @JsonProperty("aprovado")
+    private boolean aprovado;
+
     public EntregadorResponseDTO(Entregador entregador) {
         this.id = entregador.getId();
         this.nome = entregador.getNome();
         this.placaVeiculo = entregador.getPlacaVeiculo();
         this.tipoVeiculo = entregador.getTipoVeiculo();
         this.corVeiculo = entregador.getCorVeiculo();
+        this.aprovado = entregador.isAprovado();
     }
 
 }

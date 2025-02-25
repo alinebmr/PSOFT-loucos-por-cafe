@@ -41,4 +41,8 @@ public class Entregador {
     @Column(nullable = false)
     private String codigo;
 
+    @JsonProperty("aprovado")
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean aprovado = false;
 }

@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorResponseDTO;
 import com.ufcg.psoft.commerce.exception.CustomErrorType;
-import com.ufcg.psoft.commerce.model.Cliente;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -165,8 +164,28 @@ public class EntregadorControllerTests {
     }
 
     @Nested
+    @DisplayName("Conjunto de casos para status de aprovação")
+    class EntregadorStatusAprovado {
+        @Test
+        @DisplayName("Verificar status inicial de aprovação")
+        void statusInicial() throws Exception {
+            String responseJsonString = driver.perform(get(URI_ENTREGADORES + "/" + entregador.getId()))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+            EntregadorResponseDTO resultado = objectMapper.readValue(responseJsonString,
+                EntregadorResponseDTO.EntregadorResponseDTOBuilder.class).build();
+
+            assertFalse(resultado.isAprovado());
+        }
+    }
+
+    @Nested
     @DisplayName("Conjunto de casos de verificação da placa do veículo")
-    class ClienteVerificacaoPlacaVeiculo {
+    class EntregadorVerificacaoPlacaVeiculo {
 
         @Test
         @DisplayName("Quando alteramos a placa do veiculo do entregador com dados válidos")
@@ -239,7 +258,7 @@ public class EntregadorControllerTests {
 
     @Nested
     @DisplayName("Conjunto de casos de verificação do tipo do veiculo")
-    class ClienteVerificacaoTipoVeiculo {
+    class EntregadorVerificacaoTipoVeiculo {
 
         @Test
         @DisplayName("Quando alteramos o tipo do veiculo do entregador com dados válidos")
@@ -313,7 +332,7 @@ public class EntregadorControllerTests {
 
     @Nested
     @DisplayName("Conjunto de casos de verificação da cor do veiculo")
-    class ClienteVerificacaoCorVeiculo {
+    class EntregadorVerificacaoCorVeiculo {
 
         @Test
         @DisplayName("Quando alteramos o tipo do veiculo do entregador com dados válidos")
@@ -384,9 +403,6 @@ public class EntregadorControllerTests {
                     () -> assertEquals("Cor do veiculo obrigatoria", resultado.getErrors().get(0)));
         }
     }
-
-
-
 
     @Nested
     @DisplayName("Conjunto de casos de verificação do código de acesso")
