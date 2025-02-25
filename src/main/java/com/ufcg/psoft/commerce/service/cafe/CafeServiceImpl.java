@@ -78,7 +78,7 @@ public class CafeServiceImpl implements CafeService{
     }
 
     @Override
-    public List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor, String codigoAcesso) {
+    public List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor) {
         Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(FornecedorNaoExisteException::new);
         List<Cafe> cafes = cafeRepository.findByFornecedor(fornecedor);
         return cafes.stream()

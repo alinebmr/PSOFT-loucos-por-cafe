@@ -10,7 +10,7 @@ public interface CafeService {
 
     List<CafeResponseDTO> listar();
 
-    List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor, String codigoAcesso);
+    List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor);
 
     CafeResponseDTO recuperar(Long id);
 

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 )
 
 public class CafeController {
-    
+
     @Autowired
     CafeService cafeService;
 
@@ -62,13 +62,12 @@ public class CafeController {
 
     @GetMapping("")
     public ResponseEntity<?> listarCafePorFornecedores(
-            @RequestParam(required = false, defaultValue = "") Long idFornecedor, 
-            @RequestParam(required = false, defaultValue = "") String codigoAcesso) {
+            @RequestParam(required = false, defaultValue = "") Long idFornecedor) {
 
         if (idFornecedor != null && idFornecedor != 0) {
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(cafeService.listarPorFornecedor(idFornecedor, codigoAcesso));
+                    .body(cafeService.listarPorFornecedor(idFornecedor));
         }
         return ResponseEntity
                 .status(HttpStatus.OK)
