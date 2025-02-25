@@ -1,5 +1,6 @@
 package com.ufcg.psoft.commerce.service.fornecedor;
 
+import com.ufcg.psoft.commerce.dto.entregador.EntregadorResponseDTO;
 import com.ufcg.psoft.commerce.dto.fornecedor.*;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface FornecedorService {
     void remover(Long id, String codigoAcesso);
 
     List<FornecedorResponseDTO> listarPorNome(String nomeEmpresa);
+
+    EntregadorResponseDTO alterarAprovacaoEntregador(Long fornecedorId, String codigoAcesso, Long entregadorId, boolean aprovado);
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ufcg.psoft.commerce.dto.EnderecoDTO;
 import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
+import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.exception.CustomErrorType;
 import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.model.Endereco;
@@ -256,6 +257,75 @@ public class ClienteControllerTests {
                     () -> assertEquals("Erros de validacao encontrados", resultado.getMessage()),
                     () -> assertEquals("CEP deve ter exatamente 8 digitos numericos", resultado.getErrors().get(0))
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("Conjunto de casos de verificação de assinatura")
+    class ClienteVerificacaoAssinatura {
+        @Test
+        @DisplayName("Quando alteramos a assinatura do cliente pra normal")
+        void alteraAssinaturaClientePraNormal() throws Exception {
+            // Arrange
+            clientePostPutRequestDTO.setAssinatura(TipoAssinatura.NORMAL);
+
+            // Act
+            String responseJsonString = driver.perform(put(URI_CLIENTES + "/" + cliente.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("codigo", cliente.getCodigo())
+                        .content(objectMapper.writeValueAsString(clientePostPutRequestDTO)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn().getResponse().getContentAsString();
+
+            Cliente resultado = objectMapper.readValue(responseJsonString, Cliente.ClienteBuilder.class).build();
+
+            // Assert
+            assertEquals(TipoAssinatura.NORMAL, resultado.getAssinatura());
+        }
+
+        @Test
+        @DisplayName("Quando alteramos a assinatura do cliente pra premium")
+        void alteraAssinaturaClientePraPremium() throws Exception {
+            // Arrange
+            clientePostPutRequestDTO.setAssinatura(TipoAssinatura.PREMIUM);
+
+            // Act
+            String responseJsonString = driver.perform(put(URI_CLIENTES + "/" + cliente.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("codigo", cliente.getCodigo())
+                        .content(objectMapper.writeValueAsString(clientePostPutRequestDTO)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn().getResponse().getContentAsString();
+
+            Cliente resultado = objectMapper.readValue(responseJsonString, Cliente.ClienteBuilder.class).build();
+
+            // Assert
+            assertEquals(TipoAssinatura.PREMIUM, resultado.getAssinatura());
+        }
+
+        @Test
+        @DisplayName("Quando alteramos a assinatura do cliente pra null")
+        void alteraAssinaturaClientePraNull() throws Exception {
+            // Arrange
+            // Null significa que não deve ser alterado a assinatura do cliente
+            clientePostPutRequestDTO.setAssinatura(null);
+
+            // Act
+            String responseJsonString = driver.perform(put(URI_CLIENTES + "/" + cliente.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("codigo", cliente.getCodigo())
+                        .content(objectMapper.writeValueAsString(clientePostPutRequestDTO)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn().getResponse().getContentAsString();
+
+            Cliente resultado = objectMapper.readValue(responseJsonString, Cliente.ClienteBuilder.class).build();
+
+            // Assert
+            // cliente já tinha assinatura como normal
+            assertEquals(TipoAssinatura.NORMAL, resultado.getAssinatura());
         }
     }
 

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
     produces = MediaType.APPLICATION_JSON_VALUE
 )
 public class FornecedorController {
-    
+
     @Autowired
     FornecedorService fornecedorService;
 
@@ -68,5 +68,16 @@ public class FornecedorController {
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .body("");
+    }
+
+    @PatchMapping("/{id}/aprovaEntregador")
+    public ResponseEntity<?> aprovaEntregador(
+        @PathVariable Long id,
+        @RequestParam String codigo,
+        @RequestParam Long entregadorId,
+        @RequestParam boolean aprovado) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(fornecedorService.alterarAprovacaoEntregador(id, codigo, entregadorId, aprovado));
     }
 }

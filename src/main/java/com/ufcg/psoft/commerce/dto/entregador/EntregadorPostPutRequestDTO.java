@@ -1,11 +1,7 @@
-package com.ufcg.psoft.commerce.dto.cliente;
+package com.ufcg.psoft.commerce.dto.entregador;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ufcg.psoft.commerce.dto.EnderecoDTO;
-import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 
-import jakarta.annotation.Nullable;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -18,20 +14,23 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientePostPutRequestDTO {
+public class EntregadorPostPutRequestDTO {
 
     @JsonProperty("nome")
     @NotBlank(message = "Nome obrigatorio")
     private String nome;
 
-    @JsonProperty("endereco")
-    @Valid
-    @NotNull(message = "Endereco obrigatorio")
-    private EnderecoDTO endereco;
+    @JsonProperty("placa_veiculo")
+    @NotBlank(message = "Placa do veiculo obrigatoria")
+    private String placaVeiculo;
 
-    @JsonProperty("assinatura")
-    @Nullable
-    private TipoAssinatura assinatura;
+    @JsonProperty("tipo_veiculo")
+    @NotBlank(message = "Tipo do veiculo obrigatorio")
+    private String tipoVeiculo;
+
+    @JsonProperty("cor_veiculo")
+    @NotBlank(message = "Cor do veiculo obrigatoria")
+    private String corVeiculo;
 
     @JsonProperty("codigo")
     @NotNull(message = "Codigo de acesso obrigatorio")

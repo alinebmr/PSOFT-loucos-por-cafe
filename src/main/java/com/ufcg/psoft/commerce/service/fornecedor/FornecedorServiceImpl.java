@@ -4,7 +4,9 @@ import com.ufcg.psoft.commerce.exception.FornecedorNaoExisteException;
 import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
 import com.ufcg.psoft.commerce.exception.AdminInvalidoException;
 import com.ufcg.psoft.commerce.repository.FornecedorRepository;
+import com.ufcg.psoft.commerce.service.entregador.EntregadorService;
 import com.ufcg.psoft.commerce.repository.AdminRepository;
+import com.ufcg.psoft.commerce.dto.entregador.EntregadorResponseDTO;
 import com.ufcg.psoft.commerce.dto.fornecedor.*;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 import org.modelmapper.ModelMapper;
@@ -21,6 +23,8 @@ public class FornecedorServiceImpl implements FornecedorService {
     FornecedorRepository fornecedorRepository;
     @Autowired
     AdminRepository adminRepository;
+    @Autowired
+    EntregadorService entregadorService;
     @Autowired
     ModelMapper modelMapper;
 
@@ -74,5 +78,15 @@ public class FornecedorServiceImpl implements FornecedorService {
     public FornecedorResponseDTO recuperar(Long id) {
         Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(FornecedorNaoExisteException::new);
         return new FornecedorResponseDTO(fornecedor);
+    }
+
+    @Override
+    public EntregadorResponseDTO alterarAprovacaoEntregador(Long fornecedorId, String codigoAcesso, Long entregadorId,
+        boolean aprovado) {
+        Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId).orElseThrow(FornecedorNaoExisteException::new);
+        if (!fornecedor.getCodigo().equals(codigoAcesso)) {
+            throw new CodigoDeAcessoInvalidoException();
+        }
+        return entregadorService.alterarAprovacao(entregadorId, aprovado);
     }
 }

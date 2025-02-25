@@ -2,6 +2,7 @@ package com.ufcg.psoft.commerce.dto.cliente;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.dto.EnderecoDTO;
+import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.model.Cliente;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,9 +32,13 @@ public class ClienteResponseDTO {
     @NotBlank(message = "Endereco obrigatorio")
     private EnderecoDTO endereco;
 
+    @JsonProperty("assinatura")
+    private TipoAssinatura assinatura;
+
     public ClienteResponseDTO(Cliente cliente) {
         this.id = cliente.getId();
         this.nome = cliente.getNome();
         this.endereco = new EnderecoDTO(cliente.getEndereco());
+        this.assinatura = cliente.getAssinatura();
     }
 }
