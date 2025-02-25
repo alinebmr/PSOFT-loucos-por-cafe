@@ -41,7 +41,7 @@ public class CafeServiceImpl implements CafeService{
     }
 
     @Override
-    public void remover(Long idFornecedor, String codigoAcesso, Long idCafe) {
+    public void remover(Long idCafe, Long idFornecedor, String codigoAcesso) {
         Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(FornecedorNaoExisteException::new);
         if (!fornecedor.getCodigo().equals(codigoAcesso)) {
             throw new CodigoDeAcessoInvalidoException();

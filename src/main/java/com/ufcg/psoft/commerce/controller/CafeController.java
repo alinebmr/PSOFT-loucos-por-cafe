@@ -33,9 +33,9 @@ public class CafeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirCafe(
             @PathVariable Long idCafe,
-            @RequestParam String codigo,
-            @RequestParam Long idFornecedor) {
-        cafeService.remover(idFornecedor, codigo, idCafe);
+            @RequestParam Long idFornecedor,
+            @RequestParam String codigo) {
+        cafeService.remover(idCafe, idFornecedor, codigo);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .body("");

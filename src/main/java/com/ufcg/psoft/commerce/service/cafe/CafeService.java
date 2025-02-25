@@ -16,5 +16,5 @@ public interface CafeService {
 
     CafeResponseDTO criar(Long idFornecedor, String codigoAcesso, CafePostPutRequestDTO cafePostPutRequestDTO);
 
-    void remover(Long idFornecedor, String codigoAcesso, Long idCafe);
+    void remover(Long idCafe, Long idFornecedor, String codigoAcesso);
 }

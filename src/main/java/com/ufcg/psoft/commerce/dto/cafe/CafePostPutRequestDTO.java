@@ -50,11 +50,12 @@ public class CafePostPutRequestDTO {
     
     @JsonProperty("qualidade")
     @Valid
-    @NotBlank(message = "Qualidade obrigatorio")
+    @NotNull(message = "Qualidade obrigatoria")
     private QualidadeCafe qualidade;
 
     @JsonProperty("tamanhoEmbalagem")
     @Valid
+    @Min(value = 0L, message = "Tamanho da embalagem deve ser maior que 0")
     @NotNull(message = "Tamanho da embalagem obrigatorio")
     private Integer tamanhoEmbalagem;
 }

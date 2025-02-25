@@ -40,7 +40,7 @@ public class CafeResponseDTO {
     private String origem;
     
     @JsonProperty("tipo")
-    @NotBlank(message = "Tipo obrigatorio")
+    @NotNull(message = "Tipo obrigatorio")
     private TipoGraoCafe tipo;
     
     @JsonProperty("perfil")
@@ -53,11 +53,12 @@ public class CafeResponseDTO {
     private double preco;
 
     @JsonProperty("qualidade")
-    @NotBlank(message = "Qualidade obrigatoria")
+    @NotNull(message = "Qualidade obrigatoria")
     private QualidadeCafe qualidade;
 
     @JsonProperty("tamanhoEmbalagem")
-    @NotBlank(message = "Nome obrigatorio")
+    @Min(value = 0L, message = "Tamanho da embalagem deve ser maior que 0")
+    @NotBlank(message = "Tamanho da embalagem obrigatorio")
     private Integer tamanhoEmbalagem;
 
     public CafeResponseDTO(Cafe cafe) {
