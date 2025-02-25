@@ -38,11 +38,11 @@ public class CafeResponseDTO {
     @JsonProperty("origem")
     @NotBlank(message = "Origem obrigatoria")
     private String origem;
-    
+
     @JsonProperty("tipo")
     @NotNull(message = "Tipo obrigatorio")
     private TipoGraoCafe tipo;
-    
+
     @JsonProperty("perfil")
     @NotBlank(message = "Perfil sensorial obrigatorio")
     private String perfil;
@@ -61,9 +61,12 @@ public class CafeResponseDTO {
     @NotBlank(message = "Tamanho da embalagem obrigatorio")
     private Integer tamanhoEmbalagem;
 
+    @JsonProperty("disponivel")
+    private boolean disponivel;
+
     public CafeResponseDTO(Cafe cafe) {
         this.id = cafe.getId();
-        this.idFornecedor = cafe.getIdFornecedor();
+        this.idFornecedor = cafe.getFornecedor().getId();
         this.nome = cafe.getNome();
         this.origem = cafe.getOrigem();
         this.tipo = cafe.getTipo();
@@ -71,5 +74,6 @@ public class CafeResponseDTO {
         this.preco = cafe.getPreco();
         this.qualidade = cafe.getQualidade();
         this.tamanhoEmbalagem = cafe.getTamanhoEmbalagem();
+        this.disponivel = cafe.isDisponivel();
     }
 }

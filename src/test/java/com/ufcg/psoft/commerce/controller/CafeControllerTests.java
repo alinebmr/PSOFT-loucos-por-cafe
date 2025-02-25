@@ -74,7 +74,7 @@ public class CafeControllerTests {
         // Object Mapper suporte para LocalDateTime
         objectMapper.registerModule(new JavaTimeModule());
         cafe = cafeRepository.save(Cafe.builder()
-                .idFornecedor(fornecedor.getId())
+                .fornecedor(fornecedor)
                 .nome("Cafe Muito Bom")
                 .origem("Xique-Xique Bahia")
                 .tipo(TipoGraoCafe.GRAO)
@@ -114,7 +114,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals("Cafe Muito Bom", resultado.getNome());
@@ -136,7 +136,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals("Cafe Bom Alterado", resultado.getNome());
@@ -207,7 +207,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals("Xique-Xique Bahia", resultado.getOrigem());
@@ -230,7 +230,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals("Guarabira Paraiba", resultado.getOrigem());
@@ -301,7 +301,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals(TipoGraoCafe.GRAO, resultado.getTipo());
@@ -324,7 +324,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals(TipoGraoCafe.CAPSULA, resultado.getTipo());
@@ -371,7 +371,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals("Frutas Vermelhas", resultado.getPerfil());
@@ -393,7 +393,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals("Achocolatado", resultado.getPerfil());
@@ -464,7 +464,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals(24.99, resultado.getPreco());
@@ -486,7 +486,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals(15.29, resultado.getPreco());
@@ -532,7 +532,7 @@ public class CafeControllerTests {
                         .andDo(print())
                         .andReturn().getResponse().getContentAsString();
 
-                Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+                CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
                 // Assert
                 assertEquals(35, resultado.getTamanhoEmbalagem());
@@ -555,7 +555,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals(15, resultado.getTamanhoEmbalagem());
@@ -600,7 +600,7 @@ public class CafeControllerTests {
                         .andDo(print())
                         .andReturn().getResponse().getContentAsString();
 
-                Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+                CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
                 // Assert
                 assertEquals(QualidadeCafe.NORMAL, resultado.getQualidade());
@@ -622,7 +622,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertEquals(QualidadeCafe.PREMIUM, resultado.getQualidade());
@@ -667,7 +667,7 @@ public class CafeControllerTests {
                         .andDo(print())
                         .andReturn().getResponse().getContentAsString();
 
-                Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+                CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
                 // Assert
                 assertEquals(true, resultado.isDisponivel());
@@ -684,7 +684,7 @@ public class CafeControllerTests {
             // Arrange
             // Vamos ter 3 clientes no banco
             Cafe cafe1 = Cafe.builder()
-                    .idFornecedor(cafe.getIdFornecedor())
+                    .fornecedor(fornecedor)
                     .nome("Cafe exemplo1")
                     .origem("Campina Grande Paraiba")
                     .tipo(TipoGraoCafe.CAPSULA)
@@ -694,7 +694,7 @@ public class CafeControllerTests {
                     .tamanhoEmbalagem(10)
                     .build();
            Cafe cafe2 = Cafe.builder()
-                    .idFornecedor(cafe.getIdFornecedor())
+                    .fornecedor(fornecedor)
                     .nome("Cafe exemplo2")
                     .origem("Campina Grande Paraiba")
                     .tipo(TipoGraoCafe.CAPSULA)
@@ -713,7 +713,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            List<Cafe> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
+            List<CafeResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
             });
 
             // Assert
@@ -728,7 +728,7 @@ public class CafeControllerTests {
             // Arrange
             // Vamos ter 3 clientes no banco
             Cafe cafe1 = Cafe.builder()
-                    .idFornecedor(cafe.getIdFornecedor())
+                    .fornecedor(fornecedor)
                     .nome("Cafe exemplo1")
                     .origem("Campina Grande Paraiba")
                     .tipo(TipoGraoCafe.CAPSULA)
@@ -785,7 +785,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             assertAll(
                     () -> assertNotNull(cafe.getId()),
@@ -808,7 +808,7 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
             // Assert
             assertAll(

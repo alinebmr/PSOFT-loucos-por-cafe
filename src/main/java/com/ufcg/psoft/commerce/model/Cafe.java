@@ -23,9 +23,8 @@ public class Cafe {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @JsonProperty("idFornecedor")
-    @Column(nullable = false)
-    private Long idFornecedor;
+    @ManyToOne
+    private Fornecedor fornecedor;
 
     @JsonProperty("nome")
     @Column(nullable = false)
@@ -57,7 +56,7 @@ public class Cafe {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private QualidadeCafe qualidade;
-    
+
     @JsonProperty("tamanhoEmbalagem")
     @Column(nullable = false)
     private Integer tamanhoEmbalagem;

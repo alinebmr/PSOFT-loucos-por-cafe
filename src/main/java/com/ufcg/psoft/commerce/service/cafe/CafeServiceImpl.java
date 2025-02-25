@@ -36,7 +36,7 @@ public class CafeServiceImpl implements CafeService{
             throw new CodigoDeAcessoInvalidoException();
         }
         Cafe cafe = modelMapper.map(cafePostPutRequestDTO, Cafe.class);
-        cafe.setIdFornecedor(idFornecedor);
+        cafe.setFornecedor(fornecedor);
         cafeRepository.save(cafe);
         return modelMapper.map(cafe, CafeResponseDTO.class);
     }
@@ -79,7 +79,8 @@ public class CafeServiceImpl implements CafeService{
 
     @Override
     public List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor, String codigoAcesso) {
-        List<Cafe> cafes = cafeRepository.findByIdFornecedorContaining(idFornecedor);
+        Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(FornecedorNaoExisteException::new);
+        List<Cafe> cafes = cafeRepository.findByFornecedor(fornecedor);
         return cafes.stream()
                 .map(CafeResponseDTO::new)
                 .collect(Collectors.toList());
