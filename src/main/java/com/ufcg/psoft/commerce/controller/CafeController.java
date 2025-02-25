@@ -20,7 +20,7 @@ public class CafeController {
     @Autowired
     CafeService cafeService;
 
-        @PostMapping()
+    @PostMapping()
     public ResponseEntity<?> criarCafe(
             @RequestParam Long idFornecedor,
             @RequestParam String codigoAcesso,
@@ -32,10 +32,10 @@ public class CafeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirCafe(
-            @PathVariable Long idCafe,
+            @PathVariable Long id,
             @RequestParam Long idFornecedor,
             @RequestParam String codigo) {
-        cafeService.remover(idCafe, idFornecedor, codigo);
+        cafeService.remover(id, idFornecedor, codigo);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .body("");

@@ -62,6 +62,7 @@ public class ClienteController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirCliente(
             @PathVariable Long id,
+            @RequestParam String a,
             @RequestParam String codigo) {
         clienteService.remover(id, codigo);
         return ResponseEntity

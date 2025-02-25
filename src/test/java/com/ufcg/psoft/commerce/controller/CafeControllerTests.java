@@ -5,15 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ufcg.psoft.commerce.dto.cafe.CafePostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
-import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
 import com.ufcg.psoft.commerce.dto.fornecedor.FornecedorPostPutRequestDTO;
-import com.ufcg.psoft.commerce.dto.fornecedor.FornecedorResponseDTO;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
 import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 import com.ufcg.psoft.commerce.exception.CustomErrorType;
 import com.ufcg.psoft.commerce.model.Cafe;
-import com.ufcg.psoft.commerce.model.Cliente;
-import com.ufcg.psoft.commerce.model.Endereco;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 import com.ufcg.psoft.commerce.repository.CafeRepository;
 import com.ufcg.psoft.commerce.repository.FornecedorRepository;
@@ -89,7 +85,7 @@ public class CafeControllerTests {
                 .build()
         );
         cafePostPutRequestDTO = CafePostPutRequestDTO.builder()
-                .idFornecedor(fornecedor.getId())
+                .idFornecedor(cafe.getIdFornecedor())
                 .nome(cafe.getNome())
                 .origem(cafe.getOrigem())
                 .tipo(cafe.getTipo())
@@ -802,12 +798,10 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando alteramos o cafe com dados válidos")
         void quandoAlteramosCafeValido() throws Exception {
-            // Arrange
-            Long cafeID = cafe.getId();
-
+            
             // Act
-            String responseJsonString = driver.perform(put(URI_CAFES + "/" + cafeID)
-                            .param("IdFornecedor", fornecedor.getId().toString())
+            String responseJsonString = driver.perform(put(URI_CAFES + "/" + cafe.getId())
+                            .param("idFornecedor", fornecedor.getId().toString())
                             .param("codigo", fornecedor.getCodigo())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(cafePostPutRequestDTO)))
@@ -819,7 +813,7 @@ public class CafeControllerTests {
 
             // Assert
             assertAll(
-                    () -> assertEquals(resultado.getId().longValue(), cafeID),
+                    () -> assertEquals(resultado.getId().longValue(), cafe.getId()),
                     () -> assertEquals(cafePostPutRequestDTO.getNome(), resultado.getNome())
             );
         }
@@ -833,7 +827,7 @@ public class CafeControllerTests {
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("idFornecedor", fornecedor.getId().toString())
                             .param("codigo", fornecedor.getCodigo())
-                            .content(objectMapper.writeValueAsString(fornecedorPostPutRequestDTO)))
+                            .content(objectMapper.writeValueAsString(cafePostPutRequestDTO)))
                     .andExpect(status().isBadRequest())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -841,7 +835,7 @@ public class CafeControllerTests {
             CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
 
             assertAll(
-                    () -> assertEquals("O fornecedor consultado nao existe!", resultado.getMessage())
+                    () -> assertEquals("O cafe consultado nao existe!", resultado.getMessage())
             );
         }
 
@@ -853,9 +847,9 @@ public class CafeControllerTests {
 
             String response = driver.perform(put(URI_CAFES + "/" + cafeId)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .param("idFornecedor", "invalido")
+                            .param("idFornecedor", "9999")
                             .param("codigo", fornecedor.getCodigo())
-                            .content(objectMapper.writeValueAsString(fornecedorPostPutRequestDTO)))
+                            .content(objectMapper.writeValueAsString(cafePostPutRequestDTO)))
                     .andExpect(status().isBadRequest())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -878,7 +872,7 @@ public class CafeControllerTests {
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("idFornecedor", fornecedor.getId().toString())
                             .param("codigo", "invalido")
-                            .content(objectMapper.writeValueAsString(fornecedorPostPutRequestDTO)))
+                            .content(objectMapper.writeValueAsString(cafePostPutRequestDTO)))
                     .andExpect(status().isBadRequest())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -931,7 +925,7 @@ public class CafeControllerTests {
             
             String response = driver.perform(delete(URI_CAFES + "/" + cafe.getId())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .param("idFornecedor", "invalido")
+                            .param("idFornecedor", "9999")
                             .param("codigo", fornecedor.getCodigo()))
                     .andExpect(status().isBadRequest())
                     .andDo(print())
