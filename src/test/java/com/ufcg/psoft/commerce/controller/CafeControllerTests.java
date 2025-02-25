@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Testes do controlador de Cafes")
 
 public class CafeControllerTests {
-    
+
     final String URI_CAFES = "/cafes";
 
     @Autowired
@@ -85,7 +85,6 @@ public class CafeControllerTests {
                 .build()
         );
         cafePostPutRequestDTO = CafePostPutRequestDTO.builder()
-                .idFornecedor(cafe.getIdFornecedor())
                 .nome(cafe.getNome())
                 .origem(cafe.getOrigem())
                 .tipo(cafe.getTipo())
@@ -120,7 +119,7 @@ public class CafeControllerTests {
             // Assert
             assertEquals("Cafe Muito Bom", resultado.getNome());
         }
-        
+
 
         @Test
         @DisplayName("Quando alteramos o nome do cafe com dados válidos")
@@ -193,7 +192,7 @@ public class CafeControllerTests {
             );
         }
     }
-    
+
     @Nested
     @DisplayName("Conjunto de casos de verificação de origem")
     class CafeVerificacaoOrigem {
@@ -213,14 +212,14 @@ public class CafeControllerTests {
             // Assert
             assertEquals("Xique-Xique Bahia", resultado.getOrigem());
         }
-    
+
 
         @Test
         @DisplayName("Quando alteramos o nome do cafe com dados válidos")
         void quandoAlteramosOrigemDoCafeValido() throws Exception {
             // Arrange
             cafePostPutRequestDTO.setOrigem("Guarabira Paraiba");
-            
+
             // Act
             String responseJsonString = driver.perform(put(URI_CAFES + "/" + cafe.getId())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -307,14 +306,14 @@ public class CafeControllerTests {
             // Assert
             assertEquals(TipoGraoCafe.GRAO, resultado.getTipo());
         }
-    
+
 
         @Test
         @DisplayName("Quando alteramos o tipo do cafe com dados válidos")
         void quandoAlteramosTipoDoCafeValido() throws Exception {
             // Arrange
             cafePostPutRequestDTO.setTipo(TipoGraoCafe.CAPSULA);
-           
+
             // Act
             String responseJsonString = driver.perform(put(URI_CAFES + "/" + cafe.getId())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -357,7 +356,7 @@ public class CafeControllerTests {
         }
 
     }
-    
+
     @Nested
     @DisplayName("Conjunto de casos de verificação de perfil")
     class CafeVerificacaoPerfil {
@@ -377,7 +376,7 @@ public class CafeControllerTests {
             // Assert
             assertEquals("Frutas Vermelhas", resultado.getPerfil());
         }
-    
+
 
         @Test
         @DisplayName("Quando alteramos o perfil do cafe com dados válidos")
@@ -470,7 +469,7 @@ public class CafeControllerTests {
             // Assert
             assertEquals(24.99, resultado.getPreco());
         }
-    
+
 
         @Test
         @DisplayName("Quando alteramos o preco do cafe com dados válidos")
@@ -532,13 +531,13 @@ public class CafeControllerTests {
                         .andExpect(status().isOk())
                         .andDo(print())
                         .andReturn().getResponse().getContentAsString();
-    
+
                 Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
-    
+
                 // Assert
                 assertEquals(35, resultado.getTamanhoEmbalagem());
         }
-        
+
 
         @Test
         @DisplayName("Quando alteramos o tamanho da embalagem do cafe com dados válidos")
@@ -600,13 +599,13 @@ public class CafeControllerTests {
                         .andExpect(status().isOk())
                         .andDo(print())
                         .andReturn().getResponse().getContentAsString();
-    
+
                 Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
-    
+
                 // Assert
                 assertEquals(QualidadeCafe.NORMAL, resultado.getQualidade());
         }
-        
+
 
         @Test
         @DisplayName("Quando alteramos a qualidade do cafe com dados válidos")
@@ -667,9 +666,9 @@ public class CafeControllerTests {
                         .andExpect(status().isOk())
                         .andDo(print())
                         .andReturn().getResponse().getContentAsString();
-    
+
                 Cafe resultado = objectMapper.readValue(responseJsonString, Cafe.CafeBuilder.class).build();
-    
+
                 // Assert
                 assertEquals(true, resultado.isDisponivel());
         }
@@ -758,7 +757,7 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando buscamos um cafe inexistente")
         void buscaPorUmCafeInexistente() throws Exception {
-            
+
             String responseJsonString = driver.perform(get(URI_CAFES + "/" + 999999999)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(cafePostPutRequestDTO)))
@@ -772,11 +771,11 @@ public class CafeControllerTests {
                     () -> assertEquals("O cafe consultado nao existe!", resultado.getMessage())
             );
         }
-        
+
         @Test
         @DisplayName("Quando criamos um novo cafe com dados válidos")
         void criarCafeValido() throws Exception {
-            
+
             String responseJsonString = driver.perform(post(URI_CAFES)
                             .param("idFornecedor", fornecedor.getId().toString())
                             .param("codigoAcesso", fornecedor.getCodigo())
@@ -794,11 +793,11 @@ public class CafeControllerTests {
             );
 
         }
-        
+
         @Test
         @DisplayName("Quando alteramos o cafe com dados válidos")
         void quandoAlteramosCafeValido() throws Exception {
-            
+
             // Act
             String responseJsonString = driver.perform(put(URI_CAFES + "/" + cafe.getId())
                             .param("idFornecedor", fornecedor.getId().toString())
@@ -817,12 +816,12 @@ public class CafeControllerTests {
                     () -> assertEquals(cafePostPutRequestDTO.getNome(), resultado.getNome())
             );
         }
-        
+
 
         @Test
         @DisplayName("Quando alteramos o cafe inexistente")
         void alteramosCafeInexistente() throws Exception {
-            
+
             String response = driver.perform(put(URI_CAFES + "/" + 99999L)
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("idFornecedor", fornecedor.getId().toString())
@@ -842,7 +841,7 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando alteramos o cafe passando id de fornecedor inválido")
         void alteraCafeIdFornecedorInvalido() throws Exception {
-            
+
             Long cafeId = cafe.getId();
 
             String response = driver.perform(put(URI_CAFES + "/" + cafeId)
@@ -865,7 +864,7 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando alteramos o cafe passando codigo de acesso de fornecedor inválido")
         void alteraCafeCodigoAcessoInvalido() throws Exception {
-            
+
             Long cafeId = cafe.getId();
 
             String response = driver.perform(put(URI_CAFES + "/" + cafeId)
@@ -884,11 +883,11 @@ public class CafeControllerTests {
                     () -> assertEquals("Codigo de acesso invalido!", resultado.getMessage())
             );
         }
-        
+
         @Test
         @DisplayName("Quando excluímos um cafe salvo")
         void excluiCafeValido() throws Exception {
-            
+
             String response = driver.perform(delete(URI_CAFES + "/" + cafe.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("idFornecedor", fornecedor.getId().toString())
@@ -903,7 +902,7 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando excluímos um cafe inexistente")
         void excluiCafeInexistente() throws Exception {
-            
+
             String response = driver.perform(delete(URI_CAFES + "/" + 999999)
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("idFornecedor", fornecedor.getId().toString())
@@ -922,7 +921,7 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando excluímos um cafe salvo passando id de fornecedor inválido")
         void excluiCafeIdFornecedorInvalido() throws Exception {
-            
+
             String response = driver.perform(delete(URI_CAFES + "/" + cafe.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("idFornecedor", "9999")
@@ -941,7 +940,7 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando excluímos um cafe salvo passando codigo de acesso inválido")
         void excluiCafeCodigoAcessoInvalido() throws Exception {
-            
+
             String response = driver.perform(delete(URI_CAFES + "/" + cafe.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("idFornecedor", fornecedor.getId().toString())

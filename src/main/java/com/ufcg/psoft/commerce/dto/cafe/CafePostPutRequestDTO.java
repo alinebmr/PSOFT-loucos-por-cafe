@@ -18,11 +18,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CafePostPutRequestDTO {
-
-    @JsonProperty("idFornecedor")
-    @NotNull(message = "Id do fornecedor obrigatorio")
-    private Long idFornecedor;
-
     @JsonProperty("nome")
     @NotBlank(message = "Nome obrigatorio")
     private String nome;
@@ -31,12 +26,12 @@ public class CafePostPutRequestDTO {
     @Valid
     @NotBlank(message = "Origem obrigatoria")
     private String origem;
-    
+
     @JsonProperty("tipo")
     @Valid
     @NotNull(message = "Tipo obrigatorio")
     private TipoGraoCafe tipo;
-    
+
     @JsonProperty("perfil")
     @Valid
     @NotBlank(message = "Perfil sensorial obrigatorio")
@@ -47,7 +42,7 @@ public class CafePostPutRequestDTO {
     @Min(value = 0L, message = "Preco deve ser maior que 0")
     @NotNull(message = "Preço obrigatorio")
     private double preco;
-    
+
     @JsonProperty("qualidade")
     @Valid
     @NotNull(message = "Qualidade obrigatoria")
