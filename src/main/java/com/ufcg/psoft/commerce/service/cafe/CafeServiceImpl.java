@@ -4,16 +4,21 @@ import com.ufcg.psoft.commerce.exception.FornecedorNaoExisteException;
 import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
 import com.ufcg.psoft.commerce.exception.CafeNaoExisteException;
 import com.ufcg.psoft.commerce.repository.FornecedorRepository;
+import com.ufcg.psoft.commerce.service.cliente.ClienteService;
 import com.ufcg.psoft.commerce.repository.AdminRepository;
 import com.ufcg.psoft.commerce.repository.CafeRepository;
 import com.ufcg.psoft.commerce.dto.cafe.CafePostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
+import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
+import com.ufcg.psoft.commerce.enums.QualidadeCafe;
+import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.model.Cafe;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +33,8 @@ public class CafeServiceImpl implements CafeService{
     ModelMapper modelMapper;
     @Autowired
     CafeRepository cafeRepository;
+    @Autowired
+    ClienteService clienteService;
 
     @Override
     public CafeResponseDTO criar(Long idFornecedor, String codigoAcesso, CafePostPutRequestDTO cafePostPutRequestDTO) {
@@ -81,6 +88,21 @@ public class CafeServiceImpl implements CafeService{
     public List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor) {
         Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(FornecedorNaoExisteException::new);
         List<Cafe> cafes = cafeRepository.findByFornecedor(fornecedor);
+        return cafes.stream()
+                .map(CafeResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CafeResponseDTO> listarFiltraQualidade(Long idCliente) {
+        ClienteResponseDTO cliente = clienteService.recuperar(idCliente);
+
+        HashMap<TipoAssinatura, QualidadeCafe> tipos = new HashMap<>();
+        tipos.put(TipoAssinatura.NORMAL, QualidadeCafe.NORMAL);
+        tipos.put(TipoAssinatura.PREMIUM, QualidadeCafe.PREMIUM);
+
+        List<Cafe> cafes = cafeRepository.findByQualidade(tipos.get(cliente.getAssinatura()));
+
         return cafes.stream()
                 .map(CafeResponseDTO::new)
                 .collect(Collectors.toList());

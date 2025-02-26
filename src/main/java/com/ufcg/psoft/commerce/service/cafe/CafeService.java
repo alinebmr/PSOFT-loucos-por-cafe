@@ -10,6 +10,8 @@ public interface CafeService {
 
     List<CafeResponseDTO> listar();
 
+    List<CafeResponseDTO> listarFiltraQualidade(Long idCliente);
+
     List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor);
 
     CafeResponseDTO recuperar(Long id);

@@ -73,4 +73,13 @@ public class CafeController {
                 .status(HttpStatus.OK)
                 .body(cafeService.listar());
     }
+
+    @GetMapping("/listaQualidade")
+    public ResponseEntity<?> listarCafeFiltradoQualidade(
+            @RequestParam Long idCliente) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(cafeService.listarFiltraQualidade(idCliente));
+    }
 }
