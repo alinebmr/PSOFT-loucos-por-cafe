@@ -1,4 +1,4 @@
-package com.ufcg.psoft.commerce.controller.Entregador;
+package com.ufcg.psoft.commerce.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
