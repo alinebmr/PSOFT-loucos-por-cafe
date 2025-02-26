@@ -1,6 +1,7 @@
 package com.ufcg.psoft.commerce.repository;
 
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
+import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 import com.ufcg.psoft.commerce.model.Cafe;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 
@@ -13,6 +14,12 @@ public interface CafeRepository extends JpaRepository<Cafe, Long> {
 
     List<Cafe> findByFornecedor(Fornecedor fornecedor);
 
-    List<Cafe> findByQualidade(QualidadeCafe qualidade);
+    List<Cafe> findByDisponivel(boolean disponivel);
+
+    List<Cafe> findByTipoAndDisponivel(TipoGraoCafe tipo, boolean disponivel);
+
+    List<Cafe> findByQualidadeAndDisponivel(QualidadeCafe qualidade, boolean disponivel);
+
+    List<Cafe> findByQualidadeAndTipoAndDisponivel(QualidadeCafe qualidade, TipoGraoCafe tipo, boolean disponivel);
 }
 

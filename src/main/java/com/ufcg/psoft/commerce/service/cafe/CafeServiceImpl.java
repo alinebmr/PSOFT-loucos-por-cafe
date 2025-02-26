@@ -12,6 +12,7 @@ import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
 import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
+import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 import com.ufcg.psoft.commerce.model.Cafe;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 import org.modelmapper.ModelMapper;
@@ -97,11 +98,37 @@ public class CafeServiceImpl implements CafeService{
     public List<CafeResponseDTO> listarFiltraQualidade(Long idCliente) {
         ClienteResponseDTO cliente = clienteService.recuperar(idCliente);
 
-        HashMap<TipoAssinatura, QualidadeCafe> tipos = new HashMap<>();
-        tipos.put(TipoAssinatura.NORMAL, QualidadeCafe.NORMAL);
-        tipos.put(TipoAssinatura.PREMIUM, QualidadeCafe.PREMIUM);
+        List<Cafe> cafes;
 
-        List<Cafe> cafes = cafeRepository.findByQualidade(tipos.get(cliente.getAssinatura()));
+        if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
+            cafes = cafeRepository.findByDisponivel(true);
+        } else {
+            cafes = cafeRepository.findByQualidadeAndDisponivel(QualidadeCafe.NORMAL, true);
+        }
+
+
+        return cafes.stream()
+                .map(CafeResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CafeResponseDTO> listarFiltraQualidadeTipo(Long idCliente, String tipo) {
+        ClienteResponseDTO cliente = clienteService.recuperar(idCliente);
+
+        List<Cafe> cafes;
+
+        HashMap<String, TipoGraoCafe> tiposCafe = new HashMap<>();
+        tiposCafe.put("GRAO", TipoGraoCafe.GRAO);
+        tiposCafe.put("MOIDO", TipoGraoCafe.MOIDO);
+        tiposCafe.put("CAPSULA", TipoGraoCafe.CAPSULA);
+
+        if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
+            cafes = cafeRepository.findByTipoAndDisponivel(tiposCafe.get(tipo.toUpperCase()), true);
+        } else {
+            cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, tiposCafe.get(tipo.toUpperCase()), true);
+        }
+
 
         return cafes.stream()
                 .map(CafeResponseDTO::new)

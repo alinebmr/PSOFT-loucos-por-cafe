@@ -12,6 +12,8 @@ public interface CafeService {
 
     List<CafeResponseDTO> listarFiltraQualidade(Long idCliente);
 
+    List<CafeResponseDTO> listarFiltraQualidadeTipo(Long idCliente, String tipo);
+
     List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor);
 
     CafeResponseDTO recuperar(Long id);
