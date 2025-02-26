@@ -74,7 +74,7 @@ public class CafeController {
                 .body(cafeService.listar());
     }
 
-    @GetMapping("/listaQualidade")
+    @GetMapping("/catalogo")
     public ResponseEntity<?> listarCafeFiltradoQualidade(
             @RequestParam Long idCliente,
             @RequestParam(required = false, defaultValue = "") String tipoCafe) {
