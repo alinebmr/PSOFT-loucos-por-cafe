@@ -1,6 +1,5 @@
 package com.ufcg.psoft.commerce.service.cafe;
 
-import com.ufcg.psoft.commerce.exception.CommerceException;
 import com.ufcg.psoft.commerce.exception.CafeNaoExisteException;
 import com.ufcg.psoft.commerce.service.fornecedor.FornecedorService;
 import com.ufcg.psoft.commerce.service.cliente.ClienteService;
@@ -17,7 +16,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -108,19 +106,10 @@ public class CafeServiceImpl implements CafeService{
 
         List<Cafe> cafes;
 
-        HashMap<String, TipoGraoCafe> tiposCafe = new HashMap<>();
-        tiposCafe.put("GRAO", TipoGraoCafe.GRAO);
-        tiposCafe.put("MOIDO", TipoGraoCafe.MOIDO);
-        tiposCafe.put("CAPSULA", TipoGraoCafe.CAPSULA);
-
-        if(!tiposCafe.containsKey(tipo.toUpperCase())) {
-            throw new CommerceException("Tipo do cafe invalido!");
-        }
-
         if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
-            cafes = cafeRepository.findByTipoAndDisponivel(tiposCafe.get(tipo.toUpperCase()), true);
+            cafes = cafeRepository.findByTipoAndDisponivel(TipoGraoCafe.fromString(tipo), true);
         } else {
-            cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, tiposCafe.get(tipo.toUpperCase()), true);
+            cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, TipoGraoCafe.fromString(tipo), true);
         }
 
 
