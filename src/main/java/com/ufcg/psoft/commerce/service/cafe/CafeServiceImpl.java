@@ -101,15 +101,15 @@ public class CafeServiceImpl implements CafeService{
     }
 
     @Override
-    public List<CafeResponseDTO> listarFiltraQualidadeTipo(Long idCliente, String tipo) {
+    public List<CafeResponseDTO> listarFiltraQualidadeTipo(Long idCliente, TipoGraoCafe tipo) {
         ClienteResponseDTO cliente = clienteService.recuperar(idCliente);
 
         List<Cafe> cafes;
 
         if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
-            cafes = cafeRepository.findByTipoAndDisponivel(TipoGraoCafe.fromString(tipo), true);
+            cafes = cafeRepository.findByTipoAndDisponivel(tipo, true);
         } else {
-            cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, TipoGraoCafe.fromString(tipo), true);
+            cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, tipo, true);
         }
 
 

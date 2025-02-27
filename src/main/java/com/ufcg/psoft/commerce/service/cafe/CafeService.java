@@ -1,6 +1,7 @@
 package com.ufcg.psoft.commerce.service.cafe;
 
 import com.ufcg.psoft.commerce.dto.cafe.*;
+import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface CafeService {
 
     List<CafeResponseDTO> listarFiltraQualidade(Long idCliente);
 
-    List<CafeResponseDTO> listarFiltraQualidadeTipo(Long idCliente, String tipo);
+    List<CafeResponseDTO> listarFiltraQualidadeTipo(Long idCliente, TipoGraoCafe tipo);
 
     List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor);
 

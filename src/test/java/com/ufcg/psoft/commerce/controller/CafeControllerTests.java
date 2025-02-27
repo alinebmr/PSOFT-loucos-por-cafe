@@ -996,7 +996,7 @@ public class CafeControllerTests {
 
     @Nested
     @DisplayName("Testes do catálogo de cafés")
-    class catalogoCafeTeste {
+    class CatalogoCafeTeste {
 
         @Test
         @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo")
@@ -1164,4 +1164,3 @@ public class CafeControllerTests {
         }
     }
 }
-
