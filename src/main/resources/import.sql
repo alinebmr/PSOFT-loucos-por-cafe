@@ -1,2 +1,0 @@
-SHOW TABLES;
-INSERT INTO cliente (id, nome, codigo, assinatura, endereco_cep, endereco_cidade, endereco_bairro, endereco_rua, endereco_numero) VALUES (10001, 'sicrano', '123456', 'NORMAL', '12345000', 'Campina Grande', 'Centro', 'Rua Jose Dantas', '123');
