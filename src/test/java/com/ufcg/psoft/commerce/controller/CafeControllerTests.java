@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -35,9 +36,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @DisplayName("Testes do controlador de Cafes")
-
 public class CafeControllerTests {
 
     final String URI_CAFES = "/cafes";
@@ -1019,6 +1020,18 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo filtrando o tipo do café")
         void catalogoCafeNormalFiltraTipoCafe() throws Exception {
+
+                cafeRepository.save(Cafe.builder()
+                        .fornecedor(fornecedor)
+                        .nome("Leite com cafe")
+                        .origem("Xique-Xique Bahia")
+                        .tipo(TipoGraoCafe.MOIDO)
+                        .perfil("Leitoso")
+                        .preco(24.99)
+                        .qualidade(QualidadeCafe.NORMAL)
+                        .tamanhoEmbalagem(35)
+                        .build()
+                );
 
                 String response = driver.perform(get(URI_CAFES + "/catalogo")
                                   .contentType(MediaType.APPLICATION_JSON)

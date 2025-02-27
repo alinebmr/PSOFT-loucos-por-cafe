@@ -1,12 +1,9 @@
 package com.ufcg.psoft.commerce.service.cafe;
 
-import com.ufcg.psoft.commerce.exception.FornecedorNaoExisteException;
-import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
 import com.ufcg.psoft.commerce.exception.CommerceException;
 import com.ufcg.psoft.commerce.exception.CafeNaoExisteException;
-import com.ufcg.psoft.commerce.repository.FornecedorRepository;
+import com.ufcg.psoft.commerce.service.fornecedor.FornecedorService;
 import com.ufcg.psoft.commerce.service.cliente.ClienteService;
-import com.ufcg.psoft.commerce.repository.AdminRepository;
 import com.ufcg.psoft.commerce.repository.CafeRepository;
 import com.ufcg.psoft.commerce.dto.cafe.CafePostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
@@ -28,9 +25,7 @@ import java.util.stream.Collectors;
 public class CafeServiceImpl implements CafeService{
 
     @Autowired
-    FornecedorRepository fornecedorRepository;
-    @Autowired
-    AdminRepository adminRepository;
+    FornecedorService fornecedorService;
     @Autowired
     ModelMapper modelMapper;
     @Autowired
@@ -40,10 +35,8 @@ public class CafeServiceImpl implements CafeService{
 
     @Override
     public CafeResponseDTO criar(Long idFornecedor, String codigoAcesso, CafePostPutRequestDTO cafePostPutRequestDTO) {
-        Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(FornecedorNaoExisteException::new);
-        if (!fornecedor.getCodigo().equals(codigoAcesso)) {
-            throw new CodigoDeAcessoInvalidoException();
-        }
+        Fornecedor fornecedor = fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
+
         Cafe cafe = modelMapper.map(cafePostPutRequestDTO, Cafe.class);
         cafe.setFornecedor(fornecedor);
         cafeRepository.save(cafe);
@@ -52,10 +45,8 @@ public class CafeServiceImpl implements CafeService{
 
     @Override
     public void remover(Long idCafe, Long idFornecedor, String codigoAcesso) {
-        Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(FornecedorNaoExisteException::new);
-        if (!fornecedor.getCodigo().equals(codigoAcesso)) {
-            throw new CodigoDeAcessoInvalidoException();
-        }
+        fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
+
         Cafe cafe = cafeRepository.findById(idCafe).orElseThrow(CafeNaoExisteException::new);
         cafeRepository.delete(cafe);
     }
@@ -68,10 +59,8 @@ public class CafeServiceImpl implements CafeService{
 
     @Override
     public CafeResponseDTO alterar(Long idFornecedor, String codigoAcesso, Long idCafe, CafePostPutRequestDTO cafePostPutRequestDTO) {
-        Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(FornecedorNaoExisteException::new);
-        if (!fornecedor.getCodigo().equals(codigoAcesso)) {
-            throw new CodigoDeAcessoInvalidoException();
-        }
+        fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
+
         Cafe cafe = cafeRepository.findById(idCafe).orElseThrow(CafeNaoExisteException::new);
         modelMapper.map(cafePostPutRequestDTO, cafe);
         cafeRepository.save(cafe);
@@ -88,7 +77,7 @@ public class CafeServiceImpl implements CafeService{
 
     @Override
     public List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor) {
-        Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(FornecedorNaoExisteException::new);
+        Fornecedor fornecedor = fornecedorService.verificaFornecedor(idFornecedor);
         List<Cafe> cafes = cafeRepository.findByFornecedor(fornecedor);
         return cafes.stream()
                 .map(CafeResponseDTO::new)
