@@ -2,9 +2,14 @@ package com.ufcg.psoft.commerce.service.cafe;
 
 import com.ufcg.psoft.commerce.exception.CafeNaoExisteException;
 import com.ufcg.psoft.commerce.service.fornecedor.FornecedorService;
+import com.ufcg.psoft.commerce.service.cliente.ClienteService;
 import com.ufcg.psoft.commerce.repository.CafeRepository;
 import com.ufcg.psoft.commerce.dto.cafe.CafePostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
+import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
+import com.ufcg.psoft.commerce.enums.QualidadeCafe;
+import com.ufcg.psoft.commerce.enums.TipoAssinatura;
+import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 import com.ufcg.psoft.commerce.model.Cafe;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +28,8 @@ public class CafeServiceImpl implements CafeService{
     ModelMapper modelMapper;
     @Autowired
     CafeRepository cafeRepository;
+    @Autowired
+    ClienteService clienteService;
 
     @Override
     public CafeResponseDTO criar(Long idFornecedor, String codigoAcesso, CafePostPutRequestDTO cafePostPutRequestDTO) {
@@ -70,6 +77,42 @@ public class CafeServiceImpl implements CafeService{
     public List<CafeResponseDTO> listarPorFornecedor(Long idFornecedor) {
         Fornecedor fornecedor = fornecedorService.verificaFornecedor(idFornecedor);
         List<Cafe> cafes = cafeRepository.findByFornecedor(fornecedor);
+        return cafes.stream()
+                .map(CafeResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CafeResponseDTO> listarFiltraQualidade(Long idCliente) {
+        ClienteResponseDTO cliente = clienteService.recuperar(idCliente);
+
+        List<Cafe> cafes;
+
+        if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
+            cafes = cafeRepository.findByDisponivel(true);
+        } else {
+            cafes = cafeRepository.findByQualidadeAndDisponivel(QualidadeCafe.NORMAL, true);
+        }
+
+
+        return cafes.stream()
+                .map(CafeResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CafeResponseDTO> listarFiltraQualidadeTipo(Long idCliente, TipoGraoCafe tipo) {
+        ClienteResponseDTO cliente = clienteService.recuperar(idCliente);
+
+        List<Cafe> cafes;
+
+        if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
+            cafes = cafeRepository.findByTipoAndDisponivel(tipo, true);
+        } else {
+            cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, tipo, true);
+        }
+
+
         return cafes.stream()
                 .map(CafeResponseDTO::new)
                 .collect(Collectors.toList());

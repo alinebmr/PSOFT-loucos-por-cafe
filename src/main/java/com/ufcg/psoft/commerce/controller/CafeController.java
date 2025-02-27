@@ -1,6 +1,7 @@
 package com.ufcg.psoft.commerce.controller;
 
 import com.ufcg.psoft.commerce.dto.cafe.CafePostPutRequestDTO;
+import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 import com.ufcg.psoft.commerce.service.cafe.CafeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,5 +73,21 @@ public class CafeController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(cafeService.listar());
+    }
+
+    @GetMapping("/catalogo")
+    public ResponseEntity<?> listarCafeFiltradoQualidade(
+            @RequestParam Long idCliente,
+            @RequestParam(required = false, defaultValue = "") String tipoCafe) {
+
+        if(!tipoCafe.isBlank()) {
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(cafeService.listarFiltraQualidadeTipo(idCliente, TipoGraoCafe.fromString(tipoCafe)));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(cafeService.listarFiltraQualidade(idCliente));
     }
 }

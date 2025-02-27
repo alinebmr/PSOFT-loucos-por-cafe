@@ -74,7 +74,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Override
     public EntregadorResponseDTO alterarAprovacaoEntregador(Long fornecedorId, String codigoAcesso, Long entregadorId,
         boolean aprovado) {
-        verificaFornecedor(entregadorId, codigoAcesso);
+        verificaFornecedor(fornecedorId, codigoAcesso);
         return entregadorService.alterarAprovacao(entregadorId, aprovado);
     }
 
