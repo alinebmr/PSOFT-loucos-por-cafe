@@ -2,6 +2,7 @@ package com.ufcg.psoft.commerce.service.cafe;
 
 import com.ufcg.psoft.commerce.exception.FornecedorNaoExisteException;
 import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
+import com.ufcg.psoft.commerce.exception.CommerceException;
 import com.ufcg.psoft.commerce.exception.CafeNaoExisteException;
 import com.ufcg.psoft.commerce.repository.FornecedorRepository;
 import com.ufcg.psoft.commerce.service.cliente.ClienteService;
@@ -122,6 +123,10 @@ public class CafeServiceImpl implements CafeService{
         tiposCafe.put("GRAO", TipoGraoCafe.GRAO);
         tiposCafe.put("MOIDO", TipoGraoCafe.MOIDO);
         tiposCafe.put("CAPSULA", TipoGraoCafe.CAPSULA);
+
+        if(!tiposCafe.containsKey(tipo.toUpperCase())) {
+            throw new CommerceException("Tipo do cafe invalido!");
+        }
 
         if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
             cafes = cafeRepository.findByTipoAndDisponivel(tiposCafe.get(tipo.toUpperCase()), true);
