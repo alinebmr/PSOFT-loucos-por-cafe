@@ -20,24 +20,15 @@ public class PedidoController {
     @Autowired
     PedidoService pedidoService;
 
-    @GetMapping("/{idCliente}")
-    public ResponseEntity<?> listarPorCliente(
-            @PathVariable Long idCliente,
-            @RequestParam String codigoAcesso) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> listar(
+            @PathVariable Long id,
+            @RequestParam String codigoAcesso,
+            @RequestParam boolean isFornecedor) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(pedidoService.listarPedidoCliente(idCliente, codigoAcesso));
-    }
-
-    @GetMapping("/{idFornecedor}")
-    public ResponseEntity<?> listarPorFornecedor(
-            @PathVariable Long idFornecedor,
-            @RequestParam String codigoAcesso) {
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(pedidoService.listarPedidoFornecedor(idFornecedor, codigoAcesso));
+                .body(pedidoService.listar(id, codigoAcesso, isFornecedor));
     }
 
     @PostMapping()
@@ -53,20 +44,34 @@ public class PedidoController {
     @PutMapping("/{idPedido}")
     public ResponseEntity<?> atualizarPedido(
             @PathVariable Long idPedido,
-            @RequestParam Long idCliente,
-            @RequestParam String codigoCliente,
+            @RequestParam Long id,
+            @RequestParam String codigo,
+            @RequestParam boolean isFornecedor,
             @RequestBody @Valid PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(pedidoService.alterar(idCliente, codigoCliente, idPedido, pedidoPostPutRequestDTO));
+                .body(pedidoService.alterar(id, codigo, idPedido, pedidoPostPutRequestDTO, isFornecedor));
+    }
+
+    @PatchMapping("/{idPedido}")
+    public ResponseEntity<?> confirmarPagamento(
+            @PathVariable Long idPedido,
+            @RequestParam Long idCliente,
+            @RequestParam String codigoAcesso,
+            @RequestParam boolean confirmacao) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(pedidoService.confirmarPagamento(idPedido, idCliente, codigoAcesso, confirmacao));
     }
 
     @DeleteMapping("/{idPedido}")
     public ResponseEntity<?> excluirPedido(
             @PathVariable Long idPedido,
-            @RequestParam Long idCliente,
-            @RequestParam String codigoCliente) {
-        pedidoService.remover(idCliente, codigoCliente, idPedido);
+            @RequestParam Long id,
+            @RequestParam String codigo,
+            @RequestParam boolean isFornecedor) {
+        pedidoService.remover(id, codigo, idPedido, isFornecedor);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .body("");

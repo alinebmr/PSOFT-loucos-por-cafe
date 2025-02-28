@@ -2,7 +2,11 @@ package com.ufcg.psoft.commerce.service.pedido;
 
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
+import com.ufcg.psoft.commerce.enums.QualidadeCafe;
+import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.exception.ClienteInvalido;
+import com.ufcg.psoft.commerce.exception.CommerceException;
+import com.ufcg.psoft.commerce.exception.FornecedorInvalido;
 import com.ufcg.psoft.commerce.exception.PedidoNaoExiste;
 import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.repository.PedidoRepository;
@@ -35,6 +39,8 @@ public class PedidoServiceImpl implements PedidoService {
         Cliente cliente = clienteService.verificaCliente(idCliente, codigoCliente);
         Cafe cafe = cafeService.recuperaCafe(pedidoPostPutRequestDTO.getIdCafe());
 
+        verificaQualidadeAssinatura(cafe.getQualidade(), cliente.getAssinatura());
+
         Pedido pedido = pedidoRepository.save(Pedido.builder()
                 .cliente(cliente)
                 .endereco(pedidoPostPutRequestDTO.getEndereco() != null ? modelMapper.map(pedidoPostPutRequestDTO.getEndereco(), Endereco.class) : cliente.getEndereco())
@@ -48,17 +54,25 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public PedidoResponseDTO alterar(Long idCliente, String codigo, Long idPedido, PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
+    public PedidoResponseDTO alterar(Long id, String codigo, Long idPedido, PedidoPostPutRequestDTO pedidoPostPutRequestDTO, boolean isFornecedor) {
         Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExiste::new);
 
-        Cliente cliente = clienteService.verificaCliente(idCliente, codigo);
+        if(isFornecedor) {
+            fornecedorService.verificaFornecedor(id, codigo);
+        } else {
+            clienteService.verificaCliente(id, codigo);
+        }
 
         Cafe cafe = cafeService.recuperaCafe(pedidoPostPutRequestDTO.getIdCafe());
 
-        Endereco endereco = modelMapper.map(pedidoPostPutRequestDTO.getEndereco(), Endereco.class);
+        verificaQualidadeAssinatura(cafe.getQualidade(), pedido.getAssinatura());
+
+        if(pedidoPostPutRequestDTO.getEndereco() != null) {
+            Endereco endereco = modelMapper.map(pedidoPostPutRequestDTO.getEndereco(), Endereco.class);
+            pedido.setEndereco(endereco);
+        }
 
         pedido.setCafe(cafe);
-        pedido.setEndereco(endereco);
         pedido.setFornecedor(cafe.getFornecedor());
         pedidoRepository.save(pedido);
 
@@ -66,23 +80,39 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public void remover(Long idCliente, String codigoCliente, Long idPedido) {
+    public void remover(Long id, String codigo, Long idPedido, boolean isFornecedor) {
         Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExiste::new);
 
-        if(!pedido.getCliente().getId().equals(idCliente)) {
-            throw new ClienteInvalido();
+        if(isFornecedor) {
+            if(!pedido.getFornecedor().getId().equals(id)) {
+                throw new FornecedorInvalido();
+            } else {
+                fornecedorService.verificaFornecedor(id, codigo);
+            }
         } else {
-            clienteService.verificaCliente(idCliente, codigoCliente);
-
-            pedidoRepository.delete(pedido);
+            if(!pedido.getCliente().getId().equals(id)) {
+                throw new ClienteInvalido();
+            } else {
+                clienteService.verificaCliente(id, codigo);
+            }
         }
+
+        pedidoRepository.delete(pedido);
     }
 
     @Override
-    public List<PedidoResponseDTO> listarPedidoCliente(Long idCliente, String codigoCliente) {
-        Cliente cliente = clienteService.verificaCliente(idCliente, codigoCliente);
+    public List<PedidoResponseDTO> listar(Long id, String codigo, boolean isFornecedor) {
+        List<Pedido> pedidos;
 
-        List<Pedido> pedidos = pedidoRepository.findByCliente(cliente);
+        if(isFornecedor) {
+            Fornecedor fornecedor = fornecedorService.verificaFornecedor(id, codigo);
+
+            pedidos = pedidoRepository.findByFornecedor(fornecedor);
+        } else {
+            Cliente cliente = clienteService.verificaCliente(id, codigo);
+
+            pedidos = pedidoRepository.findByCliente(cliente);
+        }
 
         return pedidos.stream()
                 .map(PedidoResponseDTO::new)
@@ -90,13 +120,24 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public List<PedidoResponseDTO> listarPedidoFornecedor(Long idFornecedor, String codigoFornecedor) {
-        Fornecedor fornecedor = fornecedorService.verificaFornecedor(idFornecedor, codigoFornecedor);
+    public PedidoResponseDTO confirmarPagamento(Long idPedido, Long idCliente, String codigoAcesso, boolean confirmacao) {
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExiste::new);
 
-        List<Pedido> pedidos = pedidoRepository.findByFornecedor(fornecedor);
+        if(!confirmacao) {
+            throw new CommerceException("Operacao invalida");
+        }
 
-        return pedidos.stream()
-                .map(PedidoResponseDTO::new)
-                .collect(Collectors.toList());
+        clienteService.verificaCliente(idCliente, codigoAcesso);
+
+        pedido.setPago(confirmacao);
+        pedido = pedidoRepository.save(pedido);
+
+        return new PedidoResponseDTO(pedido);
+    }
+
+    private void verificaQualidadeAssinatura(QualidadeCafe cafe, TipoAssinatura assinatura) {
+        if(cafe.equals(QualidadeCafe.PREMIUM) && assinatura.equals(TipoAssinatura.NORMAL)) {
+            throw new CommerceException("Assinatura invalida para este cafe!");
+        }
     }
 }

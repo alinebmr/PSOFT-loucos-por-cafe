@@ -9,11 +9,11 @@ public interface PedidoService {
 
     PedidoResponseDTO criar(Long idCliente, String codigoCliente, PedidoPostPutRequestDTO pedidoPostPutRequestDTO);
 
-    PedidoResponseDTO alterar(Long id, String codigo, Long idPedido, PedidoPostPutRequestDTO pedidoPostPutRequestDTO);
+    PedidoResponseDTO alterar(Long id, String codigo, Long idPedido, PedidoPostPutRequestDTO pedidoPostPutRequestDTO, boolean isFornecedor);
 
-    void remover(Long idCliente, String codigoCliente, Long idPedido);
+    void remover(Long id, String codigo, Long idPedido, boolean isFornecedor);
 
-    List<PedidoResponseDTO> listarPedidoCliente(Long idCliente, String codigoCliente);
+    List<PedidoResponseDTO> listar(Long id, String codigo, boolean isFornecedor);
 
-    List<PedidoResponseDTO> listarPedidoFornecedor(Long idFornecedor, String codigoFornecedor);
+    PedidoResponseDTO confirmarPagamento(Long idPedido, Long idCliente, String codigoAcesso, boolean confirmacao);
 }

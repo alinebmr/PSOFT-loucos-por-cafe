@@ -1,45 +1,60 @@
 package com.ufcg.psoft.commerce.dto.pedido;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ufcg.psoft.commerce.model.Cafe;
-import com.ufcg.psoft.commerce.model.Endereco;
+import com.ufcg.psoft.commerce.dto.EnderecoDTO;
+import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
+import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
+import com.ufcg.psoft.commerce.dto.fornecedor.FornecedorResponseDTO;
+import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.model.Pedido;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PedidoResponseDTO {
     @JsonProperty("id")
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @JsonProperty("idFornecedor")
-    @NotNull(message = "Id do fornecedor obrigatorio")
-    private Long idFornecedor;
+    @JsonProperty("fornecedor")
+    @NotNull(message = "Fornecedor obrigatorio")
+    private FornecedorResponseDTO fornecedor;
 
-    @JsonProperty("idCliente")
-    @NotNull(message = "Id do cliente obrigatorio")
-    private Long idCliente;
+    @JsonProperty("cliente")
+    @NotNull(message = "Cliente obrigatorio")
+    private ClienteResponseDTO cliente;
 
     @JsonProperty("endereco")
-    private Endereco endereco;
+    private EnderecoDTO endereco;
 
     @JsonProperty("cafe")
     @NotBlank(message = "Cafe obrigatorio")
-    private Cafe cafe;
+    private CafeResponseDTO cafe;
 
-    @JsonProperty("statusPagamento")
+    @JsonProperty("pago")
     private boolean pago;
+
+    @JsonProperty("assinatura")
+    private TipoAssinatura assinatura;
 
     public PedidoResponseDTO(Pedido pedido) {
         this.id = pedido.getId();
-        this.idFornecedor = pedido.getCafe().getFornecedor().getId();
-        this.idCliente = pedido.getCliente().getId();
-        this.cafe = pedido.getCafe();
-        this.endereco = pedido.getEndereco() != null ? pedido.getEndereco() : pedido.getCliente().getEndereco();
+        this.fornecedor = new FornecedorResponseDTO(pedido.getFornecedor());
+        this.cliente = new ClienteResponseDTO(pedido.getCliente());
+        this.cafe = new CafeResponseDTO(pedido.getCafe());
+        this.endereco = new EnderecoDTO(pedido.getEndereco() != null ? pedido.getEndereco() : pedido.getCliente().getEndereco());
         this.pago = pedido.isPago();
+        this.assinatura = pedido.getAssinatura();
     }
 }
