@@ -4,10 +4,7 @@ import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
-import com.ufcg.psoft.commerce.exception.ClienteInvalido;
-import com.ufcg.psoft.commerce.exception.CommerceException;
-import com.ufcg.psoft.commerce.exception.FornecedorInvalido;
-import com.ufcg.psoft.commerce.exception.PedidoNaoExiste;
+import com.ufcg.psoft.commerce.exception.*;
 import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.repository.PedidoRepository;
 import com.ufcg.psoft.commerce.service.cafe.CafeService;
@@ -39,6 +36,7 @@ public class PedidoServiceImpl implements PedidoService {
         Cliente cliente = clienteService.verificaCliente(idCliente, codigoCliente);
         Cafe cafe = cafeService.recuperaCafe(pedidoPostPutRequestDTO.getIdCafe());
 
+        verificaDisponibilidadeCafe(cafe.isDisponivel());
         verificaQualidadeAssinatura(cafe.getQualidade(), cliente.getAssinatura());
 
         Pedido pedido = pedidoRepository.save(Pedido.builder()
@@ -65,6 +63,7 @@ public class PedidoServiceImpl implements PedidoService {
 
         Cafe cafe = cafeService.recuperaCafe(pedidoPostPutRequestDTO.getIdCafe());
 
+        verificaDisponibilidadeCafe(cafe.isDisponivel());
         verificaQualidadeAssinatura(cafe.getQualidade(), pedido.getAssinatura());
 
         if(pedidoPostPutRequestDTO.getEndereco() != null) {
@@ -124,13 +123,13 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExiste::new);
 
         if(!confirmacao) {
-            throw new CommerceException("Operacao invalida");
+            throw new CommerceException("Operacao invalida! Somente confirmar de pagamento");
         }
 
         clienteService.verificaCliente(idCliente, codigoAcesso);
 
         pedido.setPago(confirmacao);
-        pedido = pedidoRepository.save(pedido);
+        pedidoRepository.save(pedido);
 
         return new PedidoResponseDTO(pedido);
     }
@@ -138,6 +137,12 @@ public class PedidoServiceImpl implements PedidoService {
     private void verificaQualidadeAssinatura(QualidadeCafe cafe, TipoAssinatura assinatura) {
         if(cafe.equals(QualidadeCafe.PREMIUM) && assinatura.equals(TipoAssinatura.NORMAL)) {
             throw new CommerceException("Assinatura invalida para este cafe!");
+        }
+    }
+
+    private void verificaDisponibilidadeCafe(boolean disponibilidade) {
+        if(!disponibilidade) {
+            throw new CafeIndisponivel();
         }
     }
 }
