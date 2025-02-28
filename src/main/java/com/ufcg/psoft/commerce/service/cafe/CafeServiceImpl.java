@@ -56,6 +56,11 @@ public class CafeServiceImpl implements CafeService{
     }
 
     @Override
+    public Cafe recuperaCafe(Long id) {
+        return cafeRepository.findById(id).orElseThrow(CafeNaoExisteException::new);
+    }
+
+    @Override
     public CafeResponseDTO alterar(Long idFornecedor, String codigoAcesso, Long idCafe, CafePostPutRequestDTO cafePostPutRequestDTO) {
         fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
 

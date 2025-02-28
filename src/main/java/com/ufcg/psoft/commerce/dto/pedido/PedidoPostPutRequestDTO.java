@@ -19,7 +19,7 @@ public class PedidoPostPutRequestDTO {
     @Valid
     private EnderecoDTO endereco;
 
-    @JsonProperty("cafe")
+    @JsonProperty("idCafe")
     @NotNull(message = "Cafe obrigatorio")
-    private Cafe cafe;
+    private Long idCafe;
 }

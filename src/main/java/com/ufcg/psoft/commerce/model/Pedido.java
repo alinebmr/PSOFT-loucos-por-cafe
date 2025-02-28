@@ -1,6 +1,7 @@
 package com.ufcg.psoft.commerce.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,9 @@ public class Pedido {
     @ManyToOne
     private Cafe cafe;
 
+    @ManyToOne
+    private Fornecedor fornecedor;
+
     @JsonProperty("endereco")
     @Embedded
     private Endereco endereco;
@@ -33,4 +37,10 @@ public class Pedido {
     @Column(nullable = false)
     @Builder.Default
     private boolean pago = false;
+
+    @JsonProperty("assinatura")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private TipoAssinatura assinatura = TipoAssinatura.NORMAL;
 }
