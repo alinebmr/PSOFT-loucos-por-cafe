@@ -112,7 +112,7 @@ public class PedidoServiceImpl implements PedidoService {
         if(isFornecedor) {
             Fornecedor fornecedor = fornecedorService.verificaFornecedor(id, codigo);
 
-            pedidos = pedidoRepository.findByFornecedor(fornecedor);
+            pedidos = pedidoRepository.findByCafeFornecedor(fornecedor);
         } else {
             Cliente cliente = clienteService.verificaCliente(id, codigo);
 

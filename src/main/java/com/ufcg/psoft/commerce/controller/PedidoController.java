@@ -25,7 +25,6 @@ public class PedidoController {
             @PathVariable Long id,
             @RequestParam String codigoAcesso,
             @RequestParam boolean isFornecedor) {
-
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(pedidoService.listar(id, codigoAcesso, isFornecedor));
