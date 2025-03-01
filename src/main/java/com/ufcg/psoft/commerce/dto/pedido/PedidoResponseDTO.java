@@ -50,7 +50,7 @@ public class PedidoResponseDTO {
 
     public PedidoResponseDTO(Pedido pedido) {
         this.id = pedido.getId();
-        this.fornecedor = new FornecedorResponseDTO(pedido.getFornecedor());
+        this.fornecedor = new FornecedorResponseDTO(pedido.getCafe().getFornecedor());
         this.cliente = new ClienteResponseDTO(pedido.getCliente());
         this.cafe = new CafeResponseDTO(pedido.getCafe());
         this.endereco = new EnderecoDTO(pedido.getEndereco() != null ? pedido.getEndereco() : pedido.getCliente().getEndereco());

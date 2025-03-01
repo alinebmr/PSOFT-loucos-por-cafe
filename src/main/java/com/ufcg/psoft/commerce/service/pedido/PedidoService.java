@@ -15,5 +15,5 @@ public interface PedidoService {
 
     List<PedidoResponseDTO> listar(Long id, String codigo, boolean isFornecedor);
 
-    PedidoResponseDTO confirmarPagamento(Long idPedido, Long idCliente, String codigoAcesso, boolean confirmacao);
+    PedidoResponseDTO confirmarPagamento(Long idPedido, Long idCliente, String codigoAcesso);
 }

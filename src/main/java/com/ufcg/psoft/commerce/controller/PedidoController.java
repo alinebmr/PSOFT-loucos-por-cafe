@@ -53,16 +53,14 @@ public class PedidoController {
                 .body(pedidoService.alterar(id, codigo, idPedido, pedidoPostPutRequestDTO, isFornecedor));
     }
 
-    @PatchMapping("/{idPedido}")
+    @PatchMapping("/{idPedido}/pagar")
     public ResponseEntity<?> confirmarPagamento(
             @PathVariable Long idPedido,
             @RequestParam Long idCliente,
-            @RequestParam String codigoAcesso,
-            @RequestParam boolean confirmacao) {
-
+            @RequestParam String codigoAcesso) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(pedidoService.confirmarPagamento(idPedido, idCliente, codigoAcesso, confirmacao));
+                .body(pedidoService.confirmarPagamento(idPedido, idCliente, codigoAcesso));
     }
 
     @DeleteMapping("/{idPedido}")

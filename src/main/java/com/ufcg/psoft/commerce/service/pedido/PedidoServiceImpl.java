@@ -44,7 +44,6 @@ public class PedidoServiceImpl implements PedidoService {
                 .endereco(pedidoPostPutRequestDTO.getEndereco() != null ? modelMapper.map(pedidoPostPutRequestDTO.getEndereco(), Endereco.class) : cliente.getEndereco())
                 .cafe(cafe)
                 .assinatura(cliente.getAssinatura())
-                .fornecedor(cafe.getFornecedor())
                 .build()
         );
 
@@ -53,12 +52,20 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public PedidoResponseDTO alterar(Long id, String codigo, Long idPedido, PedidoPostPutRequestDTO pedidoPostPutRequestDTO, boolean isFornecedor) {
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExiste::new);
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
 
         if(isFornecedor) {
-            fornecedorService.verificaFornecedor(id, codigo);
+            if(!pedido.getCafe().getFornecedor().getId().equals(id)) {
+                throw new FornecedorInvalidoException();
+            } else {
+                fornecedorService.verificaFornecedor(id, codigo);
+            }
         } else {
-            clienteService.verificaCliente(id, codigo);
+            if(!pedido.getCliente().getId().equals(id)) {
+                throw new ClienteInvalidoException();
+            } else {
+                clienteService.verificaCliente(id, codigo);
+            }
         }
 
         Cafe cafe = cafeService.recuperaCafe(pedidoPostPutRequestDTO.getIdCafe());
@@ -72,7 +79,6 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.setCafe(cafe);
-        pedido.setFornecedor(cafe.getFornecedor());
         pedidoRepository.save(pedido);
 
         return modelMapper.map(pedido, PedidoResponseDTO.class);
@@ -80,17 +86,17 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public void remover(Long id, String codigo, Long idPedido, boolean isFornecedor) {
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExiste::new);
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
 
         if(isFornecedor) {
-            if(!pedido.getFornecedor().getId().equals(id)) {
-                throw new FornecedorInvalido();
+            if(!pedido.getCafe().getFornecedor().getId().equals(id)) {
+                throw new FornecedorInvalidoException();
             } else {
                 fornecedorService.verificaFornecedor(id, codigo);
             }
         } else {
             if(!pedido.getCliente().getId().equals(id)) {
-                throw new ClienteInvalido();
+                throw new ClienteInvalidoException();
             } else {
                 clienteService.verificaCliente(id, codigo);
             }
@@ -119,16 +125,16 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public PedidoResponseDTO confirmarPagamento(Long idPedido, Long idCliente, String codigoAcesso, boolean confirmacao) {
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExiste::new);
-
-        if(!confirmacao) {
-            throw new CommerceException("Operacao invalida! Somente confirmar de pagamento");
-        }
+    public PedidoResponseDTO confirmarPagamento(Long idPedido, Long idCliente, String codigoAcesso) {
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
 
         clienteService.verificaCliente(idCliente, codigoAcesso);
 
-        pedido.setPago(confirmacao);
+        if (!pedido.getCliente().getId().equals(idCliente)) {
+            throw new ClienteInvalidoException();
+        }
+
+        pedido.setPago(true);
         pedidoRepository.save(pedido);
 
         return new PedidoResponseDTO(pedido);
@@ -142,7 +148,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     private void verificaDisponibilidadeCafe(boolean disponibilidade) {
         if(!disponibilidade) {
-            throw new CafeIndisponivel();
+            throw new CafeIndisponivelException();
         }
     }
 }

@@ -23,9 +23,6 @@ public class Pedido {
     @ManyToOne
     private Cafe cafe;
 
-    @ManyToOne
-    private Fornecedor fornecedor;
-
     @JsonProperty("endereco")
     @Embedded
     private Endereco endereco;
