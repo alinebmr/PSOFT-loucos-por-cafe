@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
+import com.ufcg.psoft.commerce.enums.TipoPagamento;
 import com.ufcg.psoft.commerce.model.Admin;
 import com.ufcg.psoft.commerce.model.Cafe;
 import com.ufcg.psoft.commerce.model.Cliente;
@@ -80,6 +81,9 @@ public class DadosIniciais implements ApplicationRunner {
             .codigo("123123")
             .build()
         );
+        fornecedor1.getTiposPagamento().add(TipoPagamento.PIX);
+        fornecedor1.getTiposPagamento().add(TipoPagamento.DEBITO);
+        fornecedor1 = fornecedorRepository.save(fornecedor1);
 
         cafeRepository.save(Cafe.builder()
             .fornecedor(fornecedor1)
@@ -111,6 +115,9 @@ public class DadosIniciais implements ApplicationRunner {
             .codigo("123123")
             .build()
         );
+        fornecedor2.getTiposPagamento().add(TipoPagamento.CREDITO);
+        fornecedor2.getTiposPagamento().add(TipoPagamento.DEBITO);
+        fornecedor2 = fornecedorRepository.save(fornecedor2);
 
         cafeRepository.save(Cafe.builder()
             .fornecedor(fornecedor2)
