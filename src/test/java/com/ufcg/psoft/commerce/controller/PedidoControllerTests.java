@@ -127,6 +127,10 @@ public class PedidoControllerTests {
             .cnpj("12.345.678/0001-22")
             .codigo("222222")
             .build());
+        fornecedor.getTiposPagamento().add(TipoPagamento.PIX);
+        fornecedor.getTiposPagamento().add(TipoPagamento.DEBITO);
+        fornecedor.getTiposPagamento().add(TipoPagamento.CREDITO);
+        fornecedor = fornecedorRepository.save(fornecedor);
 
         fornecedorOutro = fornecedorRepository.save(Fornecedor.builder()
             .nomeEmpresa("Joaninha Cafe")
@@ -427,6 +431,30 @@ public class PedidoControllerTests {
         }
 
         @Test
+        @DisplayName("Quando criamos um pedido com tipo de pagamento não aceito")
+        void criarPedidoPagamentoNaoAceito() throws Exception {
+            // Arrange
+            pedidoPostPutRequestDTO.setTipoPagamento(TipoPagamento.PIX);
+            fornecedor.getTiposPagamento().remove(TipoPagamento.PIX);
+            fornecedor = fornecedorRepository.save(fornecedor);
+
+            // Act
+            String responseJsonString = driver.perform(post(URI_PEDIDOS)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+            // Assert
+            assertEquals("Fornecedor nao aceita esse tipo de pagamento!", resultado.getMessage());
+        }
+
+        @Test
         @DisplayName("Quando atualizamos um pedido")
         void atualizarPedidoValido() throws Exception {
             // Arrange
@@ -569,6 +597,31 @@ public class PedidoControllerTests {
 
             // Assert
             assertEquals("Fornecedor invalido!", resultado.getMessage());
+        }
+
+        @Test
+        @DisplayName("Quando atualizamos um pedido com café inexistente")
+        void atualizarPedidoPagamentoNaoAceito() throws Exception {
+            // Arrange
+            pedidoPostPutRequestDTO.setTipoPagamento(TipoPagamento.PIX);
+            fornecedor.getTiposPagamento().remove(TipoPagamento.PIX);
+            fornecedor = fornecedorRepository.save(fornecedor);
+
+            // Act
+            String responseJsonString = driver.perform(put(URI_PEDIDOS + "/" + pedido.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("id", pedido.getCliente().getId().toString())
+                    .param("codigo", pedido.getCliente().getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+            // Assert
+            assertEquals("Fornecedor nao aceita esse tipo de pagamento!", resultado.getMessage());
         }
 
         @Test
