@@ -1,8 +1,10 @@
 package com.ufcg.psoft.commerce.controller;
 
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
+import com.ufcg.psoft.commerce.enums.TipoPagamento;
 import com.ufcg.psoft.commerce.service.pedido.PedidoService;
 import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,14 +22,25 @@ public class PedidoController {
     @Autowired
     PedidoService pedidoService;
 
-    @GetMapping("/{id}")
+    @GetMapping()
     public ResponseEntity<?> listar(
-            @PathVariable Long id,
+            @RequestParam Long id,
             @RequestParam String codigoAcesso,
             @RequestParam boolean isFornecedor) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(pedidoService.listar(id, codigoAcesso, isFornecedor));
+    }
+
+    @GetMapping("/{idPedido}")
+    public ResponseEntity<?> recuperarPedido(
+            @PathVariable Long idPedido,
+            @RequestParam Long id,
+            @RequestParam String codigoAcesso,
+            @RequestParam boolean isFornecedor) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(pedidoService.recuperar(idPedido, id, codigoAcesso, isFornecedor));
     }
 
     @PostMapping()

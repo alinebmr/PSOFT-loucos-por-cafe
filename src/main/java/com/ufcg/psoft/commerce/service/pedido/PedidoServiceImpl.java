@@ -4,6 +4,7 @@ import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
+import com.ufcg.psoft.commerce.enums.TipoPagamento;
 import com.ufcg.psoft.commerce.exception.*;
 import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.repository.PedidoRepository;
@@ -39,68 +40,43 @@ public class PedidoServiceImpl implements PedidoService {
         verificaDisponibilidadeCafe(cafe.isDisponivel());
         verificaQualidadeAssinatura(cafe.getQualidade(), cliente.getAssinatura());
 
-        Pedido pedido = pedidoRepository.save(Pedido.builder()
-                .cliente(cliente)
-                .endereco(pedidoPostPutRequestDTO.getEndereco() != null ? modelMapper.map(pedidoPostPutRequestDTO.getEndereco(), Endereco.class) : cliente.getEndereco())
-                .cafe(cafe)
-                .assinatura(cliente.getAssinatura())
-                .build()
-        );
+        Pedido pedido = Pedido.builder()
+            .cafe(cafe)
+            .cliente(cliente)
+            .assinatura(cliente.getAssinatura())
+            .build();
 
-        return modelMapper.map(pedido, PedidoResponseDTO.class);
+        modelMapper.map(pedidoPostPutRequestDTO, pedido);
+
+        if (pedido.getEndereco() == null) {
+            pedido.setEndereco(cliente.getEndereco());
+        }
+
+        pedido = pedidoRepository.save(pedido);
+
+        return new PedidoResponseDTO(pedido);
     }
 
     @Override
     public PedidoResponseDTO alterar(Long id, String codigo, Long idPedido, PedidoPostPutRequestDTO pedidoPostPutRequestDTO, boolean isFornecedor) {
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
-
-        if(isFornecedor) {
-            if(!pedido.getCafe().getFornecedor().getId().equals(id)) {
-                throw new FornecedorInvalidoException();
-            } else {
-                fornecedorService.verificaFornecedor(id, codigo);
-            }
-        } else {
-            if(!pedido.getCliente().getId().equals(id)) {
-                throw new ClienteInvalidoException();
-            } else {
-                clienteService.verificaCliente(id, codigo);
-            }
-        }
+        Pedido pedido = verificaPedido(idPedido, id, codigo, isFornecedor);
 
         Cafe cafe = cafeService.recuperaCafe(pedidoPostPutRequestDTO.getIdCafe());
 
         verificaDisponibilidadeCafe(cafe.isDisponivel());
         verificaQualidadeAssinatura(cafe.getQualidade(), pedido.getAssinatura());
 
-        if(pedidoPostPutRequestDTO.getEndereco() != null) {
-            Endereco endereco = modelMapper.map(pedidoPostPutRequestDTO.getEndereco(), Endereco.class);
-            pedido.setEndereco(endereco);
-        }
-
+        modelMapper.map(pedidoPostPutRequestDTO, pedido);
         pedido.setCafe(cafe);
-        pedidoRepository.save(pedido);
 
-        return modelMapper.map(pedido, PedidoResponseDTO.class);
+        pedido = pedidoRepository.save(pedido);
+
+        return new PedidoResponseDTO(pedido);
     }
 
     @Override
     public void remover(Long id, String codigo, Long idPedido, boolean isFornecedor) {
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
-
-        if(isFornecedor) {
-            if(!pedido.getCafe().getFornecedor().getId().equals(id)) {
-                throw new FornecedorInvalidoException();
-            } else {
-                fornecedorService.verificaFornecedor(id, codigo);
-            }
-        } else {
-            if(!pedido.getCliente().getId().equals(id)) {
-                throw new ClienteInvalidoException();
-            } else {
-                clienteService.verificaCliente(id, codigo);
-            }
-        }
+        Pedido pedido = verificaPedido(idPedido, id, codigo, isFornecedor);
 
         pedidoRepository.delete(pedido);
     }
@@ -120,18 +96,23 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         return pedidos.stream()
-                .map(PedidoResponseDTO::new)
-                .collect(Collectors.toList());
+            .map(PedidoResponseDTO::new)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public PedidoResponseDTO recuperar(Long id, Long idUsuario, String codigo, boolean isFornecedor) {
+        Pedido pedido = verificaPedido(id, idUsuario, codigo, isFornecedor);
+
+        return new PedidoResponseDTO(pedido);
     }
 
     @Override
     public PedidoResponseDTO confirmarPagamento(Long idPedido, Long idCliente, String codigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
+        Pedido pedido = verificaPedido(idPedido, idCliente, codigoAcesso, false);
 
-        clienteService.verificaCliente(idCliente, codigoAcesso);
-
-        if (!pedido.getCliente().getId().equals(idCliente)) {
-            throw new ClienteInvalidoException();
+        if (pedido.isPago()) {
+            throw new CommerceException("Pedido ja foi pago!");
         }
 
         pedido.setPago(true);
@@ -150,5 +131,25 @@ public class PedidoServiceImpl implements PedidoService {
         if(!disponibilidade) {
             throw new CafeIndisponivelException();
         }
+    }
+
+    private Pedido verificaPedido(Long idPedido, Long idUsuario, String codigo, boolean isFornecedor) {
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
+
+        if (isFornecedor) {
+            if (!pedido.getCafe().getFornecedor().getId().equals(idUsuario)) {
+                throw new FornecedorInvalidoException();
+            } else {
+                fornecedorService.verificaFornecedor(idUsuario, codigo);
+            }
+        } else {
+            if (!pedido.getCliente().getId().equals(idUsuario)) {
+                throw new ClienteInvalidoException();
+            } else {
+                clienteService.verificaCliente(idUsuario, codigo);
+            }
+        }
+
+        return pedido;
     }
 }
