@@ -1,6 +1,9 @@
 package com.ufcg.psoft.commerce.dto.fornecedor;
 
+import java.util.Collection;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ufcg.psoft.commerce.enums.TipoPagamento;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,9 +33,13 @@ public class FornecedorResponseDTO {
     @NotBlank(message = "CNPJ obrigatorio")
     private String cnpj;
 
+    @JsonProperty("tipoPagamentos")
+    private Collection<TipoPagamento> tiposPagamento;
+
     public FornecedorResponseDTO(Fornecedor fornecedor) {
         this.id = fornecedor.getId();
         this.nomeEmpresa = fornecedor.getNomeEmpresa();
         this.cnpj = fornecedor.getCnpj();
+        this.tiposPagamento = fornecedor.getTiposPagamento();
     }
 }

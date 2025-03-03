@@ -39,6 +39,7 @@ public class PedidoServiceImpl implements PedidoService {
 
         verificaDisponibilidadeCafe(cafe.isDisponivel());
         verificaQualidadeAssinatura(cafe.getQualidade(), cliente.getAssinatura());
+        verificaTipoPagamento(cafe.getFornecedor(), pedidoPostPutRequestDTO.getTipoPagamento());
 
         Pedido pedido = Pedido.builder()
             .cafe(cafe)
@@ -65,6 +66,7 @@ public class PedidoServiceImpl implements PedidoService {
 
         verificaDisponibilidadeCafe(cafe.isDisponivel());
         verificaQualidadeAssinatura(cafe.getQualidade(), pedido.getAssinatura());
+        verificaTipoPagamento(cafe.getFornecedor(), pedidoPostPutRequestDTO.getTipoPagamento());
 
         modelMapper.map(pedidoPostPutRequestDTO, pedido);
         pedido.setCafe(cafe);
@@ -130,6 +132,12 @@ public class PedidoServiceImpl implements PedidoService {
     private void verificaDisponibilidadeCafe(boolean disponibilidade) {
         if(!disponibilidade) {
             throw new CafeIndisponivelException();
+        }
+    }
+
+    private void verificaTipoPagamento(Fornecedor fornecedor, TipoPagamento tipoPagamento) {
+        if (!fornecedor.getTiposPagamento().contains(tipoPagamento)) {
+            throw new CommerceException("Fornecedor nao aceita esse tipo de pagamento!");
         }
     }
 
