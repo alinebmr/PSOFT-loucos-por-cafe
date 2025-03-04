@@ -48,6 +48,9 @@ public class PedidoResponseDTO {
     @JsonProperty("assinatura")
     private TipoAssinatura assinatura;
 
+    @JsonProperty("valor")
+    private double valor;
+
     public PedidoResponseDTO(Pedido pedido) {
         this.id = pedido.getId();
         this.fornecedor = new FornecedorResponseDTO(pedido.getCafe().getFornecedor());
@@ -56,5 +59,6 @@ public class PedidoResponseDTO {
         this.endereco = new EnderecoDTO(pedido.getEndereco() != null ? pedido.getEndereco() : pedido.getCliente().getEndereco());
         this.pago = pedido.isPago();
         this.assinatura = pedido.getAssinatura();
+        this.valor = pedido.getValor();
     }
 }

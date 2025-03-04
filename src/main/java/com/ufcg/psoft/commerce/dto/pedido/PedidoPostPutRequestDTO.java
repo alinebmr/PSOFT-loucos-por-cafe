@@ -2,6 +2,8 @@ package com.ufcg.psoft.commerce.dto.pedido;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.dto.EnderecoDTO;
+import com.ufcg.psoft.commerce.enums.TipoPagamento;
+
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -23,4 +25,8 @@ public class PedidoPostPutRequestDTO {
     @JsonProperty("idCafe")
     @NotNull(message = "Cafe obrigatorio")
     private Long idCafe;
+
+    @JsonProperty("tipoPagamento")
+    @NotNull(message = "Tipo de pagamento obrigatorio")
+    private TipoPagamento tipoPagamento;
 }
