@@ -1,6 +1,11 @@
 package com.ufcg.psoft.commerce.service.cafe;
 
+import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
 import com.ufcg.psoft.commerce.exception.CafeNaoExisteException;
+import com.ufcg.psoft.commerce.exception.ClienteNaoExisteException;
+import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
+import com.ufcg.psoft.commerce.exception.InteresseEmCafeDisponivelException;
+import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.service.fornecedor.FornecedorService;
 import com.ufcg.psoft.commerce.service.cliente.ClienteService;
 import com.ufcg.psoft.commerce.repository.CafeRepository;
@@ -122,4 +127,32 @@ public class CafeServiceImpl implements CafeService{
                 .map(CafeResponseDTO::new)
                 .collect(Collectors.toList());
     }
+
+
+    @Override
+    public ClienteResponseDTO demonstrarInteresse(Long idCliente, String codigoAcesso, Long idCafe){
+        Cliente cliente = clienteService.verificaCliente(idCliente, codigoAcesso);
+        Cafe cafe = recuperaCafe(idCafe);
+
+        if (cafe.isDisponivel()) {
+            throw new InteresseEmCafeDisponivelException();
+        }
+
+        if (!(cliente.getCafesDeInteresse().contains(cafe))) {
+            cliente.getCafesDeInteresse().add(cafe);
+            clienteService.alterar(idCliente,codigoAcesso,modelMapper.map(cliente, ClientePostPutRequestDTO.class));
+        }
+
+        return new ClienteResponseDTO(cliente);
+
+    }
+
+    @Override
+    public List<CafeResponseDTO> listarCafesInteresseCliente(Long idCliente, String codigoAcesso) {
+        Cliente cliente = clienteService.verificaCliente(idCliente,codigoAcesso);
+
+        List<Cafe> cafes = cliente.getCafesDeInteresse();
+        return cafes.stream().map(CafeResponseDTO::new).collect(Collectors.toList());
+    }
+
 }
