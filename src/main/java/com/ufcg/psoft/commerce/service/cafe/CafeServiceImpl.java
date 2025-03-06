@@ -106,17 +106,68 @@ public class CafeServiceImpl implements CafeService{
     }
 
     @Override
-    public List<CafeResponseDTO> listarFiltraQualidadeTipo(Long idCliente, TipoGraoCafe tipo) {
+    public List<CafeResponseDTO> listarFiltro(Long idCliente, String tipo, String origem, String perfil) {
         ClienteResponseDTO cliente = clienteService.recuperar(idCliente);
 
-        List<Cafe> cafes;
+        TipoGraoCafe tipoGrao = null;
 
-        if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
-            cafes = cafeRepository.findByTipoAndDisponivel(tipo, true);
-        } else {
-            cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, tipo, true);
+        if(!tipo.isBlank()) {
+            tipoGrao = TipoGraoCafe.fromString(tipo);
         }
 
+        if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
+            return listarFiltroPremium(tipoGrao, origem, perfil);
+        } else {
+            return listarFiltroNormal(tipoGrao, origem, perfil);
+        }
+    }
+
+    private List<CafeResponseDTO> listarFiltroPremium(TipoGraoCafe tipo, String origem, String perfil) {
+        List<Cafe> cafes;
+
+        if(tipo == null && origem.isBlank() && perfil.isBlank()) {
+            cafes = cafeRepository.findByDisponivel(true);
+        } else if(origem.isBlank() && perfil.isBlank()) {
+            cafes = cafeRepository.findByTipoAndDisponivel(tipo, true);
+        } else if(tipo == null && origem.isBlank()) {
+            cafes = cafeRepository.findByDisponivelAndPerfilContainingIgnoreCase(true, perfil);
+        } else if(tipo == null && perfil.isBlank()) {
+            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCase(true, origem);
+        } else if(tipo == null) {
+            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(true, origem, perfil);
+        } else if(origem.isBlank()) {
+            cafes = cafeRepository.findByDisponivelAndPerfilContainingIgnoreCaseAndTipo(true, perfil, tipo);
+        } else if(perfil.isBlank()){
+            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndTipo(true, perfil, tipo);
+        } else {
+            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(true, origem, perfil, tipo);
+        }
+
+        return cafes.stream()
+                .map(CafeResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    private List<CafeResponseDTO> listarFiltroNormal(TipoGraoCafe tipo, String origem, String perfil) {
+        List<Cafe> cafes;
+
+        if(tipo == null && origem.isBlank() && perfil.isBlank()) {
+            cafes = cafeRepository.findByQualidadeAndDisponivel(QualidadeCafe.NORMAL, true);
+        } else if(origem.isBlank() && perfil.isBlank()) {
+            cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, tipo, true);
+        } else if(tipo == null && origem.isBlank()) {
+            cafes = cafeRepository.findByQualidadeAndDisponivelAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, true, perfil);
+        } else if(tipo == null && perfil.isBlank()) {
+            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCase(QualidadeCafe.NORMAL ,true, origem);
+        } else if(tipo == null) {
+            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, true, origem, perfil);
+        } else if(origem.isBlank()) {
+            cafes = cafeRepository.findByQualidadeAndDisponivelAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, perfil, tipo);
+        } else if(perfil.isBlank()){
+            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, perfil, tipo);
+        } else {
+            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, origem, perfil, tipo);
+        }
 
         return cafes.stream()
                 .map(CafeResponseDTO::new)
