@@ -93,6 +93,23 @@ public class CafeController {
                 .body(cafeService.listarFiltraQualidade(idCliente));
     }
 
+    @PutMapping("/{idCliente}/interesse/{idCafe}")
+    public ResponseEntity<?> demonstrarInteresse(
+            @PathVariable Long idCliente,
+            @PathVariable Long idCafe,
+            @RequestParam String codigo) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(cafeService.demonstrarInteresse(idCliente,codigo,idCafe));
+
+    }
+
+    @GetMapping("/{idCliente}/interesse")
+    public ResponseEntity<?> listarCafeInteresseCliente(
+            @PathVariable Long idCliente,
+            @RequestParam String codigo){
+        return ResponseEntity.status(HttpStatus.OK).body(cafeService.listarCafesInteresseCliente(idCliente,codigo));
+    }
+
     @PatchMapping("/{id}/alteraDisponibilidade")
     public ResponseEntity<?> alteraDisponibilidade(
         @PathVariable Long id,

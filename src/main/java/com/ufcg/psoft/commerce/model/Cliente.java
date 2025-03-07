@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @Builder
@@ -38,4 +41,14 @@ public class Cliente {
     @Column(nullable = false)
     @Builder.Default
     private TipoAssinatura assinatura = TipoAssinatura.NORMAL;
+
+    @JsonProperty("cafesDeInteresse")
+    @Builder.Default
+    @ManyToMany
+    @JoinTable(
+            name = "cafe_interesse_cliente",
+            joinColumns = @JoinColumn(name = "cliente_id"),
+            inverseJoinColumns = @JoinColumn(name = "cafe_id")
+    )
+    private List<Cafe> cafesDeInteresse = new ArrayList<Cafe>();
 }
