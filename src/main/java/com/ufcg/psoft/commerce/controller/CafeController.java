@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.DeleteExchange;
 
 @RestController
 @RequestMapping(
@@ -101,6 +102,15 @@ public class CafeController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(cafeService.demonstrarInteresse(idCliente,codigo,idCafe));
 
+    }
+
+    @DeleteMapping("/{idCliente}/interesse/{idCafe}")
+    public ResponseEntity<?> removerInteresseClienteCafe(
+            @PathVariable Long idCliente,
+            @PathVariable Long idCafe,
+            @RequestParam String codigo){
+        cafeService.removerInteresseClienteCafe(idCliente,codigo,idCafe);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
     }
 
     @GetMapping("/{idCliente}/interesse")
