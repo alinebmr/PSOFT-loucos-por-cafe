@@ -68,6 +68,8 @@ public class CafeControllerTests {
 
     Cliente cliente;
 
+    Cliente cliente1;
+
     CafePostPutRequestDTO cafePostPutRequestDTO;
 
     FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO;
@@ -93,6 +95,19 @@ public class CafeControllerTests {
                 .endereco(new EnderecoDTO(cliente.getEndereco()))
                 .codigo(cliente.getCodigo())
                 .build();
+
+        cliente1 = clienteRepository.save(Cliente.builder()
+                .nome("Min")
+                .codigo("111111")
+                .assinatura(TipoAssinatura.PREMIUM)
+                .endereco(Endereco.builder()
+                        .cep("12345678")
+                        .bairro("Um lugar aí")
+                        .cidade("Uma cidade aí")
+                        .rua("Avenida Qualquer")
+                        .numero("15")
+                        .build())
+                .build());
 
         fornecedor = fornecedorRepository.save(Fornecedor.builder()
                 .nomeEmpresa("MicroCoffee")
@@ -140,7 +155,6 @@ public class CafeControllerTests {
                 .tamanhoEmbalagem(35)
                 .build()
         );
-
     }
 
     @AfterEach
@@ -576,16 +590,16 @@ public class CafeControllerTests {
         @DisplayName("Quando recuperamos o tamanho da embalagem do cafe com dados válidos")
         void quandoRecuperamosTamanhoEmbalagemDoCafeValido() throws Exception {
 
-            // Act
-            String responseJsonString = driver.perform(get(URI_CAFES + "/" + cafe.getId()))
-                    .andExpect(status().isOk())
-                    .andDo(print())
-                    .andReturn().getResponse().getContentAsString();
+                // Act
+                String responseJsonString = driver.perform(get(URI_CAFES + "/" + cafe.getId()))
+                        .andExpect(status().isOk())
+                        .andDo(print())
+                        .andReturn().getResponse().getContentAsString();
 
-            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
+                CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
-            // Assert
-            assertEquals(35, resultado.getTamanhoEmbalagem());
+                // Assert
+                assertEquals(35, resultado.getTamanhoEmbalagem());
         }
 
 
@@ -644,16 +658,16 @@ public class CafeControllerTests {
         @DisplayName("Quando recuperamos a qualidade do cafe com dados válidos")
         void quandoRecuperamosQualidadeDoCafeValido() throws Exception {
 
-            // Act
-            String responseJsonString = driver.perform(get(URI_CAFES + "/" + cafe.getId()))
-                    .andExpect(status().isOk())
-                    .andDo(print())
-                    .andReturn().getResponse().getContentAsString();
+                // Act
+                String responseJsonString = driver.perform(get(URI_CAFES + "/" + cafe.getId()))
+                        .andExpect(status().isOk())
+                        .andDo(print())
+                        .andReturn().getResponse().getContentAsString();
 
-            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
+                CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
-            // Assert
-            assertEquals(QualidadeCafe.NORMAL, resultado.getQualidade());
+                // Assert
+                assertEquals(QualidadeCafe.NORMAL, resultado.getQualidade());
         }
 
 
@@ -711,16 +725,16 @@ public class CafeControllerTests {
         @DisplayName("Quando recuperamos a disponibilidade do cafe com dados válidos")
         void quandoRecuperamosDisponibilidadeCafeValido() throws Exception {
 
-            // Act
-            String responseJsonString = driver.perform(get(URI_CAFES + "/" + cafe.getId()))
-                    .andExpect(status().isOk())
-                    .andDo(print())
-                    .andReturn().getResponse().getContentAsString();
+                // Act
+                String responseJsonString = driver.perform(get(URI_CAFES + "/" + cafe.getId()))
+                        .andExpect(status().isOk())
+                        .andDo(print())
+                        .andReturn().getResponse().getContentAsString();
 
-            CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
+                CafeResponseDTO resultado = objectMapper.readValue(responseJsonString, CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
-            // Assert
-            assertEquals(true, resultado.isDisponivel());
+                // Assert
+                assertEquals(true, resultado.isDisponivel());
         }
     }
 
@@ -743,7 +757,7 @@ public class CafeControllerTests {
                     .qualidade(QualidadeCafe.NORMAL)
                     .tamanhoEmbalagem(10)
                     .build();
-            Cafe cafe2 = Cafe.builder()
+           Cafe cafe2 = Cafe.builder()
                     .fornecedor(fornecedor)
                     .nome("Cafe exemplo2")
                     .origem("Campina Grande Paraiba")
@@ -1015,9 +1029,86 @@ public class CafeControllerTests {
         @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo")
         void catalogoCafeNormal() throws Exception {
 
+                String response = driver.perform(get(URI_CAFES + "/catalogo")
+                                  .contentType(MediaType.APPLICATION_JSON)
+                                  .param("idCliente", cliente.getId().toString()))
+                                .andExpect(status().isOk())
+                                .andDo(print())
+                                .andReturn().getResponse().getContentAsString();
+
+                                
+                CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+                                
+                List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+                assertEquals(1, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo filtrando o tipo do café")
+        void catalogoCafeNormalFiltraTipoCafe() throws Exception {
+
+                cafeRepository.save(Cafe.builder()
+                        .fornecedor(fornecedor)
+                        .nome("Leite com cafe")
+                        .origem("Xique-Xique Bahia")
+                        .tipo(TipoGraoCafe.MOIDO)
+                        .perfil("Leitoso")
+                        .preco(24.99)
+                        .qualidade(QualidadeCafe.NORMAL)
+                        .tamanhoEmbalagem(35)
+                        .build()
+                );
+
+                String response = driver.perform(get(URI_CAFES + "/catalogo")
+                                  .contentType(MediaType.APPLICATION_JSON)
+                                  .param("idCliente", cliente.getId().toString())
+                                  .param("tipoCafe", "moido"))
+                                .andExpect(status().isOk())
+                                .andDo(print())
+                                .andReturn().getResponse().getContentAsString();
+
+
+                CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+
+                List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+                assertEquals(1, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo filtrando o tipo do café e a origem")
+        void catalogoCafeNormalFiltraTipoCafeOrigem() throws Exception {
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.MOIDO)
+                    .perfil("Leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
             String response = driver.perform(get(URI_CAFES + "/catalogo")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .param("idCliente", cliente.getId().toString()))
+                            .param("idCliente", cliente.getId().toString())
+                            .param("tipoCafe", "moido")
+                            .param("origem", "xiq"))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -1031,8 +1122,66 @@ public class CafeControllerTests {
         }
 
         @Test
-        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo filtrando o tipo do café")
-        void catalogoCafeNormalFiltraTipoCafe() throws Exception {
+        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo filtrando o tipo do café, origem e perfil")
+        void catalogoCafeNormalFiltraTipoCafeOrigemPerfil() throws Exception {
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.MOIDO)
+                    .perfil("Leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Aguado")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe com leite")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.MOIDO)
+                    .perfil("Leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            String response = driver.perform(get(URI_CAFES + "/catalogo")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idCliente", cliente.getId().toString())
+                            .param("tipoCafe", "moido")
+                            .param("origem", "xiq")
+                            .param("perfil", "leitoso"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+
+            List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+            assertEquals(2, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo filtrando a origem")
+        void catalogoCafeNormalFiltraOrigem() throws Exception {
 
             cafeRepository.save(Cafe.builder()
                     .fornecedor(fornecedor)
@@ -1049,39 +1198,7 @@ public class CafeControllerTests {
             String response = driver.perform(get(URI_CAFES + "/catalogo")
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("idCliente", cliente.getId().toString())
-                            .param("tipoCafe", "moido"))
-                    .andExpect(status().isOk())
-                    .andDo(print())
-                    .andReturn().getResponse().getContentAsString();
-
-
-            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
-
-            List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
-
-            assertEquals(1, resultado.size());
-        }
-
-        @Test
-        @DisplayName("Quando um cliente com assinatura premium visualiza o catálogo")
-        void catalogoCafePremium() throws Exception {
-
-            Cliente cliente1 = clienteRepository.save(Cliente.builder()
-                    .nome("Min")
-                    .codigo("111111")
-                    .assinatura(TipoAssinatura.PREMIUM)
-                    .endereco(Endereco.builder()
-                            .cep("12345678")
-                            .bairro("Um lugar aí")
-                            .cidade("Uma cidade aí")
-                            .rua("Avenida Qualquer")
-                            .numero("15")
-                            .build())
-                    .build());
-
-            String response = driver.perform(get(URI_CAFES + "/catalogo")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("idCliente", cliente1.getId().toString()))
+                            .param("origem", "xiq"))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -1095,26 +1212,385 @@ public class CafeControllerTests {
         }
 
         @Test
+        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo filtrando o perfil")
+        void catalogoCafeNormalFiltraPerfil() throws Exception {
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.MOIDO)
+                    .perfil("Leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Aguado")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            String response = driver.perform(get(URI_CAFES + "/catalogo")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idCliente", cliente.getId().toString())
+                            .param("perfil", "aguado"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+
+            List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+            assertEquals(1, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo filtrando a origem e o perfil")
+        void catalogoCafeNormalFiltraOrigemPerfil() throws Exception {
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.MOIDO)
+                    .perfil("Leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Cajazeiras")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            String response = driver.perform(get(URI_CAFES + "/catalogo")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idCliente", cliente.getId().toString())
+                            .param("origem", "xiq")
+                            .param("perfil", "leitoso"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+
+            List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+            assertEquals(1, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo filtrando o tipo do café e o perfil")
+        void catalogoCafeNormalFiltraTipoCafePerfil() throws Exception {
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.MOIDO)
+                    .perfil("Leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Leite com cafe")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            String response = driver.perform(get(URI_CAFES + "/catalogo")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idCliente", cliente.getId().toString())
+                            .param("tipoCafe", "moido")
+                            .param("perfil", "leitoso"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+                                
+                CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+                                
+                List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+                assertEquals(1, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura premium visualiza o catálogo")
+        void catalogoCafePremium() throws Exception {
+
+                String response = driver.perform(get(URI_CAFES + "/catalogo")
+                                  .contentType(MediaType.APPLICATION_JSON)
+                                  .param("idCliente", cliente1.getId().toString()))
+                                .andExpect(status().isOk())
+                                .andDo(print())
+                                .andReturn().getResponse().getContentAsString();
+
+                                
+                CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+                                
+                List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+                assertEquals(2, resultado.size());
+        }
+
+        @Test
         @DisplayName("Quando um cliente com assinatura premium visualiza o catálogo filtrando o tipo do café")
         void catalogoCafePremiumFiltraTipoCafe() throws Exception {
 
-            Cliente cliente1 = clienteRepository.save(Cliente.builder()
-                    .nome("Min")
-                    .codigo("111111")
-                    .assinatura(TipoAssinatura.PREMIUM)
-                    .endereco(Endereco.builder()
-                            .cep("12345678")
-                            .bairro("Um lugar aí")
-                            .cidade("Uma cidade aí")
-                            .rua("Avenida Qualquer")
-                            .numero("15")
-                            .build())
-                    .build());
+                String response = driver.perform(get(URI_CAFES + "/catalogo")
+                                  .contentType(MediaType.APPLICATION_JSON)
+                                  .param("idCliente", cliente1.getId().toString())
+                                  .param("tipoCafe", "capsula"))
+                                .andExpect(status().isOk())
+                                .andDo(print())
+                                .andReturn().getResponse().getContentAsString();
+
+                                
+                CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+                                
+                List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+                assertEquals(1, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura premium visualiza o catálogo filtrando o tipo do café e a origem")
+        void catalogoCafePremiumFiltraTipoCafeOrigem() throws Exception {
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Muito Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Frutas Vermelhas")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Muito Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.CAPSULA)
+                    .perfil("Frutas Vermelhas")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
 
             String response = driver.perform(get(URI_CAFES + "/catalogo")
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("idCliente", cliente1.getId().toString())
-                            .param("tipoCafe", "capsula"))
+                            .param("tipoCafe", "grao")
+                            .param("origem", "xiq"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+
+            List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+            assertEquals(2, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura premium visualiza o catálogo filtrando o tipo do café, a origem e o perfil")
+        void catalogoCafePremiumFiltraTipoCafeOrigemPerfil() throws Exception {
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Muito Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Frutas Vermelhas")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.MOIDO)
+                    .perfil("Frutas Vermelhas")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            String response = driver.perform(get(URI_CAFES + "/catalogo")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idCliente", cliente1.getId().toString())
+                            .param("tipoCafe", "grao")
+                            .param("origem", "xiq")
+                            .param("perfil", "frutas"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+
+            List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+            assertEquals(2, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura premium visualiza o catálogo filtrando a origem")
+        void catalogoCafePremiumFiltraOrigem() throws Exception {
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Muito Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Frutas Vermelhas")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Muito Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.CAPSULA)
+                    .perfil("Frutas Vermelhas")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            String response = driver.perform(get(URI_CAFES + "/catalogo")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idCliente", cliente1.getId().toString())
+                            .param("origem", "xiq"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+
+            List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+            assertEquals(3, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura premium visualiza o catálogo filtrando o tipo do café e o perfil")
+        void catalogoCafePremiumFiltraTipoCafePerfil() throws Exception {
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Muito Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Frutas Vermelhas")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Muito Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("leitoso")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            String response = driver.perform(get(URI_CAFES + "/catalogo")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idCliente", cliente1.getId().toString())
+                            .param("tipoCafe", "grao")
+                            .param("perfil", "frutas"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+
+            List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+            assertEquals(2, resultado.size());
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura premium visualiza o catálogo filtrando o perfil")
+        void catalogoCafePremiumFiltraPerfil() throws Exception {
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Muito Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.GRAO)
+                    .perfil("Frutas Vermelhas")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            cafeRepository.save(Cafe.builder()
+                    .fornecedor(fornecedor)
+                    .nome("Cafe Muito Bom")
+                    .origem("Xique-Xique Bahia")
+                    .tipo(TipoGraoCafe.CAPSULA)
+                    .perfil("Aguado")
+                    .preco(24.99)
+                    .qualidade(QualidadeCafe.PREMIUM)
+                    .tamanhoEmbalagem(35)
+                    .build()
+            );
+
+            String response = driver.perform(get(URI_CAFES + "/catalogo")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idCliente", cliente1.getId().toString())
+                            .param("perfil", "aguado"))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -1131,47 +1607,34 @@ public class CafeControllerTests {
         @DisplayName("Quando um cliente com assinatura premium visualiza o catálogo filtrando o tipo do café, sendo este inválido")
         void catalogoCafePremiumFiltraTipoCafeInvalido() throws Exception {
 
-            Cliente cliente1 = clienteRepository.save(Cliente.builder()
-                    .nome("Min")
-                    .codigo("111111")
-                    .assinatura(TipoAssinatura.PREMIUM)
-                    .endereco(Endereco.builder()
-                            .cep("12345678")
-                            .bairro("Um lugar aí")
-                            .cidade("Uma cidade aí")
-                            .rua("Avenida Qualquer")
-                            .numero("15")
-                            .build())
-                    .build());
+                String response = driver.perform(get(URI_CAFES + "/catalogo")
+                                  .contentType(MediaType.APPLICATION_JSON)
+                                  .param("idCliente", cliente1.getId().toString())
+                                  .param("tipoCafe", "invalido"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(print())
+                                .andReturn().getResponse().getContentAsString();
 
-            String response = driver.perform(get(URI_CAFES + "/catalogo")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("idCliente", cliente1.getId().toString())
-                            .param("tipoCafe", "invalido"))
-                    .andExpect(status().isBadRequest())
-                    .andDo(print())
-                    .andReturn().getResponse().getContentAsString();
+                
+                CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
 
-
-            CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
-
-            assertEquals("Tipo do cafe invalido!", resultado.getMessage());
+                assertEquals("Tipo do cafe invalido!", resultado.getMessage());
         }
 
         @Test
         @DisplayName("Quando um cliente inválido tenta acessar o catálogo")
         void catalogoCafeAcessoClienteInvalido() throws Exception {
 
-            String response = driver.perform(get(URI_CAFES + "/catalogo")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("idCliente", "99999")
-                            .param("tipoCafe", "grao"))
-                    .andExpect(status().isBadRequest())
-                    .andDo(print())
-                    .andReturn().getResponse().getContentAsString();
+                String response = driver.perform(get(URI_CAFES + "/catalogo")
+                                  .contentType(MediaType.APPLICATION_JSON)
+                                  .param("idCliente", "99999")
+                                  .param("tipoCafe", "grao"))
+                                .andExpect(status().isBadRequest())
+                                .andDo(print())
+                                .andReturn().getResponse().getContentAsString();
 
-
-            CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
+                
+                CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
 
             assertEquals("O cliente consultado nao existe!", resultado.getMessage());
         }

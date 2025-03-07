@@ -78,12 +78,14 @@ public class CafeController {
     @GetMapping("/catalogo")
     public ResponseEntity<?> listarCafeFiltradoQualidade(
             @RequestParam Long idCliente,
-            @RequestParam(required = false, defaultValue = "") String tipoCafe) {
+            @RequestParam(required = false, defaultValue = "") String tipoCafe,
+            @RequestParam(required = false, defaultValue = "") String origem,
+            @RequestParam(required = false, defaultValue = "") String perfil) {
 
-        if(!tipoCafe.isBlank()) {
+        if(!tipoCafe.isBlank() || !perfil.isBlank() || !origem.isBlank()) {
                 return ResponseEntity
                         .status(HttpStatus.OK)
-                        .body(cafeService.listarFiltraQualidadeTipo(idCliente, TipoGraoCafe.fromString(tipoCafe)));
+                        .body(cafeService.listarFiltro(idCliente, tipoCafe, origem, perfil));
         }
 
         return ResponseEntity
