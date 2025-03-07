@@ -1,7 +1,7 @@
 package com.ufcg.psoft.commerce.exception;
 
-public class InteresseEmCafeDisponivelException extends RuntimeException {
+public class InteresseEmCafeDisponivelException extends CommerceException {
     public InteresseEmCafeDisponivelException() {
-        super("Não é possível demonstrar interesse em um café disponível");
+        super("Nao e possivel demonstrar interesse em um cafe disponivel");
     }
 }

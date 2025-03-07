@@ -42,6 +42,7 @@ public class Cliente {
     @Builder.Default
     private TipoAssinatura assinatura = TipoAssinatura.NORMAL;
 
+    @JsonProperty("cafesDeInteresse")
     @Builder.Default
     @ManyToMany
     @JoinTable(

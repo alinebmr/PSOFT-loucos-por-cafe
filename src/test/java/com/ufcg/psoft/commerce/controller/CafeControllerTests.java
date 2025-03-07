@@ -145,8 +145,9 @@ public class CafeControllerTests {
 
     @AfterEach
     void tearDown() {
-        cafeRepository.deleteAll();
         clienteRepository.deleteAll();
+        cafeRepository.deleteAll();
+
     }
 
     @Nested
@@ -1179,12 +1180,15 @@ public class CafeControllerTests {
     @Nested
     @DisplayName("Conjunto de casos de teste de cafes de interesse do cliente")
 
-    class CasoVerificacaoClienteInteresseCafe{
+    class CasoVerificacaoClienteInteresseCafe {
 
         @Test
-        void clienteInteresseCafeIndisponivel() throws Exception{
+        @DisplayName("Quando um cliente valido tenta demonstrar interesse em um café indisponivel")
+        void clienteValidoInteresseCafeIndisponivel() throws Exception {
 
-            cafePostPutRequestDTO.setDisponivel(false);
+            cafe.setDisponivel(false);
+            cafeRepository.save(cafe);
+
 
             String responseJsonString = driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -1194,8 +1198,119 @@ public class CafeControllerTests {
                     .andReturn().getResponse().getContentAsString();
 
             ClienteResponseDTO resultado = objectMapper.readValue(responseJsonString, ClienteResponseDTO.ClienteResponseDTOBuilder.class).build();
+            assertTrue(resultado.getCafesDeInteresse().contains(new CafeResponseDTO(cafe)));
 
-            assertTrue(resultado.getCafesDeInteresse().contains(cafe));
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com invalido tenta demonstrar interesse em um café indisponivel")
+        void clienteInvalidoInteresseCafeIndisponivel() throws Exception {
+
+            cafe.setDisponivel(false);
+            cafeRepository.save(cafe);
+
+
+            String responseJsonString = driver.perform(put(URI_CAFES + "/" + 1111 + "/interesse/" + cafe.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", cliente.getCodigo()))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+            assertEquals("O cliente consultado nao existe!", resultado.getMessage());
+
+        }
+
+        @Test
+        @DisplayName("Quando um cliente valido tenta demonstrar interesse em um café disponivel")
+        void clienteValidoInteresseCafeDisponivel() throws Exception {
+
+            String responseJsonString = driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", cliente.getCodigo()))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+            assertEquals("Nao e possivel demonstrar interesse em um cafe disponivel", resultado.getMessage());
+
+        }
+
+        @Test
+        @DisplayName("Quando um cliente invalido tenta demonstrar interesse em um café indisponivel")
+        void clienteInvalidoInteresseCafeDisponivel() throws Exception {
+
+            String responseJsonString = driver.perform(put(URI_CAFES + "/" + 1111 + "/interesse/" + cafe.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", cliente.getCodigo()))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+            assertEquals("O cliente consultado nao existe!", resultado.getMessage());
+
+        }
+
+        @Test
+        @DisplayName("Listar cafés de interesse de um cliente válido")
+        void listarCafesInteresseClienteValido() throws Exception {
+
+            cafe.setDisponivel(false);
+            cafeRepository.save(cafe);
+
+            driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", cliente.getCodigo()))
+                    .andExpect(status().isOk());
+
+            String response = driver.perform(get(URI_CAFES + "/" + cliente.getId() + "/interesse")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", cliente.getCodigo()))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+
+            List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+            assertEquals(1, resultado.size());
+
+        }
+
+        @Test
+        @DisplayName("Listar cafés de interesse de um cliente inválido")
+        void listarCafesInteresseClienteInvalido() throws Exception {
+
+            cafe.setDisponivel(false);
+            cafeRepository.save(cafe);
+
+            driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", cliente.getCodigo()))
+                    .andExpect(status().isOk());
+
+            String responseJsonString = driver.perform(get(URI_CAFES + "/" + 111 + "/interesse")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", cliente.getCodigo()))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+            assertEquals("O cliente consultado nao existe!", resultado.getMessage());
 
         }
     }

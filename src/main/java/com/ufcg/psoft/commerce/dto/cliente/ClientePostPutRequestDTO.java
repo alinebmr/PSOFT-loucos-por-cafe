@@ -2,6 +2,7 @@ package com.ufcg.psoft.commerce.dto.cliente;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.dto.EnderecoDTO;
+import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 
 import com.ufcg.psoft.commerce.model.Cafe;
@@ -43,6 +44,7 @@ public class ClientePostPutRequestDTO {
     private String codigo;
 
     @JsonProperty("cafesDeInteresse")
-    private List<Cafe> cafesDeInteresse = new ArrayList<Cafe>();
+    @Nullable
+    private List<CafeResponseDTO> cafesDeInteresse;
 
 }
