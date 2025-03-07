@@ -105,7 +105,7 @@ public class FornecedorControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertEquals("MicroCoffee", resultado.getNomeEmpresa());
         }
@@ -124,7 +124,7 @@ public class FornecedorControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertEquals("Cofflee", resultado.getNomeEmpresa());
         }
@@ -186,7 +186,7 @@ public class FornecedorControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertEquals("12.345.678/0001-22", resultado.getCnpj());
         }
@@ -205,7 +205,7 @@ public class FornecedorControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertEquals("12.345.678/0001-23", resultado.getCnpj());
         }
@@ -417,8 +417,7 @@ public class FornecedorControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            List<Fornecedor> resultado = objectMapper.readValue(response, new TypeReference<>() {
-            });
+            List<FornecedorResponseDTO> resultado = objectMapper.readValue(response, new TypeReference<>() {});
 
             assertAll(
                     () -> assertEquals(3, resultado.size())
@@ -474,7 +473,7 @@ public class FornecedorControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(responseJsonString, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(responseJsonString, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertAll(
                     () -> assertNotNull(resultado.getId()),
@@ -498,7 +497,7 @@ public class FornecedorControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertAll(
                     () -> assertEquals(resultado.getId().longValue(), fornecedorId),
