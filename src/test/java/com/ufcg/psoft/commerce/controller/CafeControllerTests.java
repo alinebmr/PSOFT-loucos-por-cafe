@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ufcg.psoft.commerce.dto.cafe.CafePostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
+import com.ufcg.psoft.commerce.dto.entregador.EntregadorResponseDTO;
 import com.ufcg.psoft.commerce.dto.fornecedor.FornecedorPostPutRequestDTO;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
@@ -1016,7 +1017,27 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo")
         void catalogoCafeNormal() throws Exception {
-
+                cafeRepository.save(Cafe.builder()
+                .fornecedor(fornecedor)
+                .nome("Cafe Muito Bom Indisponivel")
+                .origem("Xique-Xique Bahia")
+                .tipo(TipoGraoCafe.GRAO)
+                .perfil("Frutas Vermelhas")
+                .preco(24.99)
+                .qualidade(QualidadeCafe.NORMAL)
+                .tamanhoEmbalagem(35)
+                .disponivel(false)
+                .build());
+                cafeRepository.save(Cafe.builder()
+                .fornecedor(fornecedor)
+                .nome("Cafe Muito Bom Disponivel")
+                .origem("Xique-Xique Bahia")
+                .tipo(TipoGraoCafe.GRAO)
+                .perfil("Frutas Vermelhas")
+                .preco(24.99)
+                .qualidade(QualidadeCafe.NORMAL)
+                .tamanhoEmbalagem(35)
+                .build());
                 String response = driver.perform(get(URI_CAFES + "/catalogo")
                                   .contentType(MediaType.APPLICATION_JSON)
                                   .param("idCliente", cliente.getId().toString()))
@@ -1029,7 +1050,8 @@ public class CafeControllerTests {
                                 
                 List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
 
-                assertEquals(1, resultado.size());
+                assertEquals(3, resultado.size());
+                assertEquals(resultado.get(2).getNome(), "Cafe Muito Bom Indisponivel");
         }
 
         @Test
@@ -1627,4 +1649,33 @@ public class CafeControllerTests {
                 assertEquals("O cliente consultado nao existe!", resultado.getMessage());
         }
     }
+
+
+    @Nested
+    @DisplayName("Testes de disponibilidade de café")
+    class disponibilidadeCafeTeste {
+        @Test
+        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo")
+        void cafeIndisponivel() throws Exception {
+                                
+                String response = driver.perform(patch(URI_CAFES + "/" + cafe.getId() + "/alteraDisponibilidade")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("id", cafe.getId().toString())
+                            .param("idFornecedor", fornecedor.getId().toString())
+                            .param("codigo", fornecedor.getCodigo())
+                            .param("disponibilidade", "false"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            CafeResponseDTO resultado = objectMapper.readValue(response,
+                CafeResponseDTO.CafeResponseDTOBuilder.class).build();
+
+                assertEquals(false, resultado.isDisponivel());
+                List<Cafe> caf = cafeRepository.findByDisponivel(false);
+                
+                assertEquals(caf.get(0).getNome(), "Cafe Muito Bom");
+
+        }
+    }       
 }

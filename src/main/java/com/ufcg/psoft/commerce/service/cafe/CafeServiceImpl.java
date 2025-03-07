@@ -95,8 +95,16 @@ public class CafeServiceImpl implements CafeService{
 
         if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
             cafes = cafeRepository.findByDisponivel(true);
+            List<Cafe> indisponiveis = cafeRepository.findByDisponivel(false);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else {
             cafes = cafeRepository.findByQualidadeAndDisponivel(QualidadeCafe.NORMAL, true);
+            List<Cafe> indisponiveis = cafeRepository.findByQualidadeAndDisponivel(QualidadeCafe.NORMAL,false);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         }
 
 
@@ -127,20 +135,53 @@ public class CafeServiceImpl implements CafeService{
 
         if(tipo == null && origem.isBlank() && perfil.isBlank()) {
             cafes = cafeRepository.findByDisponivel(true);
+            List<Cafe> indisponiveis = cafeRepository.findByDisponivel(false);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(origem.isBlank() && perfil.isBlank()) {
             cafes = cafeRepository.findByTipoAndDisponivel(tipo, true);
+            List<Cafe> indisponiveis = cafeRepository.findByTipoAndDisponivel(tipo,false);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(tipo == null && origem.isBlank()) {
             cafes = cafeRepository.findByDisponivelAndPerfilContainingIgnoreCase(true, perfil);
+            List<Cafe> indisponiveis = cafeRepository.findByDisponivelAndPerfilContainingIgnoreCase(false, perfil);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(tipo == null && perfil.isBlank()) {
             cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCase(true, origem);
+            List<Cafe> indisponiveis = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCase(false, origem);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(tipo == null) {
             cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(true, origem, perfil);
+            List<Cafe> indisponiveis = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(false, origem, perfil);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
+            
         } else if(origem.isBlank()) {
             cafes = cafeRepository.findByDisponivelAndPerfilContainingIgnoreCaseAndTipo(true, perfil, tipo);
+            List<Cafe> indisponiveis = cafeRepository.findByDisponivelAndPerfilContainingIgnoreCaseAndTipo(false, perfil, tipo);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(perfil.isBlank()){
-            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndTipo(true, perfil, tipo);
+            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndTipo(true, origem, tipo);
+            List<Cafe> indisponiveis = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndTipo(false, origem, tipo);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else {
             cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(true, origem, perfil, tipo);
+            List<Cafe> indisponiveis = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(false, origem, perfil, tipo);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         }
 
         return cafes.stream()
@@ -153,24 +194,66 @@ public class CafeServiceImpl implements CafeService{
 
         if(tipo == null && origem.isBlank() && perfil.isBlank()) {
             cafes = cafeRepository.findByQualidadeAndDisponivel(QualidadeCafe.NORMAL, true);
+            List<Cafe> indisponiveis = cafeRepository.findByQualidadeAndDisponivel(QualidadeCafe.NORMAL,false);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
+            
         } else if(origem.isBlank() && perfil.isBlank()) {
             cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, tipo, true);
+            List<Cafe> indisponiveis = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL,tipo,false);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(tipo == null && origem.isBlank()) {
             cafes = cafeRepository.findByQualidadeAndDisponivelAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, true, perfil);
+            List<Cafe> indisponiveis = cafeRepository.findByQualidadeAndDisponivelAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL,false,perfil);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(tipo == null && perfil.isBlank()) {
             cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCase(QualidadeCafe.NORMAL ,true, origem);
+            List<Cafe> indisponiveis = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCase(QualidadeCafe.NORMAL,false,origem);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(tipo == null) {
             cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, true, origem, perfil);
+            List<Cafe> indisponiveis = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL,false,origem,perfil);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(origem.isBlank()) {
             cafes = cafeRepository.findByQualidadeAndDisponivelAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, perfil, tipo);
+            List<Cafe> indisponiveis = cafeRepository.findByQualidadeAndDisponivelAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL,false,perfil,tipo);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else if(perfil.isBlank()){
-            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, perfil, tipo);
+            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, origem, tipo);
+            List<Cafe> indisponiveis = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL,false,origem,tipo);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         } else {
             cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, origem, perfil, tipo);
+            List<Cafe> indisponiveis = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL,false,origem,perfil,tipo);
+            for (Cafe cafe : indisponiveis) {
+                cafes.add(cafe);
+            }
         }
 
         return cafes.stream()
                 .map(CafeResponseDTO::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CafeResponseDTO alterarDisponibilidadeCafe(Long idCafe, Long idFornecedor, String codigoAcesso, boolean disponibilidade){
+        fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
+        Cafe cafe = recuperaCafe(idCafe);
+        cafe.setDisponivel(disponibilidade);
+        cafeRepository.save(cafe);
+        return new CafeResponseDTO(cafe);
     }
 }
