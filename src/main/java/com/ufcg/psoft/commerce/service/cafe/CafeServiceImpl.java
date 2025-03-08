@@ -276,7 +276,6 @@ public class CafeServiceImpl implements CafeService{
     @Override
     public List<CafeResponseDTO> listarCafesInteresseCliente(Long idCliente, String codigoAcesso) {
         Cliente cliente = clienteService.verificaCliente(idCliente,codigoAcesso);
-
         List<Cafe> cafes = cliente.getCafesDeInteresse();
         return cafes.stream().map(CafeResponseDTO::new).collect(Collectors.toList());
     }
@@ -286,8 +285,22 @@ public class CafeServiceImpl implements CafeService{
     public CafeResponseDTO alterarDisponibilidadeCafe(Long idCafe, Long idFornecedor, String codigoAcesso, boolean disponibilidade){
         fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
         Cafe cafe = recuperaCafe(idCafe);
+        if(disponibilidade && !cafe.isDisponivel()){
+            notificaClientesInteressados(cafe);
+        }
         cafe.setDisponivel(disponibilidade);
         cafeRepository.save(cafe);
         return new CafeResponseDTO(cafe);
+    }
+
+    //@SuppressWarnings("unlikely-arg-type")
+    private void notificaClientesInteressados(Cafe cafe){
+        List<ClienteResponseDTO> clientes = clienteService.listar();
+        for (ClienteResponseDTO cliente : clientes) {
+            if(cliente.getCafesDeInteresse().contains(cafe)){
+                String notificacao = "Cliente " + cliente.getNome() + ", o cafe " + cafe.getNome() + " voltou ao estoque.";
+                System.out.println(notificacao);
+            }
+        }
     }
 }

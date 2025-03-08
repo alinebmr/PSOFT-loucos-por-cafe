@@ -30,6 +30,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,9 +76,13 @@ public class CafeControllerTests {
 
     FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO;
 
+    PrintStream standardOut = System.out;
+    
+    ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
     @BeforeEach
     void setup() {
-
+        System.setOut(new PrintStream(outputStreamCaptor));
         cliente = clienteRepository.save(Cliente.builder()
                 .nome("Tu")
                 .codigo("111111")
@@ -1019,6 +1025,27 @@ public class CafeControllerTests {
                     () -> assertEquals("Codigo de acesso invalido!", resultado.getMessage())
             );
         }
+        @Test
+        @DisplayName("Quando tenta-se alterar a disponibilidade de um cafe invalido")
+        void alteraDisponibilidaCafeInvalido() throws Exception {
+
+                String response = driver.perform(patch(URI_CAFES + "/" + 9999 + "/alteraDisponibilidade")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("id", cafe.getId().toString())
+                            .param("idFornecedor", fornecedor.getId().toString())
+                            .param("codigo", fornecedor.getCodigo())
+                            .param("disponibilidade", "true"))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+                CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
+
+                // Assert
+                assertAll(
+                        () -> assertEquals("O cafe consultado nao existe!", resultado.getMessage())
+                );
+        }
     }
 
     @Nested
@@ -1803,7 +1830,7 @@ public class CafeControllerTests {
     @DisplayName("Testes de disponibilidade de café")
     class disponibilidadeCafeTeste {
         @Test
-        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo")
+        @DisplayName("Quando um cafe valido se torna indisponivel")
         void cafeIndisponivel() throws Exception {
                                 
                 String response = driver.perform(patch(URI_CAFES + "/" + cafe.getId() + "/alteraDisponibilidade")
@@ -1816,14 +1843,84 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            CafeResponseDTO resultado = objectMapper.readValue(response,
+                CafeResponseDTO resultado = objectMapper.readValue(response,
                 CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
                 assertEquals(false, resultado.isDisponivel());
                 List<Cafe> caf = cafeRepository.findByDisponivel(false);
-                
                 assertEquals(caf.get(0).getNome(), "Cafe Muito Bom");
 
         }
-    }       
+    
+        @Test
+        @DisplayName("Quando um cafe valido se torna disponivel")
+        void cafeDisponivel() throws Exception {
+
+                Cafe cafeIndisponivel = cafeRepository.save(Cafe.builder()
+                .fornecedor(fornecedor)
+                .nome("Cafe Indisponivel")
+                .origem("Xique-Xique Bahia")
+                .tipo(TipoGraoCafe.GRAO)
+                .perfil("Frutas Vermelhas")
+                .preco(24.99)
+                .qualidade(QualidadeCafe.NORMAL)
+                .tamanhoEmbalagem(35)
+                .disponivel(false)
+                .build());
+
+                String response = driver.perform(patch(URI_CAFES + "/" + cafeIndisponivel.getId() + "/alteraDisponibilidade")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("id", cafeIndisponivel.getId().toString())
+                            .param("idFornecedor", fornecedor.getId().toString())
+                            .param("codigo", fornecedor.getCodigo())
+                            .param("disponibilidade", "true"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+                CafeResponseDTO resultado = objectMapper.readValue(response,
+                CafeResponseDTO.CafeResponseDTOBuilder.class).build();
+
+                assertEquals(true, resultado.isDisponivel());
+        }
+    }
+    
+
+    /*@Nested
+    @DisplayName("Testes de notificacao de café")
+    class notificacaoCafeTeste {
+        @Test
+        @DisplayName("Quando um cafe de interesse se torna disponivel")
+        void cafeIndisponivel() throws Exception {
+                driver.perform(patch(URI_CAFES + "/" + cafe.getId() + "/alteraDisponibilidade")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("id", cafe.getId().toString())
+                            .param("idFornecedor", fornecedor.getId().toString())
+                            .param("codigo", fornecedor.getCodigo())
+                            .param("disponibilidade", "false"))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+                driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", cliente.getCodigo()))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+                                
+                
+                    driver.perform(patch(URI_CAFES + "/" + cafe.getId() + "/alteraDisponibilidade")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .param("id", cafe.getId().toString())
+                    .param("idFornecedor", fornecedor.getId().toString())
+                    .param("codigo", fornecedor.getCodigo())
+                    .param("disponibilidade", "true"))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andReturn().getResponse().getContentAsString();
+        }
+    
+    }*/
+
 }
