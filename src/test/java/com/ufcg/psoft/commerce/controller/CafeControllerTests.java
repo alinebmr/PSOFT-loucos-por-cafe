@@ -1053,8 +1053,8 @@ public class CafeControllerTests {
     class CatalogoCafeTeste {
 
         @Test
-        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo")
-        void catalogoCafeNormal() throws Exception {
+        @DisplayName("Quando um cliente com assinatura normal visualiza catálogo com café indisponível")
+        void catalogoCafeIndisponivelNormal() throws Exception{
                 cafeRepository.save(Cafe.builder()
                 .fornecedor(fornecedor)
                 .nome("Cafe Muito Bom Indisponivel")
@@ -1066,6 +1066,41 @@ public class CafeControllerTests {
                 .tamanhoEmbalagem(35)
                 .disponivel(false)
                 .build());
+
+                cafeRepository.save(Cafe.builder()
+                .fornecedor(fornecedor)
+                .nome("Cafe Muito Bom Disponivel")
+                .origem("Xique-Xique Bahia")
+                .tipo(TipoGraoCafe.GRAO)
+                .perfil("Frutas Vermelhas")
+                .preco(24.99)
+                .qualidade(QualidadeCafe.NORMAL)
+                .tamanhoEmbalagem(35)
+                .disponivel(true)
+                .build());
+
+                String response = driver.perform(get(URI_CAFES + "/catalogo")
+                                  .contentType(MediaType.APPLICATION_JSON)
+                                  .param("idCliente", cliente.getId().toString()))
+                                .andExpect(status().isOk())
+                                .andDo(print())
+                                .andReturn().getResponse().getContentAsString();
+
+                                
+                CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
+                                
+                List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
+
+                assertEquals(3, resultado.size());
+                //Cafe indisponivel fica no fim do catalogo
+                assertEquals(resultado.get(2).getNome(), "Cafe Muito Bom Indisponivel");
+
+        }
+
+        @Test
+        @DisplayName("Quando um cliente com assinatura normal visualiza o catálogo")
+        void catalogoCafeNormal() throws Exception {
+
                 cafeRepository.save(Cafe.builder()
                 .fornecedor(fornecedor)
                 .nome("Cafe Muito Bom Disponivel")
@@ -1088,8 +1123,7 @@ public class CafeControllerTests {
                                 
                 List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
 
-                assertEquals(3, resultado.size());
-                assertEquals(resultado.get(2).getNome(), "Cafe Muito Bom Indisponivel");
+                assertEquals(2, resultado.size());
         }
 
         @Test
