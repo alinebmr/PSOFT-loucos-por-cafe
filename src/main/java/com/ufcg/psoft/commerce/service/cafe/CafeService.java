@@ -32,4 +32,6 @@ public interface CafeService {
     List<CafeResponseDTO> listarCafesInteresseCliente(Long idCliente, String codigoAcesso);
 
     void removerInteresseClienteCafe(Long idCliente, String codigoAcesso, Long idCafe);
+
+    CafeResponseDTO alterarDisponibilidadeCafe(Long idCafe, Long idFornecedor, String codigoAcesso, boolean disponibilidade);
 }

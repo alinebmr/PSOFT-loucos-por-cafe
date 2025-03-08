@@ -50,7 +50,7 @@ public class ClienteResponseDTO {
         this.endereco = new EnderecoDTO(cliente.getEndereco());
         this.assinatura = cliente.getAssinatura();
         this.cafesDeInteresse = cliente.getCafesDeInteresse().stream()
-                .map(cafe -> new CafeResponseDTO(cafe))
+                .map(CafeResponseDTO::new)
                 .collect(Collectors.toList());
     }
 }

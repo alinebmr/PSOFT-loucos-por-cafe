@@ -44,11 +44,6 @@ public class Cliente {
 
     @JsonProperty("cafesDeInteresse")
     @Builder.Default
-    @ManyToMany
-    @JoinTable(
-            name = "cafe_interesse_cliente",
-            joinColumns = @JoinColumn(name = "cliente_id"),
-            inverseJoinColumns = @JoinColumn(name = "cafe_id")
-    )
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Cafe> cafesDeInteresse = new ArrayList<Cafe>();
 }

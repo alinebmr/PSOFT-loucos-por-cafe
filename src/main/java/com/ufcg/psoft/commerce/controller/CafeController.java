@@ -119,4 +119,15 @@ public class CafeController {
             @RequestParam String codigo){
         return ResponseEntity.status(HttpStatus.OK).body(cafeService.listarCafesInteresseCliente(idCliente,codigo));
     }
+
+    @PatchMapping("/{id}/alteraDisponibilidade")
+    public ResponseEntity<?> alteraDisponibilidade(
+        @PathVariable Long id,
+        @RequestParam Long idFornecedor,
+        @RequestParam String codigo,
+        @RequestParam boolean disponibilidade) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(cafeService.alterarDisponibilidadeCafe(id, idFornecedor, codigo, disponibilidade));
+    }
 }
