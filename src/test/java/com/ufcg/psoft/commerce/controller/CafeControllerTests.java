@@ -81,7 +81,7 @@ public class CafeControllerTests {
     FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO;
 
     PrintStream standardOut = System.out;
-    
+
     ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
     @BeforeEach
@@ -1091,9 +1091,9 @@ public class CafeControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-                                
+
                 CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
-                                
+
                 List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
 
                 assertEquals(3, resultado.size());
@@ -1123,9 +1123,9 @@ public class CafeControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-                                
+
                 CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
-                                
+
                 List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
 
                 assertEquals(2, resultado.size());
@@ -1424,9 +1424,9 @@ public class CafeControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-                                
+
                 CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
-                                
+
                 List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
 
                 assertEquals(1, resultado.size());
@@ -1443,9 +1443,9 @@ public class CafeControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-                                
+
                 CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
-                                
+
                 List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
 
                 assertEquals(2, resultado.size());
@@ -1463,9 +1463,9 @@ public class CafeControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-                                
+
                 CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, CafeResponseDTO.class);
-                                
+
                 List<CafeResponseDTO> resultado = objectMapper.readValue(response, collectionType);
 
                 assertEquals(1, resultado.size());
@@ -1702,7 +1702,7 @@ public class CafeControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-                
+
                 CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
 
                 assertEquals("Tipo do cafe invalido!", resultado.getMessage());
@@ -1720,7 +1720,7 @@ public class CafeControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-                
+
                 CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
 
             assertEquals("O cliente consultado nao existe!", resultado.getMessage());
@@ -1956,31 +1956,28 @@ public class CafeControllerTests {
         @Test
         @DisplayName("Quando um cafe valido se torna indisponivel")
         void cafeIndisponivel() throws Exception {
-                                
-                String response = driver.perform(patch(URI_CAFES + "/" + cafe.getId() + "/alteraDisponibilidade")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("id", cafe.getId().toString())
-                            .param("idFornecedor", fornecedor.getId().toString())
-                            .param("codigo", fornecedor.getCodigo())
-                            .param("disponibilidade", "false"))
-                    .andExpect(status().isOk())
-                    .andDo(print())
-                    .andReturn().getResponse().getContentAsString();
+            String response = driver.perform(patch(URI_CAFES + "/" + cafe.getId() + "/alteraDisponibilidade")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("id", cafe.getId().toString())
+                        .param("idFornecedor", fornecedor.getId().toString())
+                        .param("codigo", fornecedor.getCodigo())
+                        .param("disponibilidade", "false"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn().getResponse().getContentAsString();
 
-                CafeResponseDTO resultado = objectMapper.readValue(response,
-                CafeResponseDTO.CafeResponseDTOBuilder.class).build();
+            CafeResponseDTO resultado = objectMapper.readValue(response,
+            CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
-                assertFalse(resultado.isDisponivel());
-                List<Cafe> caf = cafeRepository.findByDisponivel(false);
-                assertEquals( "Cafe Muito Bom",caf.get(0).getNome());
-
+            assertFalse(resultado.isDisponivel());
+            List<Cafe> caf = cafeRepository.findByDisponivel(false);
+            assertEquals( "Cafe Muito Bom",caf.get(0).getNome());
         }
-    
+
         @Test
         @DisplayName("Quando um cafe valido se torna disponivel")
         void cafeDisponivel() throws Exception {
-
-                Cafe cafeIndisponivel = cafeRepository.save(Cafe.builder()
+            Cafe cafeIndisponivel = cafeRepository.save(Cafe.builder()
                 .fornecedor(fornecedor)
                 .nome("Cafe Indisponivel")
                 .origem("Xique-Xique Bahia")
@@ -1992,20 +1989,26 @@ public class CafeControllerTests {
                 .disponivel(false)
                 .build());
 
-                String response = driver.perform(patch(URI_CAFES + "/" + cafeIndisponivel.getId() + "/alteraDisponibilidade")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("id", cafeIndisponivel.getId().toString())
-                            .param("idFornecedor", fornecedor.getId().toString())
-                            .param("codigo", fornecedor.getCodigo())
-                            .param("disponibilidade", "true"))
-                    .andExpect(status().isOk())
-                    .andDo(print())
-                    .andReturn().getResponse().getContentAsString();
+            cliente.getCafesDeInteresse().add(cafeIndisponivel);
+            cliente = clienteRepository.save(cliente);
 
-                CafeResponseDTO resultado = objectMapper.readValue(response,
-                CafeResponseDTO.CafeResponseDTOBuilder.class).build();
+            cliente1.getCafesDeInteresse().add(cafeIndisponivel);
+            cliente1 = clienteRepository.save(cliente1);
 
-                assertTrue(resultado.isDisponivel());
+            String response = driver.perform(patch(URI_CAFES + "/" + cafeIndisponivel.getId() + "/alteraDisponibilidade")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("id", cafeIndisponivel.getId().toString())
+                        .param("idFornecedor", fornecedor.getId().toString())
+                        .param("codigo", fornecedor.getCodigo())
+                        .param("disponibilidade", "true"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn().getResponse().getContentAsString();
+
+            CafeResponseDTO resultado = objectMapper.readValue(response,
+            CafeResponseDTO.CafeResponseDTOBuilder.class).build();
+
+            assertTrue(resultado.isDisponivel());
         }
     }
 

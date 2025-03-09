@@ -143,6 +143,32 @@ public class DadosIniciais implements ApplicationRunner {
             .build()
         );
 
+        cafeRepository.save(Cafe.builder()
+            .fornecedor(fornecedor2)
+            .nome("Cafe Himalaia")
+            .origem("Himalaia")
+            .tipo(TipoGraoCafe.CAPSULA)
+            .perfil("Rosas")
+            .preco(59.99)
+            .qualidade(QualidadeCafe.NORMAL)
+            .tamanhoEmbalagem(15)
+            .disponivel(false)
+            .build()
+        );
+
+        cafeRepository.save(Cafe.builder()
+            .fornecedor(fornecedor2)
+            .nome("Cafe Super Raro da Himalaia")
+            .origem("Himalaia")
+            .tipo(TipoGraoCafe.CAPSULA)
+            .perfil("Rosas")
+            .preco(99.99)
+            .qualidade(QualidadeCafe.PREMIUM)
+            .tamanhoEmbalagem(15)
+            .disponivel(false)
+            .build()
+        );
+
         entregadorRespository.save(Entregador.builder()
             .nome("Leticia Fretes")
             .placaVeiculo("AAA-2345")

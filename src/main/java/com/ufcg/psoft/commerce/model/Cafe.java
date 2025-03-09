@@ -1,5 +1,8 @@
 package com.ufcg.psoft.commerce.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
@@ -60,4 +63,8 @@ public class Cafe {
     @JsonProperty("tamanhoEmbalagem")
     @Column(nullable = false)
     private Integer tamanhoEmbalagem;
+
+    @ManyToMany(mappedBy = "cafesDeInteresse")
+    @Builder.Default
+    private List<Cliente> clientesInteressados = new ArrayList<>();
 }

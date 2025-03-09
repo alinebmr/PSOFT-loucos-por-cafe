@@ -2,7 +2,6 @@ package com.ufcg.psoft.commerce.service.cafe;
 
 import com.ufcg.psoft.commerce.dto.cafe.*;
 import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
-import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 import com.ufcg.psoft.commerce.model.Cafe;
 
 import java.util.List;

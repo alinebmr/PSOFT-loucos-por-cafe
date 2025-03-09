@@ -302,24 +302,14 @@ public class CafeServiceImpl implements CafeService{
         cliente.getCafesDeInteresse().remove(cafe);
     }
 
-    //@SuppressWarnings("unlikely-arg-type")
-    private void notificaClientesInteressados(Cafe cafe){
+    private void notificaClientesInteressados(Cafe cafe) {
+        List<Cliente> clientes = cafe.getClientesInteressados().stream().sorted((c1, c2) -> {
+            return c1.getAssinatura().compareTo(c2.getAssinatura());
+        }).toList();
 
-        List<ClienteResponseDTO> clientes = clienteService.listar().stream().sorted((c1,c2)->{
-                    if (c1.getAssinatura() == TipoAssinatura.PREMIUM && c2.getAssinatura() == TipoAssinatura.NORMAL) {
-                        return -1;
-                    } else if (c1.getAssinatura() == TipoAssinatura.NORMAL && c2.getAssinatura() == TipoAssinatura.PREMIUM) {
-                        return 1;
-                    }
-                    return 0;
-                })
-                .toList();
-
-        for (ClienteResponseDTO cliente : clientes) {
+        for (Cliente cliente : clientes) {
             String notificacao = "Cliente " + cliente.getNome() + ", o cafe " + cafe.getNome() + " voltou ao estoque.";
             System.out.println(notificacao);
-
         }
-
     }
 }
