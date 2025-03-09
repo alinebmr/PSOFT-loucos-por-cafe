@@ -5,7 +5,6 @@ import com.ufcg.psoft.commerce.dto.EnderecoDTO;
 import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 
-import com.ufcg.psoft.commerce.model.Cafe;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -15,8 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Data

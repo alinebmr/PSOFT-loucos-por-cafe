@@ -1816,11 +1816,8 @@ public class CafeControllerTests {
 
             cafe.setDisponivel(false);
             cafeRepository.save(cafe);
-
-            driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigo", cliente.getCodigo()))
-                    .andExpect(status().isOk());
+            cliente.getCafesDeInteresse().add(cafe);
+            clienteRepository.save(cliente);
 
             String responseJsonString = driver.perform(delete(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
                     .contentType(MediaType.APPLICATION_JSON).param("codigo",cliente.getCodigo()))
@@ -1837,11 +1834,8 @@ public class CafeControllerTests {
 
             cafe.setDisponivel(false);
             cafeRepository.save(cafe);
-
-            driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigo", cliente.getCodigo()))
-                    .andExpect(status().isOk());
+            cliente.getCafesDeInteresse().add(cafe);
+            clienteRepository.save(cliente);
 
             String responseJsonString = driver.perform(delete(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe1.getId())
                             .contentType(MediaType.APPLICATION_JSON).param("codigo",cliente.getCodigo()))
@@ -1858,11 +1852,8 @@ public class CafeControllerTests {
 
             cafe.setDisponivel(false);
             cafeRepository.save(cafe);
-
-            driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigo", cliente.getCodigo()))
-                    .andExpect(status().isOk());
+            cliente.getCafesDeInteresse().add(cafe);
+            clienteRepository.save(cliente);
 
             String responseJsonString = driver.perform(delete(URI_CAFES + "/" + 999 + "/interesse/" + cafe1.getId())
                             .contentType(MediaType.APPLICATION_JSON).param("codigo",cliente.getCodigo()))
@@ -1879,11 +1870,8 @@ public class CafeControllerTests {
 
             cafe.setDisponivel(false);
             cafeRepository.save(cafe);
-
-            driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigo", cliente.getCodigo()))
-                    .andExpect(status().isOk());
+            cliente.getCafesDeInteresse().add(cafe);
+            clienteRepository.save(cliente);
 
             String responseJsonString = driver.perform(delete(URI_CAFES + "/" + cliente.getId() + "/interesse/" + 9999)
                             .contentType(MediaType.APPLICATION_JSON).param("codigo",cliente.getCodigo()))
@@ -1900,11 +1888,8 @@ public class CafeControllerTests {
 
             cafe.setDisponivel(false);
             cafeRepository.save(cafe);
-
-            driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigo", cliente.getCodigo()))
-                    .andExpect(status().isOk());
+            cliente.getCafesDeInteresse().add(cafe);
+            clienteRepository.save(cliente);
 
             String responseJsonString = driver.perform(delete(URI_CAFES + "/" + 999 + "/interesse/" + cafe.getId())
                             .contentType(MediaType.APPLICATION_JSON).param("codigo",cliente.getCodigo()))
@@ -1922,11 +1907,8 @@ public class CafeControllerTests {
 
             cafe.setDisponivel(false);
             cafeRepository.save(cafe);
-
-            driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigo", cliente.getCodigo()))
-                    .andExpect(status().isOk());
+            cliente.getCafesDeInteresse().add(cafe);
+            clienteRepository.save(cliente);
 
             String responseJsonString = driver.perform(get(URI_CAFES + "/" + cliente.getId() + "/interesse")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -1950,11 +1932,8 @@ public class CafeControllerTests {
 
             cafe.setDisponivel(false);
             cafeRepository.save(cafe);
-
-            driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigo", cliente.getCodigo()))
-                    .andExpect(status().isOk());
+            cliente.getCafesDeInteresse().add(cafe);
+            clienteRepository.save(cliente);
 
             String responseJsonString = driver.perform(get(URI_CAFES + "/" + 111 + "/interesse")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -2029,43 +2008,5 @@ public class CafeControllerTests {
                 assertTrue(resultado.isDisponivel());
         }
     }
-    
-
-//    @Nested
-//    @DisplayName("Testes de notificacao de café")
-//    class notificacaoCafeTeste {
-//        @Test
-//        @DisplayName("Quando um cafe de interesse se torna disponivel")
-//        void cafeIndisponivel() throws Exception {
-//                driver.perform(patch(URI_CAFES + "/" + cafe.getId() + "/alteraDisponibilidade")
-//                            .contentType(MediaType.APPLICATION_JSON)
-//                            .param("id", cafe.getId().toString())
-//                            .param("idFornecedor", fornecedor.getId().toString())
-//                            .param("codigo", fornecedor.getCodigo())
-//                            .param("disponibilidade", "false"))
-//                    .andExpect(status().isOk())
-//                    .andDo(print())
-//                    .andReturn().getResponse().getContentAsString();
-//
-//                driver.perform(put(URI_CAFES + "/" + cliente.getId() + "/interesse/" + cafe.getId())
-//                            .contentType(MediaType.APPLICATION_JSON)
-//                            .param("codigo", cliente.getCodigo()))
-//                    .andExpect(status().isOk())
-//                    .andDo(print())
-//                    .andReturn().getResponse().getContentAsString();
-//
-//
-//                    driver.perform(patch(URI_CAFES + "/" + cafe.getId() + "/alteraDisponibilidade")
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .param("id", cafe.getId().toString())
-//                    .param("idFornecedor", fornecedor.getId().toString())
-//                    .param("codigo", fornecedor.getCodigo())
-//                    .param("disponibilidade", "true"))
-//            .andExpect(status().isOk())
-//            .andDo(print())
-//            .andReturn().getResponse().getContentAsString();
-//        }
-//
-//    }
 
 }
