@@ -955,6 +955,35 @@ public class CafeControllerTests {
         }
 
         @Test
+        @DisplayName("Quando alteramos o cafe que nao pertence ao fornecedor")
+        void alteraCafeNaoPertenceFornecedor() throws Exception {
+
+            Long cafeId = cafe.getId();
+
+            Fornecedor fornecedor2 = fornecedorRepository.save(Fornecedor.builder()
+           .nomeEmpresa("MacroCoffee")
+           .cnpj("12.345.678/0001-22")
+           .codigo("222222")
+           .build());
+
+            String response = driver.perform(put(URI_CAFES + "/" + cafeId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idFornecedor", fornecedor2.getId().toString())
+                            .param("codigo", fornecedor2.getCodigo())
+                            .content(objectMapper.writeValueAsString(cafePostPutRequestDTO)))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
+
+            // Assert
+            assertAll(
+                    () -> assertEquals("O fornecedor nao fornece esse cafe!", resultado.getMessage())
+            );
+        }
+
+        @Test
         @DisplayName("Quando excluímos um cafe salvo")
         void excluiCafeValido() throws Exception {
 
@@ -1025,6 +1054,32 @@ public class CafeControllerTests {
                     () -> assertEquals("Codigo de acesso invalido!", resultado.getMessage())
             );
         }
+
+        @Test
+        @DisplayName("Quando excluímos um cafe salvo que não pertence ao fornecedor")
+        void excluiCafeNaoPertenceFornecedor() throws Exception {
+
+           Fornecedor fornecedor2 = fornecedorRepository.save(Fornecedor.builder()
+           .nomeEmpresa("MacroCoffee")
+           .cnpj("12.345.678/0001-22")
+           .codigo("222222")
+           .build());
+
+            String response = driver.perform(delete(URI_CAFES + "/" + cafe.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("idFornecedor", fornecedor2.getId().toString())
+                            .param("codigo", fornecedor2.getCodigo()))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
+
+            assertAll(
+                    () -> assertEquals("O fornecedor nao fornece esse cafe!", resultado.getMessage())
+            );
+        }
+        
         @Test
         @DisplayName("Quando tenta-se alterar a disponibilidade de um cafe invalido")
         void alteraDisponibilidaCafeInvalido() throws Exception {
@@ -1093,7 +1148,7 @@ public class CafeControllerTests {
 
                 assertEquals(3, resultado.size());
                 //Cafe indisponivel fica no fim do catalogo
-                assertEquals(resultado.get(2).getNome(), "Cafe Muito Bom Indisponivel");
+                assertEquals("Cafe Muito Bom Indisponivel", resultado.get(2).getNome());
 
         }
 
@@ -1916,6 +1971,34 @@ public class CafeControllerTests {
                 CafeResponseDTO.CafeResponseDTOBuilder.class).build();
 
                 assertEquals(true, resultado.isDisponivel());
+        }
+
+        @Test
+        @DisplayName("Quando tentamos alterar a disponibilidade de um cafe que nao pertence ao fornecedor")
+        void AlteraDispiniblidadeCafeNaoPertenceFornecedor() throws Exception{
+
+                Fornecedor fornecedor2 = fornecedorRepository.save(Fornecedor.builder()
+                .nomeEmpresa("MacroCoffee")
+                .cnpj("12.345.678/0001-22")
+                .codigo("222222")
+                .build());
+
+                String response = driver.perform(patch(URI_CAFES + "/" + cafe.getId() + "/alteraDisponibilidade")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("id", cafe.getId().toString())
+                            .param("idFornecedor", fornecedor2.getId().toString())
+                            .param("codigo", fornecedor2.getCodigo())
+                            .param("disponibilidade", "true"))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+                CustomErrorType resultado = objectMapper.readValue(response, CustomErrorType.class);
+
+                assertAll(
+                        () -> assertEquals("O fornecedor nao fornece esse cafe!", resultado.getMessage())
+                );
+
         }
     }
     
