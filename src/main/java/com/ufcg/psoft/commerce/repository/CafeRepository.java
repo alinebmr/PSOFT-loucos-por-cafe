@@ -16,33 +16,33 @@ public interface CafeRepository extends JpaRepository<Cafe, Long> {
 
     List<Cafe> findByDisponivel(boolean disponivel);
 
-    List<Cafe> findByTipoAndDisponivel(TipoGraoCafe tipo, boolean disponivel);
+    List<Cafe> findByTipo(TipoGraoCafe tipo);
 
-    List<Cafe> findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(boolean disponivel, String origem, String perfil, TipoGraoCafe tipo);
+    List<Cafe> findByOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(String origem, String perfil, TipoGraoCafe tipo);
 
-    List<Cafe> findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(boolean disponivel, String origem, String perfil);
+    List<Cafe> findByOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(String origem, String perfil);
 
-    List<Cafe> findByDisponivelAndOrigemContainingIgnoreCaseAndTipo(boolean disponivel, String origem, TipoGraoCafe tipo);
+    List<Cafe> findByOrigemContainingIgnoreCaseAndTipo(String origem, TipoGraoCafe tipo);
 
-    List<Cafe> findByDisponivelAndPerfilContainingIgnoreCaseAndTipo(boolean disponivel, String perfil, TipoGraoCafe tipo);
+    List<Cafe> findByPerfilContainingIgnoreCaseAndTipo(String perfil, TipoGraoCafe tipo);
 
-    List<Cafe> findByDisponivelAndOrigemContainingIgnoreCase(boolean disponivel, String origem);
+    List<Cafe> findByOrigemContainingIgnoreCase(String origem);
 
-    List<Cafe> findByDisponivelAndPerfilContainingIgnoreCase(boolean disponivel, String perfil);
+    List<Cafe> findByPerfilContainingIgnoreCase(String perfil);
 
-    List<Cafe> findByQualidadeAndDisponivel(QualidadeCafe qualidade, boolean disponivel);
+    List<Cafe> findByQualidade(QualidadeCafe qualidade);
 
-    List<Cafe> findByQualidadeAndTipoAndDisponivel(QualidadeCafe qualidade, TipoGraoCafe tipo, boolean disponivel);
+    List<Cafe> findByQualidadeAndTipo(QualidadeCafe qualidade, TipoGraoCafe tipo);
 
-    List<Cafe> findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe qualidade, boolean disponivel, String origem, String perfil, TipoGraoCafe tipo);
+    List<Cafe> findByQualidadeAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe qualidade, String origem, String perfil, TipoGraoCafe tipo);
 
-    List<Cafe> findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(QualidadeCafe qualidade, boolean disponivel, String origem, String perfil);
+    List<Cafe> findByQualidadeAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(QualidadeCafe qualidade, String origem, String perfil);
 
-    List<Cafe> findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndTipo(QualidadeCafe qualidade, boolean disponivel, String origem, TipoGraoCafe tipo);
+    List<Cafe> findByQualidadeAndOrigemContainingIgnoreCaseAndTipo(QualidadeCafe qualidade, String origem, TipoGraoCafe tipo);
 
-    List<Cafe> findByQualidadeAndDisponivelAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe qualidade, boolean disponivel, String perfil, TipoGraoCafe tipo);
+    List<Cafe> findByQualidadeAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe qualidade, String perfil, TipoGraoCafe tipo);
 
-    List<Cafe> findByQualidadeAndDisponivelAndPerfilContainingIgnoreCase(QualidadeCafe qualidade, boolean disponivel, String perfil);
+    List<Cafe> findByQualidadeAndPerfilContainingIgnoreCase(QualidadeCafe qualidade, String perfil);
 
-    List<Cafe> findByQualidadeAndDisponivelAndOrigemContainingIgnoreCase(QualidadeCafe qualidade, boolean disponivel, String origem);
+    List<Cafe> findByQualidadeAndOrigemContainingIgnoreCase(QualidadeCafe qualidade, String origem);
 }
