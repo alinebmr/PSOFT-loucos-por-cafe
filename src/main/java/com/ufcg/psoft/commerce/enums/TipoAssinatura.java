@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.ufcg.psoft.commerce.exception.CommerceException;
 
 public enum TipoAssinatura {
-    NORMAL,
-    PREMIUM;
+    PREMIUM,
+    NORMAL;
 
     @JsonCreator
     public static TipoAssinatura fromString(String key) {

@@ -36,6 +36,7 @@ public class Fornecedor {
     @Column(nullable = false)
     private String cnpj;
 
+    @JsonProperty("tiposPagamento")
     @Builder.Default
     @ElementCollection(targetClass = TipoPagamento.class)
     private Set<TipoPagamento> tiposPagamento = new HashSet<>();

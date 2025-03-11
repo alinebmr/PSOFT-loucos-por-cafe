@@ -1,6 +1,13 @@
 package com.ufcg.psoft.commerce.service.cafe;
 
+import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
+import com.ufcg.psoft.commerce.exception.CafeNaoEInteresseDeClienteException;
 import com.ufcg.psoft.commerce.exception.CafeNaoExisteException;
+import com.ufcg.psoft.commerce.exception.ClienteNaoExisteException;
+import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
+import com.ufcg.psoft.commerce.exception.FornecedorNaoForneceCafeException;
+import com.ufcg.psoft.commerce.exception.InteresseEmCafeDisponivelException;
+import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.service.fornecedor.FornecedorService;
 import com.ufcg.psoft.commerce.service.cliente.ClienteService;
 import com.ufcg.psoft.commerce.repository.CafeRepository;
@@ -16,6 +23,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,8 +53,11 @@ public class CafeServiceImpl implements CafeService{
     @Override
     public void remover(Long idCafe, Long idFornecedor, String codigoAcesso) {
         fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
-
+        
         Cafe cafe = cafeRepository.findById(idCafe).orElseThrow(CafeNaoExisteException::new);
+        if(cafe.getFornecedor().getId() != idFornecedor){
+            throw new FornecedorNaoForneceCafeException();
+        };
         cafeRepository.delete(cafe);
     }
 
@@ -65,6 +77,9 @@ public class CafeServiceImpl implements CafeService{
         fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
 
         Cafe cafe = cafeRepository.findById(idCafe).orElseThrow(CafeNaoExisteException::new);
+        if(cafe.getFornecedor().getId() != idFornecedor){
+            throw new FornecedorNaoForneceCafeException();
+        };
         modelMapper.map(cafePostPutRequestDTO, cafe);
         cafeRepository.save(cafe);
         return modelMapper.map(cafe, CafeResponseDTO.class);
@@ -76,6 +91,16 @@ public class CafeServiceImpl implements CafeService{
         return cafes.stream()
                 .map(CafeResponseDTO::new)
                 .collect(Collectors.toList());
+    }
+
+    private List<Cafe> ordenaPorDisponibilidade(List<Cafe> cafes){
+        Collections.sort(cafes, new Comparator<Cafe>() {
+            @Override
+            public int compare(Cafe c1, Cafe c2) {
+                return Boolean.compare(c2.isDisponivel(), c1.isDisponivel());
+            }
+        });
+        return cafes;
     }
 
     @Override
@@ -94,10 +119,14 @@ public class CafeServiceImpl implements CafeService{
         List<Cafe> cafes;
 
         if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
-            cafes = cafeRepository.findByDisponivel(true);
+            cafes = cafeRepository.findAll();
+
         } else {
-            cafes = cafeRepository.findByQualidadeAndDisponivel(QualidadeCafe.NORMAL, true);
+            cafes = cafeRepository.findByQualidade(QualidadeCafe.NORMAL);
+
         }
+
+        cafes = ordenaPorDisponibilidade(cafes);
 
 
         return cafes.stream()
@@ -128,20 +157,22 @@ public class CafeServiceImpl implements CafeService{
         if(tipo == null && origem.isBlank() && perfil.isBlank()) {
             cafes = cafeRepository.findByDisponivel(true);
         } else if(origem.isBlank() && perfil.isBlank()) {
-            cafes = cafeRepository.findByTipoAndDisponivel(tipo, true);
+            cafes = cafeRepository.findByTipo(tipo);
         } else if(tipo == null && origem.isBlank()) {
-            cafes = cafeRepository.findByDisponivelAndPerfilContainingIgnoreCase(true, perfil);
+            cafes = cafeRepository.findByPerfilContainingIgnoreCase(perfil);
         } else if(tipo == null && perfil.isBlank()) {
-            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCase(true, origem);
+            cafes = cafeRepository.findByOrigemContainingIgnoreCase(origem);
         } else if(tipo == null) {
-            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(true, origem, perfil);
+            cafes = cafeRepository.findByOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(origem, perfil);
         } else if(origem.isBlank()) {
-            cafes = cafeRepository.findByDisponivelAndPerfilContainingIgnoreCaseAndTipo(true, perfil, tipo);
+            cafes = cafeRepository.findByPerfilContainingIgnoreCaseAndTipo(perfil, tipo);
         } else if(perfil.isBlank()){
-            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndTipo(true, perfil, tipo);
+            cafes = cafeRepository.findByOrigemContainingIgnoreCaseAndTipo(origem, tipo);
         } else {
-            cafes = cafeRepository.findByDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(true, origem, perfil, tipo);
+            cafes = cafeRepository.findByOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(origem, perfil, tipo);
         }
+
+        cafes = ordenaPorDisponibilidade(cafes);
 
         return cafes.stream()
                 .map(CafeResponseDTO::new)
@@ -152,25 +183,92 @@ public class CafeServiceImpl implements CafeService{
         List<Cafe> cafes;
 
         if(tipo == null && origem.isBlank() && perfil.isBlank()) {
-            cafes = cafeRepository.findByQualidadeAndDisponivel(QualidadeCafe.NORMAL, true);
+            cafes = cafeRepository.findByQualidade(QualidadeCafe.NORMAL);
         } else if(origem.isBlank() && perfil.isBlank()) {
-            cafes = cafeRepository.findByQualidadeAndTipoAndDisponivel(QualidadeCafe.NORMAL, tipo, true);
+            cafes = cafeRepository.findByQualidadeAndTipo(QualidadeCafe.NORMAL, tipo);
         } else if(tipo == null && origem.isBlank()) {
-            cafes = cafeRepository.findByQualidadeAndDisponivelAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, true, perfil);
+            cafes = cafeRepository.findByQualidadeAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, perfil);
         } else if(tipo == null && perfil.isBlank()) {
-            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCase(QualidadeCafe.NORMAL ,true, origem);
+            cafes = cafeRepository.findByQualidadeAndOrigemContainingIgnoreCase(QualidadeCafe.NORMAL,  origem);
         } else if(tipo == null) {
-            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, true, origem, perfil);
+            cafes = cafeRepository.findByQualidadeAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, origem, perfil);
         } else if(origem.isBlank()) {
-            cafes = cafeRepository.findByQualidadeAndDisponivelAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, perfil, tipo);
+            cafes = cafeRepository.findByQualidadeAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, perfil, tipo);
         } else if(perfil.isBlank()){
-            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, perfil, tipo);
+            cafes = cafeRepository.findByQualidadeAndOrigemContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, origem, tipo);
         } else {
-            cafes = cafeRepository.findByQualidadeAndDisponivelAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, true, origem, perfil, tipo);
+            cafes = cafeRepository.findByQualidadeAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, origem, perfil, tipo);
         }
+
+        cafes = ordenaPorDisponibilidade(cafes);
 
         return cafes.stream()
                 .map(CafeResponseDTO::new)
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public ClienteResponseDTO demonstrarInteresse(Long idCliente, String codigoAcesso, Long idCafe){
+        Cliente cliente = clienteService.verificaCliente(idCliente, codigoAcesso);
+        Cafe cafe = recuperaCafe(idCafe);
+
+        if (cafe.isDisponivel()) {
+            throw new InteresseEmCafeDisponivelException();
+        }
+
+        if (!(cliente.getCafesDeInteresse().contains(cafe))) {
+            cliente.getCafesDeInteresse().add(cafe);
+            clienteService.alterar(idCliente,codigoAcesso,modelMapper.map(cliente, ClientePostPutRequestDTO.class));
+        }
+
+        return new ClienteResponseDTO(cliente);
+
+    }
+
+    @Override
+    public List<CafeResponseDTO> listarCafesInteresseCliente(Long idCliente, String codigoAcesso) {
+        Cliente cliente = clienteService.verificaCliente(idCliente,codigoAcesso);
+
+        List<Cafe> cafes = cliente.getCafesDeInteresse();
+        return cafes.stream().map(CafeResponseDTO::new).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public CafeResponseDTO alterarDisponibilidadeCafe(Long idCafe, Long idFornecedor, String codigoAcesso, boolean disponibilidade){
+        fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
+        Cafe cafe = recuperaCafe(idCafe);
+        if(cafe.getFornecedor().getId() != idFornecedor){
+            throw new FornecedorNaoForneceCafeException();
+        }
+        if(disponibilidade && !cafe.isDisponivel()){
+            notificaClientesInteressados(cafe);
+        }
+        cafe.setDisponivel(disponibilidade);
+        cafeRepository.save(cafe);
+        return new CafeResponseDTO(cafe);
+    }
+    @Override
+    public void removerInteresseClienteCafe(Long idCliente, String codigoAcesso, Long idCafe) {
+        Cliente cliente = clienteService.verificaCliente(idCliente, codigoAcesso);
+        Cafe cafe = recuperaCafe(idCafe);
+
+        if(!(cliente.getCafesDeInteresse().contains(cafe))){
+            throw new CafeNaoEInteresseDeClienteException();
+        }
+
+        cliente.getCafesDeInteresse().remove(cafe);
+    }
+
+    private void notificaClientesInteressados(Cafe cafe) {
+        List<Cliente> clientes = cafe.getClientesInteressados().stream().sorted((c1, c2) -> {
+            return c1.getAssinatura().compareTo(c2.getAssinatura());
+        }).toList();
+
+        for (Cliente cliente : clientes) {
+            String notificacao = "Cliente " + cliente.getNome() + ", o cafe " + cafe.getNome() + " voltou ao estoque.";
+            System.out.println(notificacao);
+        }
     }
 }

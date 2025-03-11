@@ -1,7 +1,6 @@
 package com.ufcg.psoft.commerce.controller;
 
 import com.ufcg.psoft.commerce.dto.cafe.CafePostPutRequestDTO;
-import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 import com.ufcg.psoft.commerce.service.cafe.CafeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,5 +90,42 @@ public class CafeController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(cafeService.listarFiltraQualidade(idCliente));
+    }
+
+    @PutMapping("/{idCliente}/interesse/{idCafe}")
+    public ResponseEntity<?> demonstrarInteresse(
+            @PathVariable Long idCliente,
+            @PathVariable Long idCafe,
+            @RequestParam String codigo) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(cafeService.demonstrarInteresse(idCliente,codigo,idCafe));
+
+    }
+
+    @DeleteMapping("/{idCliente}/interesse/{idCafe}")
+    public ResponseEntity<?> removerInteresseClienteCafe(
+            @PathVariable Long idCliente,
+            @PathVariable Long idCafe,
+            @RequestParam String codigo){
+        cafeService.removerInteresseClienteCafe(idCliente,codigo,idCafe);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
+    }
+
+    @GetMapping("/{idCliente}/interesse")
+    public ResponseEntity<?> listarCafeInteresseCliente(
+            @PathVariable Long idCliente,
+            @RequestParam String codigo){
+        return ResponseEntity.status(HttpStatus.OK).body(cafeService.listarCafesInteresseCliente(idCliente,codigo));
+    }
+
+    @PatchMapping("/{id}/alteraDisponibilidade")
+    public ResponseEntity<?> alteraDisponibilidade(
+        @PathVariable Long id,
+        @RequestParam Long idFornecedor,
+        @RequestParam String codigo,
+        @RequestParam boolean disponibilidade) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(cafeService.alterarDisponibilidadeCafe(id, idFornecedor, codigo, disponibilidade));
     }
 }
