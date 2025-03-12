@@ -81,15 +81,9 @@ public class CafeController {
             @RequestParam(required = false, defaultValue = "") String origem,
             @RequestParam(required = false, defaultValue = "") String perfil) {
 
-        if(!tipoCafe.isBlank() || !perfil.isBlank() || !origem.isBlank()) {
-                return ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body(cafeService.listarFiltro(idCliente, tipoCafe, origem, perfil));
-        }
-
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(cafeService.listarFiltraQualidade(idCliente));
+                .body(cafeService.listarFiltro(idCliente, tipoCafe, origem, perfil));
     }
 
     @PutMapping("/{idCliente}/interesse/{idCafe}")

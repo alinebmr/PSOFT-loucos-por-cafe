@@ -7,6 +7,7 @@ import com.ufcg.psoft.commerce.exception.ClienteNaoExisteException;
 import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
 import com.ufcg.psoft.commerce.exception.FornecedorNaoForneceCafeException;
 import com.ufcg.psoft.commerce.exception.InteresseEmCafeDisponivelException;
+import com.ufcg.psoft.commerce.model.CafeSpecification;
 import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.service.fornecedor.FornecedorService;
 import com.ufcg.psoft.commerce.service.cliente.ClienteService;
@@ -21,6 +22,7 @@ import com.ufcg.psoft.commerce.model.Cafe;
 import com.ufcg.psoft.commerce.model.Fornecedor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -113,28 +115,6 @@ public class CafeServiceImpl implements CafeService{
     }
 
     @Override
-    public List<CafeResponseDTO> listarFiltraQualidade(Long idCliente) {
-        ClienteResponseDTO cliente = clienteService.recuperar(idCliente);
-
-        List<Cafe> cafes;
-
-        if(cliente.getAssinatura().equals(TipoAssinatura.PREMIUM)) {
-            cafes = cafeRepository.findAll();
-
-        } else {
-            cafes = cafeRepository.findByQualidade(QualidadeCafe.NORMAL);
-
-        }
-
-        cafes = ordenaPorDisponibilidade(cafes);
-
-
-        return cafes.stream()
-                .map(CafeResponseDTO::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<CafeResponseDTO> listarFiltro(Long idCliente, String tipo, String origem, String perfil) {
         ClienteResponseDTO cliente = clienteService.recuperar(idCliente);
 
@@ -152,25 +132,13 @@ public class CafeServiceImpl implements CafeService{
     }
 
     private List<CafeResponseDTO> listarFiltroPremium(TipoGraoCafe tipo, String origem, String perfil) {
-        List<Cafe> cafes;
+        Specification<Cafe> spec = Specification
+                .where(CafeSpecification.hasQualidade(null)
+                        .and(CafeSpecification.hasOrigem(origem))
+                        .and(CafeSpecification.hasTipo(tipo))
+                        .and(CafeSpecification.hasPerfil(perfil)));
 
-        if(tipo == null && origem.isBlank() && perfil.isBlank()) {
-            cafes = cafeRepository.findByDisponivel(true);
-        } else if(origem.isBlank() && perfil.isBlank()) {
-            cafes = cafeRepository.findByTipo(tipo);
-        } else if(tipo == null && origem.isBlank()) {
-            cafes = cafeRepository.findByPerfilContainingIgnoreCase(perfil);
-        } else if(tipo == null && perfil.isBlank()) {
-            cafes = cafeRepository.findByOrigemContainingIgnoreCase(origem);
-        } else if(tipo == null) {
-            cafes = cafeRepository.findByOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(origem, perfil);
-        } else if(origem.isBlank()) {
-            cafes = cafeRepository.findByPerfilContainingIgnoreCaseAndTipo(perfil, tipo);
-        } else if(perfil.isBlank()){
-            cafes = cafeRepository.findByOrigemContainingIgnoreCaseAndTipo(origem, tipo);
-        } else {
-            cafes = cafeRepository.findByOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(origem, perfil, tipo);
-        }
+        List<Cafe> cafes = cafeRepository.findAll(spec);
 
         cafes = ordenaPorDisponibilidade(cafes);
 
@@ -180,25 +148,14 @@ public class CafeServiceImpl implements CafeService{
     }
 
     private List<CafeResponseDTO> listarFiltroNormal(TipoGraoCafe tipo, String origem, String perfil) {
-        List<Cafe> cafes;
 
-        if(tipo == null && origem.isBlank() && perfil.isBlank()) {
-            cafes = cafeRepository.findByQualidade(QualidadeCafe.NORMAL);
-        } else if(origem.isBlank() && perfil.isBlank()) {
-            cafes = cafeRepository.findByQualidadeAndTipo(QualidadeCafe.NORMAL, tipo);
-        } else if(tipo == null && origem.isBlank()) {
-            cafes = cafeRepository.findByQualidadeAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, perfil);
-        } else if(tipo == null && perfil.isBlank()) {
-            cafes = cafeRepository.findByQualidadeAndOrigemContainingIgnoreCase(QualidadeCafe.NORMAL,  origem);
-        } else if(tipo == null) {
-            cafes = cafeRepository.findByQualidadeAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCase(QualidadeCafe.NORMAL, origem, perfil);
-        } else if(origem.isBlank()) {
-            cafes = cafeRepository.findByQualidadeAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, perfil, tipo);
-        } else if(perfil.isBlank()){
-            cafes = cafeRepository.findByQualidadeAndOrigemContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, origem, tipo);
-        } else {
-            cafes = cafeRepository.findByQualidadeAndOrigemContainingIgnoreCaseAndPerfilContainingIgnoreCaseAndTipo(QualidadeCafe.NORMAL, origem, perfil, tipo);
-        }
+        Specification<Cafe> spec = Specification
+                .where(CafeSpecification.hasQualidade(QualidadeCafe.NORMAL)
+                        .and(CafeSpecification.hasOrigem(origem))
+                        .and(CafeSpecification.hasTipo(tipo))
+                        .and(CafeSpecification.hasPerfil(perfil)));
+
+        List<Cafe> cafes = cafeRepository.findAll(spec);
 
         cafes = ordenaPorDisponibilidade(cafes);
 
