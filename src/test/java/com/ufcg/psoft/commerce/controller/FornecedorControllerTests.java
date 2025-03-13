@@ -410,9 +410,7 @@ public class FornecedorControllerTests {
                     .build();
             fornecedorRepository.saveAll(Arrays.asList(fornecedor1, fornecedor2));
 
-            String response = driver.perform(get(URI_FORNECEDORES)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(fornecedorPostPutRequestDTO)))
+            String response = driver.perform(get(URI_FORNECEDORES))
                     .andExpect(status().isOk()) // Codigo 200
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -425,12 +423,39 @@ public class FornecedorControllerTests {
         }
 
         @Test
+        @DisplayName("Quando buscamos um fornecedor pelo nome")
+        void buscaFornecedoresNome() throws Exception {
+
+            Fornecedor fornecedor1 = Fornecedor.builder()
+                    .nomeEmpresa("Cofflee")
+                    .cnpj("12.395.678/0001-23")
+                    .codigo("246810")
+                    .build();
+            Fornecedor fornecedor2 = Fornecedor.builder()
+                    .nomeEmpresa("NesCoffee")
+                    .cnpj("21.345.678/0001-23")
+                    .codigo("135790")
+                    .build();
+            fornecedorRepository.saveAll(Arrays.asList(fornecedor1, fornecedor2));
+
+            String response = driver.perform(get(URI_FORNECEDORES)
+                            .param("nomeEmpresa", "nesCoff"))
+                    .andExpect(status().isOk()) // Codigo 200
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            List<FornecedorResponseDTO> resultado = objectMapper.readValue(response, new TypeReference<>() {});
+
+            assertAll(
+                    () -> assertEquals(1, resultado.size())
+            );
+        }
+
+        @Test
         @DisplayName("Quando buscamos um fornecedor salvo pelo id")
         void buscaUmFornecedorSalvo() throws Exception {
 
-            String response = driver.perform(get(URI_FORNECEDORES + "/" + fornecedor.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(fornecedorPostPutRequestDTO)))
+            String response = driver.perform(get(URI_FORNECEDORES + "/" + fornecedor.getId()))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -447,9 +472,7 @@ public class FornecedorControllerTests {
         @DisplayName("Quando buscamos um fornecedor inexistente")
         void buscaPorUmFornecedorInexistente() throws Exception {
 
-            String responseJsonString = driver.perform(get(URI_FORNECEDORES + "/" + 999999999)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(fornecedorPostPutRequestDTO)))
+            String responseJsonString = driver.perform(get(URI_FORNECEDORES + "/" + 999999999))
                     .andExpect(status().isBadRequest())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
