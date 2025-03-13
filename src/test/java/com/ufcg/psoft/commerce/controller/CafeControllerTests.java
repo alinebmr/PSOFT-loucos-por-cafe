@@ -798,6 +798,56 @@ public class CafeControllerTests {
         }
 
         @Test
+        @DisplayName("Quando buscamos por todos os cafes de um fornecedor")
+        void quandoBuscamosPorTodosCafesFornecedor() throws Exception {
+
+            Fornecedor fornecedor1 = fornecedorRepository.save(Fornecedor.builder()
+                    .nomeEmpresa("A")
+                    .cnpj("12.345.678/0001-22")
+                    .codigo("222222")
+                    .build());
+
+            Cafe cafe1 = Cafe.builder()
+                    .fornecedor(fornecedor1)
+                    .nome("Cafe exemplo1")
+                    .origem("Campina Grande Paraiba")
+                    .tipo(TipoGraoCafe.CAPSULA)
+                    .perfil("Frutas vermelhas")
+                    .preco(19.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(10)
+                    .build();
+            Cafe cafe2 = Cafe.builder()
+                    .fornecedor(fornecedor1)
+                    .nome("Cafe exemplo2")
+                    .origem("Campina Grande Paraiba")
+                    .tipo(TipoGraoCafe.CAPSULA)
+                    .perfil("Frutas vermelhas")
+                    .preco(19.99)
+                    .qualidade(QualidadeCafe.NORMAL)
+                    .tamanhoEmbalagem(10)
+                    .build();
+            cafeRepository.saveAll(Arrays.asList(cafe1, cafe2));
+
+            // Act
+            String responseJsonString = driver.perform(get(URI_CAFES)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(cafePostPutRequestDTO))
+                            .param("idFornecedor", fornecedor1.getId().toString()))
+                    .andExpect(status().isOk()) // Codigo 200
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            List<CafeResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
+            });
+
+            // Assert
+            assertAll(
+                    () -> assertEquals(2, resultado.size())
+            );
+        }
+
+        @Test
         @DisplayName("Quando buscamos cafe por id")
         void quandoBuscamosCafePorId() throws Exception {
             // Arrange
