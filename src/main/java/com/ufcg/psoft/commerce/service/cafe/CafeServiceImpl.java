@@ -3,8 +3,6 @@ package com.ufcg.psoft.commerce.service.cafe;
 import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
 import com.ufcg.psoft.commerce.exception.CafeNaoEInteresseDeClienteException;
 import com.ufcg.psoft.commerce.exception.CafeNaoExisteException;
-import com.ufcg.psoft.commerce.exception.ClienteNaoExisteException;
-import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
 import com.ufcg.psoft.commerce.exception.FornecedorNaoForneceCafeException;
 import com.ufcg.psoft.commerce.exception.InteresseEmCafeDisponivelException;
 import com.ufcg.psoft.commerce.model.CafeSpecification;
@@ -26,7 +24,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,12 +51,7 @@ public class CafeServiceImpl implements CafeService{
 
     @Override
     public void remover(Long idCafe, Long idFornecedor, String codigoAcesso) {
-        fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
-        
-        Cafe cafe = cafeRepository.findById(idCafe).orElseThrow(CafeNaoExisteException::new);
-        if(cafe.getFornecedor().getId() != idFornecedor){
-            throw new FornecedorNaoForneceCafeException();
-        };
+        Cafe cafe = verificaCafe(idCafe, idFornecedor, codigoAcesso);
         cafeRepository.delete(cafe);
     }
 
@@ -70,18 +62,8 @@ public class CafeServiceImpl implements CafeService{
     }
 
     @Override
-    public Cafe recuperaCafe(Long id) {
-        return cafeRepository.findById(id).orElseThrow(CafeNaoExisteException::new);
-    }
-
-    @Override
     public CafeResponseDTO alterar(Long idFornecedor, String codigoAcesso, Long idCafe, CafePostPutRequestDTO cafePostPutRequestDTO) {
-        fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
-
-        Cafe cafe = cafeRepository.findById(idCafe).orElseThrow(CafeNaoExisteException::new);
-        if(cafe.getFornecedor().getId() != idFornecedor){
-            throw new FornecedorNaoForneceCafeException();
-        };
+        Cafe cafe = verificaCafe(idCafe, idFornecedor, codigoAcesso);
         modelMapper.map(cafePostPutRequestDTO, cafe);
         cafeRepository.save(cafe);
         return modelMapper.map(cafe, CafeResponseDTO.class);
@@ -96,11 +78,8 @@ public class CafeServiceImpl implements CafeService{
     }
 
     private List<Cafe> ordenaPorDisponibilidade(List<Cafe> cafes){
-        Collections.sort(cafes, new Comparator<Cafe>() {
-            @Override
-            public int compare(Cafe c1, Cafe c2) {
-                return Boolean.compare(c2.isDisponivel(), c1.isDisponivel());
-            }
+        Collections.sort(cafes, (c1, c2) -> {
+            return Boolean.compare(c2.isDisponivel(), c1.isDisponivel());
         });
         return cafes;
     }
@@ -194,11 +173,7 @@ public class CafeServiceImpl implements CafeService{
 
     @Override
     public CafeResponseDTO alterarDisponibilidadeCafe(Long idCafe, Long idFornecedor, String codigoAcesso, boolean disponibilidade){
-        fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
-        Cafe cafe = recuperaCafe(idCafe);
-        if(cafe.getFornecedor().getId() != idFornecedor){
-            throw new FornecedorNaoForneceCafeException();
-        }
+        Cafe cafe = verificaCafe(idCafe, idFornecedor, codigoAcesso);
         if(disponibilidade && !cafe.isDisponivel()){
             notificaClientesInteressados(cafe);
         }
@@ -227,5 +202,19 @@ public class CafeServiceImpl implements CafeService{
             String notificacao = "Cliente " + cliente.getNome() + ", o cafe " + cafe.getNome() + " voltou ao estoque.";
             System.out.println(notificacao);
         }
+    }
+
+    @Override
+    public Cafe recuperaCafe(Long id) {
+        return cafeRepository.findById(id).orElseThrow(CafeNaoExisteException::new);
+    }
+
+    private Cafe verificaCafe(Long id, Long idFornecedor, String codigoAcesso) {
+        fornecedorService.verificaFornecedor(idFornecedor, codigoAcesso);
+        Cafe cafe = recuperaCafe(id);
+        if (cafe.getFornecedor().getId() != idFornecedor){
+            throw new FornecedorNaoForneceCafeException();
+        }
+        return cafe;
     }
 }
