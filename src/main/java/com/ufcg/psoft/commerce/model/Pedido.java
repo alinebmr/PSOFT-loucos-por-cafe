@@ -1,8 +1,16 @@
 package com.ufcg.psoft.commerce.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ufcg.psoft.commerce.enums.StatusPedidoEnum;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.enums.TipoPagamento;
+import com.ufcg.psoft.commerce.model.pedido.PedidoEmEntrega;
+import com.ufcg.psoft.commerce.model.pedido.PedidoEntregue;
+import com.ufcg.psoft.commerce.model.pedido.PedidoPreparacao;
+import com.ufcg.psoft.commerce.model.pedido.PedidoPronto;
+import com.ufcg.psoft.commerce.model.pedido.PedidoRecebido;
+import com.ufcg.psoft.commerce.model.pedido.PedidoState;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,7 +55,47 @@ public class Pedido {
     @Builder.Default
     private TipoAssinatura assinatura = TipoAssinatura.NORMAL;
 
+    @JsonProperty("assinatura")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private StatusPedidoEnum status = StatusPedidoEnum.RECEBIDO;
+
     public double getValor() {
         return this.cafe.getPreco() * this.tipoPagamento.getDesconto();
+    }
+
+    public void confirmaPagamento(Cliente cliente) {
+        this.getState().confirmaPagamento(cliente);
+    }
+
+    public void pedidoPreparado(Fornecedor fornecedor) {
+        this.getState().pedidoPreparado(fornecedor);
+    }
+
+    public void comecaEntrega(Entregador entregador) {
+        this.getState().comecaEntrega(entregador);
+    }
+
+    public void confirmaEntrega() {
+        this.getState().confirmaEntrega();
+    }
+
+    // mds q estupido
+    private PedidoState getState() {
+        switch (status) {
+            case RECEBIDO:
+                return new PedidoRecebido(this);
+            case PREPARACAO:
+                return new PedidoPreparacao(this);
+            case PRONTO:
+                return new PedidoPronto(this);
+            case EM_ENTREGA:
+                return new PedidoEmEntrega(this);
+            case ENTREGUE:
+                return new PedidoEntregue(this);
+            default:
+                return null;
+        }
     }
 }
