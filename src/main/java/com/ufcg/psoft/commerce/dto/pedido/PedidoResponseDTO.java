@@ -5,7 +5,9 @@ import com.ufcg.psoft.commerce.dto.EnderecoDTO;
 import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
 import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
 import com.ufcg.psoft.commerce.dto.fornecedor.FornecedorResponseDTO;
+import com.ufcg.psoft.commerce.enums.StatusPedidoEnum;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
+import com.ufcg.psoft.commerce.model.Entregador;
 import com.ufcg.psoft.commerce.model.Pedido;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -51,6 +53,12 @@ public class PedidoResponseDTO {
     @JsonProperty("valor")
     private double valor;
 
+    @JsonProperty("status")
+    private StatusPedidoEnum status;
+
+    @JsonProperty("entregador")
+    private Entregador entregador;
+
     public PedidoResponseDTO(Pedido pedido) {
         this.id = pedido.getId();
         this.fornecedor = new FornecedorResponseDTO(pedido.getCafe().getFornecedor());
@@ -60,5 +68,7 @@ public class PedidoResponseDTO {
         this.pago = pedido.isPago();
         this.assinatura = pedido.getAssinatura();
         this.valor = pedido.getValor();
+        this.status = pedido.getStatus();
+        this.entregador = pedido.getEntregador();
     }
 }
