@@ -8,5 +8,5 @@ public interface PedidoState {
     public void confirmaPagamento(Cliente cliente);
     public void pedidoPreparado(Fornecedor fornecedor);
     public void comecaEntrega(Entregador entregador);
-    public void confirmaEntrega();
+    public void confirmaEntrega(Cliente cliente);
 }

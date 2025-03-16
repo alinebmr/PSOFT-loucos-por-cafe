@@ -55,34 +55,36 @@ public class Pedido {
     @Builder.Default
     private TipoAssinatura assinatura = TipoAssinatura.NORMAL;
 
-    @JsonProperty("assinatura")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private StatusPedidoEnum status = StatusPedidoEnum.RECEBIDO;
+
+    @ManyToOne(optional = true)
+    @Builder.Default
+    private Entregador entregador = null;
 
     public double getValor() {
         return this.cafe.getPreco() * this.tipoPagamento.getDesconto();
     }
 
     public void confirmaPagamento(Cliente cliente) {
-        this.getState().confirmaPagamento(cliente);
+        this.getStateObject().confirmaPagamento(cliente);
     }
 
     public void pedidoPreparado(Fornecedor fornecedor) {
-        this.getState().pedidoPreparado(fornecedor);
+        this.getStateObject().pedidoPreparado(fornecedor);
     }
 
     public void comecaEntrega(Entregador entregador) {
-        this.getState().comecaEntrega(entregador);
+        this.getStateObject().comecaEntrega(entregador);
     }
 
-    public void confirmaEntrega() {
-        this.getState().confirmaEntrega();
+    public void confirmaEntrega(Cliente cliente) {
+        this.getStateObject().confirmaEntrega(cliente);
     }
 
-    // mds q estupido
-    private PedidoState getState() {
+    private PedidoState getStateObject() {
         switch (status) {
             case RECEBIDO:
                 return new PedidoRecebido(this);
