@@ -850,7 +850,7 @@ public class PedidoControllerTests {
                 .build());
 
             String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/confirmarEntrega")
-                    .param("id", cliente.getId().toString())
+                    .param("idCliente", cliente.getId().toString())
                     .param("codigoAcesso", cliente.getCodigo()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -866,15 +866,15 @@ public class PedidoControllerTests {
         void pedidoEntregueInvalido() throws Exception {
 
             String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/confirmarEntrega")
-                            .param("id", cliente.getId().toString())
+                            .param("idCliente", cliente.getId().toString())
                             .param("codigoAcesso", cliente.getCodigo()))
                     .andDo(print())
-                    .andExpect(status().isOk())
+                    .andExpect(status().isBadRequest())
                     .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
-            assertEquals(StatusPedidoEnum.ENTREGUE, resultado.getStatus());
+            assertEquals("Status do pedido invalido para esta operacacao", resultado.getMessage());
         }
     }
 }
