@@ -874,7 +874,7 @@ public class PedidoControllerTests {
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
-            assertEquals("Status do pedido invalido para esta operacacao", resultado.getMessage());
+            assertEquals("Status do pedido invalido para esta operacao", resultado.getMessage());
         }
     }
 }
