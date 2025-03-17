@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+import com.ufcg.psoft.commerce.enums.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,10 +30,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ufcg.psoft.commerce.dto.EnderecoDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
-import com.ufcg.psoft.commerce.enums.QualidadeCafe;
-import com.ufcg.psoft.commerce.enums.TipoAssinatura;
-import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
-import com.ufcg.psoft.commerce.enums.TipoPagamento;
 import com.ufcg.psoft.commerce.exception.CustomErrorType;
 import com.ufcg.psoft.commerce.model.Cafe;
 import com.ufcg.psoft.commerce.model.Cliente;
@@ -834,6 +831,50 @@ public class PedidoControllerTests {
 
             // Assert
             assertEquals(25.0 * 0.95, resultado.getValor());
+        }
+    }
+
+    @Nested
+    @DisplayName("Conjunto de casos de verificação do status do pedido")
+    class PedidoVerificacaoStatus {
+        @Test
+        @DisplayName("Quando confirmamos a entrega de um pedido")
+        void pedidoEntregue() throws Exception {
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                .cafe(cafe)
+                .endereco(cliente.getEndereco())
+                .cliente(cliente)
+                .status(StatusPedidoEnum.EM_ENTREGA)
+                .pago(true)
+                .tipoPagamento(TipoPagamento.CREDITO)
+                .build());
+
+            String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/confirmarEntrega")
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            assertEquals(StatusPedidoEnum.ENTREGUE, resultado.getStatus());
+        }
+
+        @Test
+        @DisplayName("Quando confirmamos a entrega de um pedido que está com um status inválido")
+        void pedidoEntregueInvalido() throws Exception {
+
+            String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/confirmarEntrega")
+                            .param("idCliente", cliente.getId().toString())
+                            .param("codigoAcesso", cliente.getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+            assertEquals("Status do pedido invalido para esta operacao", resultado.getMessage());
         }
     }
 }

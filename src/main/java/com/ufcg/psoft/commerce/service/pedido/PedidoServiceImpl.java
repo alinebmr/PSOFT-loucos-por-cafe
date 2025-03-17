@@ -3,6 +3,7 @@ package com.ufcg.psoft.commerce.service.pedido;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
+import com.ufcg.psoft.commerce.enums.StatusPedidoEnum;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.enums.TipoPagamento;
 import com.ufcg.psoft.commerce.exception.*;
@@ -121,6 +122,19 @@ public class PedidoServiceImpl implements PedidoService {
         pedidoRepository.save(pedido);
 
         return new PedidoResponseDTO(pedido);
+    }
+
+    @Override
+    public PedidoResponseDTO confirmarEntrega(Long idPedido, Long idCliente, String codigoAcesso) {
+        Pedido pedido = verificaPedido(idPedido, idCliente, codigoAcesso, false);
+
+        if(!pedido.getStatus().equals(StatusPedidoEnum.EM_ENTREGA)) {
+            throw new StatusPedidoInvalidoException();
+        }
+
+        pedido.nextState();
+
+        return new PedidoResponseDTO(pedidoRepository.save(pedido));
     }
 
     private void verificaQualidadeAssinatura(QualidadeCafe cafe, TipoAssinatura assinatura) {
