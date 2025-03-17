@@ -30,7 +30,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
@@ -76,17 +75,12 @@ public class CafeControllerTests {
 
     CafePostPutRequestDTO cafePostPutRequestDTO;
 
-
-
     FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO;
 
     PrintStream standardOut = System.out;
 
-    ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
-
     @BeforeEach
     void setup() {
-        System.setOut(new PrintStream(outputStreamCaptor));
         cliente = clienteRepository.save(Cliente.builder()
                 .nome("Tu")
                 .codigo("111111")

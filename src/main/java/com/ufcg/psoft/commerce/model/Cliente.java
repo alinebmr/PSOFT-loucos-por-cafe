@@ -47,4 +47,8 @@ public class Cliente {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="interesse_cliente_cafe")
     private List<Cafe> cafesDeInteresse = new ArrayList<Cafe>();
+
+    public void notificaCafeDisponivel(Cafe cafe) {
+        System.out.println("Cliente " + this.getNome() + ", o cafe " + cafe.getNome() + " voltou ao estoque.");
+    }
 }

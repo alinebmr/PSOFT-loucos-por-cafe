@@ -199,8 +199,7 @@ public class CafeServiceImpl implements CafeService{
         }).toList();
 
         for (Cliente cliente : clientes) {
-            String notificacao = "Cliente " + cliente.getNome() + ", o cafe " + cafe.getNome() + " voltou ao estoque.";
-            System.out.println(notificacao);
+            cliente.notificaCafeDisponivel(cafe);
         }
     }
 
