@@ -1,11 +1,9 @@
 package com.ufcg.psoft.commerce.model.pedido;
 
 import com.ufcg.psoft.commerce.enums.StatusPedidoEnum;
-import com.ufcg.psoft.commerce.exception.FornecedorInvalidoException;
-import com.ufcg.psoft.commerce.model.Fornecedor;
 import com.ufcg.psoft.commerce.model.Pedido;
 
-public class PedidoPreparacao extends PedidoStateAdapter {
+public class PedidoPreparacao implements PedidoState {
     private Pedido pedido;
 
     public PedidoPreparacao(Pedido pedido) {
@@ -13,10 +11,7 @@ public class PedidoPreparacao extends PedidoStateAdapter {
     }
 
     @Override
-    public void pedidoPreparado(Fornecedor fornecedor) {
-        if (!fornecedor.equals(pedido.getCafe().getFornecedor())) {
-            throw new FornecedorInvalidoException();
-        }
+    public void nextState() {
         pedido.setStatus(StatusPedidoEnum.PRONTO);
     }
 }

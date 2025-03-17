@@ -1,11 +1,9 @@
 package com.ufcg.psoft.commerce.model.pedido;
 
 import com.ufcg.psoft.commerce.enums.StatusPedidoEnum;
-import com.ufcg.psoft.commerce.exception.ClienteInvalidoException;
-import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.model.Pedido;
 
-public class PedidoEmEntrega extends PedidoStateAdapter {
+public class PedidoEmEntrega implements PedidoState {
     private Pedido pedido;
 
     public PedidoEmEntrega(Pedido pedido) {
@@ -13,10 +11,7 @@ public class PedidoEmEntrega extends PedidoStateAdapter {
     }
 
     @Override
-    public void confirmaEntrega(Cliente cliente) {
-        if (!cliente.equals(pedido.getCliente())) {
-            throw new ClienteInvalidoException();
-        }
+    public void nextState() {
         pedido.setStatus(StatusPedidoEnum.ENTREGUE);
     }
 }

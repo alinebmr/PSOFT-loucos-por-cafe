@@ -1,8 +1,8 @@
 package com.ufcg.psoft.commerce.model.pedido;
 
-import com.ufcg.psoft.commerce.model.Pedido;
+public class PedidoEntregue implements PedidoState {
+    public PedidoEntregue() {}
 
-public class PedidoEntregue extends PedidoStateAdapter {
-    public PedidoEntregue(Pedido pedido) {
-    }
+    @Override
+    public void nextState() {}
 }

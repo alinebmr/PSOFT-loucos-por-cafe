@@ -68,20 +68,8 @@ public class Pedido {
         return this.cafe.getPreco() * this.tipoPagamento.getDesconto();
     }
 
-    public void confirmaPagamento(Cliente cliente) {
-        this.getStateObject().confirmaPagamento(cliente);
-    }
-
-    public void pedidoPreparado(Fornecedor fornecedor) {
-        this.getStateObject().pedidoPreparado(fornecedor);
-    }
-
-    public void comecaEntrega(Entregador entregador) {
-        this.getStateObject().comecaEntrega(entregador);
-    }
-
-    public void confirmaEntrega(Cliente cliente) {
-        this.getStateObject().confirmaEntrega(cliente);
+    public void nextState() {
+        this.getStateObject().nextState();
     }
 
     private PedidoState getStateObject() {
@@ -95,7 +83,7 @@ public class Pedido {
             case EM_ENTREGA:
                 return new PedidoEmEntrega(this);
             case ENTREGUE:
-                return new PedidoEntregue(this);
+                return new PedidoEntregue();
             default:
                 return null;
         }
