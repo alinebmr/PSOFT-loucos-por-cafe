@@ -39,5 +39,6 @@ public class Fornecedor {
     @JsonProperty("tiposPagamento")
     @Builder.Default
     @ElementCollection(targetClass = TipoPagamento.class)
+    @Enumerated(EnumType.STRING)
     private Set<TipoPagamento> tiposPagamento = new HashSet<>();
 }
