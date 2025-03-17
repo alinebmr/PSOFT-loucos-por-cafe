@@ -1,7 +1,8 @@
 package com.ufcg.psoft.commerce.controller;
 
-import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
-import com.ufcg.psoft.commerce.service.cliente.ClienteService;
+import com.ufcg.psoft.commerce.dto.admin.AdminPostPutRequestDTO;
+import com.ufcg.psoft.commerce.service.admin.AdminService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,59 +12,59 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(
-        value = "/clientes",
+        value = "/admins",
         produces = MediaType.APPLICATION_JSON_VALUE
 )
-public class ClienteController {
-
+public class AdminController {
+    
     @Autowired
-    ClienteService clienteService;
+    AdminService AdminService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> recuperarCliente(
+    public ResponseEntity<?> recuperarAdmin(
             @PathVariable Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(clienteService.recuperar(id));
+                .body(AdminService.recuperar(id));
     }
 
     @GetMapping("")
-    public ResponseEntity<?> listarClientes(
+    public ResponseEntity<?> listarAdmins(
             @RequestParam(required = false, defaultValue = "") String nome) {
 
         if (nome != null && !nome.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(clienteService.listarPorNome(nome));
+                    .body(AdminService.listarPorNome(nome));
         }
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(clienteService.listar());
+                .body(AdminService.listar());
     }
 
     @PostMapping()
-    public ResponseEntity<?> criarCliente(
-            @RequestBody @Valid ClientePostPutRequestDTO clientePostPutRequestDto) {
+    public ResponseEntity<?> criarAdmin(
+            @RequestBody @Valid AdminPostPutRequestDTO AdminPostPutRequestDto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(clienteService.criar(clientePostPutRequestDto));
+                .body(AdminService.criar(AdminPostPutRequestDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizarCliente(
+    public ResponseEntity<?> atualizarAdmin(
             @PathVariable Long id,
             @RequestParam String codigo,
-            @RequestBody @Valid ClientePostPutRequestDTO clientePostPutRequestDto) {
+            @RequestBody @Valid AdminPostPutRequestDTO AdminPostPutRequestDto) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(clienteService.alterar(id, codigo, clientePostPutRequestDto));
+                .body(AdminService.alterar(id, codigo, AdminPostPutRequestDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluirCliente(
+    public ResponseEntity<?> excluirAdmin(
             @PathVariable Long id,
             @RequestParam String codigo) {
-        clienteService.remover(id, codigo);
+        AdminService.remover(id, codigo);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .body("");

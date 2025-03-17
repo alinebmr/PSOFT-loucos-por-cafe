@@ -2,8 +2,6 @@ package com.ufcg.psoft.commerce.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ufcg.psoft.commerce.enums.TipoAssinatura;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +13,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cliente {
+
+public class Entregador {
+
     @JsonProperty("id")
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -25,17 +25,24 @@ public class Cliente {
     @Column(nullable = false)
     private String nome;
 
-    @JsonProperty("endereco")
-    @Embedded
-    private Endereco endereco;
+    @JsonProperty("placa_veiculo")
+    @Column(nullable = false)
+    private String placaVeiculo;
+
+    @JsonProperty("tipo_veiculo")
+    @Column(nullable = false)
+    private String tipoVeiculo;
+
+    @JsonProperty("cor_veiculo")
+    @Column(nullable = false)
+    private String corVeiculo;
 
     @JsonIgnore
     @Column(nullable = false)
     private String codigo;
 
-    @JsonProperty("assinatura")
-    @Enumerated(EnumType.STRING)
+    @JsonProperty("aprovado")
     @Column(nullable = false)
     @Builder.Default
-    private TipoAssinatura assinatura = TipoAssinatura.NORMAL;
+    private boolean aprovado = false;
 }
