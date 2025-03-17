@@ -75,6 +75,16 @@ public class PedidoController {
                 .body(pedidoService.confirmarPagamento(idPedido, idCliente, codigoAcesso));
     }
 
+    @PatchMapping("/{idPedido}/confirmarEntrega")
+    public ResponseEntity<?> confirmarEntrega(
+            @PathVariable Long idPedido,
+            @RequestParam Long idCliente,
+            @RequestParam String codigoAcesso) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(pedidoService.confirmarEntrega(idPedido, idCliente, codigoAcesso));
+    }
+
     @DeleteMapping("/{idPedido}")
     public ResponseEntity<?> excluirPedido(
             @PathVariable Long idPedido,

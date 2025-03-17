@@ -17,4 +17,6 @@ public interface PedidoService {
     PedidoResponseDTO recuperar(Long id, Long idUsuario, String codigo, boolean isFornecedor);
 
     PedidoResponseDTO confirmarPagamento(Long idPedido, Long idCliente, String codigoAcesso);
+
+    PedidoResponseDTO confirmarEntrega(Long idPedido, Long idCliente, String codigoAcesso);
 }
