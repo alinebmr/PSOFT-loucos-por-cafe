@@ -125,6 +125,27 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    public PedidoResponseDTO pedidoEmRota(Long idPedido, Long idCliente, String codigoAcesso) {
+        Pedido pedido = verificaPedido(idPedido, idCliente, codigoAcesso, false);
+
+        if(!pedido.getStatus().equals(StatusPedidoEnum.PRONTO)) {
+            throw new StatusPedidoInvalidoException();
+        }
+
+        pedido.nextState();
+        notificaCliente(pedido,pedido.getCliente(),pedido.getEntregador());
+
+        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+    }
+
+    private void notificaCliente(Pedido pedido,Cliente cliente, Entregador entregador){
+        System.out.println("O pedido: " + pedido.toString() + " entrou em processo de entrega\n" +
+                "Entregador: " + entregador.getNome() + "\n" +
+                "Veículo: [Placa: " + entregador.getPlacaVeiculo() + ", Cor : " + entregador.getCorVeiculo() + ", Tipo: " + entregador.getTipoVeiculo() + "]");
+
+    }
+
+    @Override
     public PedidoResponseDTO confirmarEntrega(Long idPedido, Long idCliente, String codigoAcesso) {
         Pedido pedido = verificaPedido(idPedido, idCliente, codigoAcesso, false);
 

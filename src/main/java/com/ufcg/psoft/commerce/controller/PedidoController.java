@@ -75,6 +75,16 @@ public class PedidoController {
                 .body(pedidoService.confirmarPagamento(idPedido, idCliente, codigoAcesso));
     }
 
+    @PatchMapping("/{idPedido}/pedidoEmEntrega")
+    public ResponseEntity<?> pedidoEmEntrega(
+            @PathVariable Long idPedido,
+            @RequestParam Long idCliente,
+            @RequestParam String codigoAcesso){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(pedidoService.pedidoEmRota(idPedido, idCliente,codigoAcesso));
+    }
+
     @PatchMapping("/{idPedido}/confirmarEntrega")
     public ResponseEntity<?> confirmarEntrega(
             @PathVariable Long idPedido,

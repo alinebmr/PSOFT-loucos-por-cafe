@@ -11,7 +11,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+import com.ufcg.psoft.commerce.dto.entregador.EntregadorPostPutRequestDTO;
 import com.ufcg.psoft.commerce.enums.*;
+import com.ufcg.psoft.commerce.model.*;
+import com.ufcg.psoft.commerce.repository.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,15 +34,6 @@ import com.ufcg.psoft.commerce.dto.EnderecoDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.exception.CustomErrorType;
-import com.ufcg.psoft.commerce.model.Cafe;
-import com.ufcg.psoft.commerce.model.Cliente;
-import com.ufcg.psoft.commerce.model.Endereco;
-import com.ufcg.psoft.commerce.model.Fornecedor;
-import com.ufcg.psoft.commerce.model.Pedido;
-import com.ufcg.psoft.commerce.repository.CafeRepository;
-import com.ufcg.psoft.commerce.repository.ClienteRepository;
-import com.ufcg.psoft.commerce.repository.FornecedorRepository;
-import com.ufcg.psoft.commerce.repository.PedidoRepository;
 import com.ufcg.psoft.commerce.service.pedido.PedidoService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -72,11 +66,16 @@ public class PedidoControllerTests {
     @Autowired
     PedidoService pedidoService;
 
+    @Autowired
+    EntregadorRespository entregadorRespository;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
     Cafe cafe;
     Cafe cafePremium;
     Cafe cafeIndisponivel;
+
+    Entregador entregador;
 
     Fornecedor fornecedor;
     Fornecedor fornecedorOutro;
@@ -87,6 +86,8 @@ public class PedidoControllerTests {
     Pedido pedido;
 
     PedidoPostPutRequestDTO pedidoPostPutRequestDTO;
+
+    EntregadorPostPutRequestDTO entregadorPostPutRequestDTO;
 
     @BeforeEach
     void setup() {
@@ -168,6 +169,24 @@ public class PedidoControllerTests {
             .tamanhoEmbalagem(35)
             .disponivel(false)
             .build());
+
+        entregador = entregadorRespository.save(Entregador.builder()
+                .nome("Leticia Fretes")
+                .placaVeiculo("AAA-2345")
+                .tipoVeiculo("Caminhão")
+                .corVeiculo("Verde")
+                .codigo("123123")
+                .aprovado(false)
+                .build()
+        );
+
+        entregadorPostPutRequestDTO = EntregadorPostPutRequestDTO.builder()
+                .nome(entregador.getNome())
+                .placaVeiculo(entregador.getPlacaVeiculo())
+                .tipoVeiculo(entregador.getTipoVeiculo())
+                .corVeiculo(entregador.getCorVeiculo())
+                .codigo(entregador.getCodigo())
+                .build();
 
         pedido = pedidoRepository.save(Pedido.builder()
             .cafe(cafe)
@@ -876,5 +895,46 @@ public class PedidoControllerTests {
 
             assertEquals("Status do pedido invalido para esta operacao", resultado.getMessage());
         }
+    }
+
+    @Test
+    @DisplayName("Quando colocamos um pedido em processo de entrega")
+    void pedidoEmRota() throws Exception{
+        Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                .cafe(cafe)
+                .endereco(cliente.getEndereco())
+                .cliente(cliente)
+                .status(StatusPedidoEnum.PRONTO)
+                .entregador(entregador)
+                .pago(true)
+                .tipoPagamento(TipoPagamento.CREDITO)
+                .build());
+
+        String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/pedidoEmEntrega")
+                        .param("idCliente", cliente.getId().toString())
+                        .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+        assertEquals(StatusPedidoEnum.EM_ENTREGA, resultado.getStatus());
+    }
+
+    @Test
+    @DisplayName("Quando colocamos um pedido com status inválido em processo de entrega")
+    void pedidoEmRotaInvalido() throws Exception {
+
+        String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/pedidoEmEntrega")
+                        .param("idCliente", cliente.getId().toString())
+                        .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+        CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+        assertEquals("Status do pedido invalido para esta operacao", resultado.getMessage());
     }
 }
