@@ -15,15 +15,7 @@ public class PedidoPronto implements PedidoState {
     @Override
     public void nextState() {
         pedido.setStatus(StatusPedidoEnum.EM_ENTREGA);
-        notificaCliente();
+        pedido.getCliente().notificaPedidoEmRota(pedido);
     }
-
-    private void notificaCliente(){
-        System.out.println("O pedido: " + pedido.toString() + " entrou em processo de entrega\n" +
-                "Entregador: " + pedido.getEntregador().getNome() + "\n" +
-                "Veículo: [Placa: " + pedido.getEntregador().getPlacaVeiculo() + ", Cor : " + pedido.getEntregador().getCorVeiculo() + ", Tipo: " + pedido.getEntregador().getTipoVeiculo() + "]");
-
-    }
-
 
 }
