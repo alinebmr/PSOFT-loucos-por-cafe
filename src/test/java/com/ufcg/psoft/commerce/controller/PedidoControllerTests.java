@@ -95,80 +95,80 @@ public class PedidoControllerTests {
         objectMapper.registerModule(new JavaTimeModule());
 
         cliente = clienteRepository.save(Cliente.builder()
-                .nome("José")
-                .codigo("123123")
-                .assinatura(TipoAssinatura.NORMAL)
-                .endereco(Endereco.builder()
-                        .cep("12345678")
-                        .bairro("Um lugar aí")
-                        .cidade("Uma cidade aí")
-                        .rua("Avenida Qualquer")
-                        .numero("15")
-                        .build())
-                .build());
+            .nome("José")
+            .codigo("123123")
+            .assinatura(TipoAssinatura.NORMAL)
+            .endereco(Endereco.builder()
+                .cep("12345678")
+                .bairro("Um lugar aí")
+                .cidade("Uma cidade aí")
+                .rua("Avenida Qualquer")
+                .numero("15")
+                .build())
+            .build());
 
         clientePremium = clienteRepository.save(Cliente.builder()
-                .nome("Paulo")
-                .codigo("123123")
-                .assinatura(TipoAssinatura.PREMIUM)
-                .endereco(Endereco.builder()
-                        .cep("44440000")
-                        .bairro("Centro")
-                        .cidade("Cidade Grande")
-                        .rua("Rua central")
-                        .numero("123")
-                        .build())
-                .build());
+            .nome("Paulo")
+            .codigo("123123")
+            .assinatura(TipoAssinatura.PREMIUM)
+            .endereco(Endereco.builder()
+                .cep("44440000")
+                .bairro("Centro")
+                .cidade("Cidade Grande")
+                .rua("Rua central")
+                .numero("123")
+                .build())
+            .build());
 
         fornecedor = fornecedorRepository.save(Fornecedor.builder()
-                .nomeEmpresa("MicroCoffee")
-                .cnpj("12.345.678/0001-22")
-                .codigo("222222")
-                .build());
+            .nomeEmpresa("MicroCoffee")
+            .cnpj("12.345.678/0001-22")
+            .codigo("222222")
+            .build());
         fornecedor.getTiposPagamento().add(TipoPagamento.PIX);
         fornecedor.getTiposPagamento().add(TipoPagamento.DEBITO);
         fornecedor.getTiposPagamento().add(TipoPagamento.CREDITO);
         fornecedor = fornecedorRepository.save(fornecedor);
 
         fornecedorOutro = fornecedorRepository.save(Fornecedor.builder()
-                .nomeEmpresa("Joaninha Cafe")
-                .cnpj("44.000.000/4444-22")
-                .codigo("123123")
-                .build());
+            .nomeEmpresa("Joaninha Cafe")
+            .cnpj("44.000.000/4444-22")
+            .codigo("123123")
+            .build());
 
         cafe = cafeRepository.save(Cafe.builder()
-                .fornecedor(fornecedor)
-                .nome("Cafe Muito Bom")
-                .origem("Xique-Xique Bahia")
-                .tipo(TipoGraoCafe.GRAO)
-                .perfil("Frutas Vermelhas")
-                .preco(25.0)
-                .qualidade(QualidadeCafe.NORMAL)
-                .tamanhoEmbalagem(35)
-                .build());
+            .fornecedor(fornecedor)
+            .nome("Cafe Muito Bom")
+            .origem("Xique-Xique Bahia")
+            .tipo(TipoGraoCafe.GRAO)
+            .perfil("Frutas Vermelhas")
+            .preco(25.0)
+            .qualidade(QualidadeCafe.NORMAL)
+            .tamanhoEmbalagem(35)
+            .build());
 
         cafePremium = cafeRepository.save(Cafe.builder()
-                .fornecedor(fornecedor)
-                .nome("Chococcino")
-                .origem("Willy Wonka")
-                .tipo(TipoGraoCafe.CAPSULA)
-                .perfil("Cremoso")
-                .preco(39.99)
-                .qualidade(QualidadeCafe.PREMIUM)
-                .tamanhoEmbalagem(35)
-                .build());
+            .fornecedor(fornecedor)
+            .nome("Chococcino")
+            .origem("Willy Wonka")
+            .tipo(TipoGraoCafe.CAPSULA)
+            .perfil("Cremoso")
+            .preco(39.99)
+            .qualidade(QualidadeCafe.PREMIUM)
+            .tamanhoEmbalagem(35)
+            .build());
 
         cafeIndisponivel = cafeRepository.save(Cafe.builder()
-                .fornecedor(fornecedorOutro)
-                .nome("Cafe raro himalaia")
-                .origem("Cavernas")
-                .tipo(TipoGraoCafe.GRAO)
-                .perfil("Cremoso")
-                .preco(39.99)
-                .qualidade(QualidadeCafe.NORMAL)
-                .tamanhoEmbalagem(35)
-                .disponivel(false)
-                .build());
+            .fornecedor(fornecedorOutro)
+            .nome("Cafe raro himalaia")
+            .origem("Cavernas")
+            .tipo(TipoGraoCafe.GRAO)
+            .perfil("Cremoso")
+            .preco(39.99)
+            .qualidade(QualidadeCafe.NORMAL)
+            .tamanhoEmbalagem(35)
+            .disponivel(false)
+            .build());
 
         entregador = entregadorRespository.save(Entregador.builder()
                 .nome("Leticia Fretes")
@@ -189,17 +189,18 @@ public class PedidoControllerTests {
                 .build();
 
         pedido = pedidoRepository.save(Pedido.builder()
-                .cafe(cafe)
-                .endereco(cliente.getEndereco())
-                .cliente(cliente).status(StatusPedidoEnum.PREPARACAO)
-                .tipoPagamento(TipoPagamento.CREDITO)
-                .build());
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .status(StatusPedidoEnum.PREPARACAO)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
 
         pedidoPostPutRequestDTO = PedidoPostPutRequestDTO.builder()
-                .endereco(null)
-                .idCafe(cafe.getId())
-                .tipoPagamento(TipoPagamento.CREDITO)
-                .build();
+            .endereco(null)
+            .idCafe(cafe.getId())
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build();
     }
 
     @AfterEach
@@ -218,15 +219,14 @@ public class PedidoControllerTests {
         void listarPedidosCliente() throws Exception {
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS)
-                            .param("id", cliente.getId().toString())
-                            .param("codigoAcesso", "123123")
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", cliente.getId().toString())
+                    .param("codigoAcesso", "123123")
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            List<PedidoResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            List<PedidoResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
 
             // Assert
             assertEquals(1, resultado.size());
@@ -237,15 +237,14 @@ public class PedidoControllerTests {
         void listarPedidosFornecedor() throws Exception {
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS)
-                            .param("id", fornecedor.getId().toString())
-                            .param("codigoAcesso", "222222")
-                            .param("isFornecedor", "true"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", fornecedor.getId().toString())
+                    .param("codigoAcesso", "222222")
+                    .param("isFornecedor", "true"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            List<PedidoResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            List<PedidoResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
 
             // Assert
             assertEquals(1, resultado.size());
@@ -256,15 +255,14 @@ public class PedidoControllerTests {
         void recuperarPedido() throws Exception {
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + pedido.getId())
-                            .param("id", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
 
             // Assert
             assertEquals(pedido.getCafe().getId(), resultado.getCafe().getId());
@@ -275,12 +273,12 @@ public class PedidoControllerTests {
         void recuperarPedidoInvalido() throws Exception {
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/99999")
-                            .param("id", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -293,24 +291,23 @@ public class PedidoControllerTests {
         void criarPedidoValido() throws Exception {
             // Act
             String responseJsonString = driver.perform(post(URI_PEDIDOS)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("idCliente", clientePremium.getId().toString())
-                            .param("codigoAcesso", clientePremium.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isCreated())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("idCliente", clientePremium.getId().toString())
+                    .param("codigoAcesso", clientePremium.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>(){});
 
             // Assert
             EnderecoDTO enderecoCliente = new EnderecoDTO(clientePremium.getEndereco());
             assertAll(
-                    () -> assertNotNull(resultado.getId()),
-                    () -> assertEquals(clientePremium.getId(), resultado.getCliente().getId()),
-                    () -> assertEquals(pedidoPostPutRequestDTO.getIdCafe(), resultado.getCafe().getId()),
-                    () -> assertEquals(enderecoCliente, resultado.getEndereco())
+                () -> assertNotNull(resultado.getId()),
+                () -> assertEquals(clientePremium.getId(), resultado.getCliente().getId()),
+                () -> assertEquals(pedidoPostPutRequestDTO.getIdCafe(), resultado.getCafe().getId()),
+                () -> assertEquals(enderecoCliente, resultado.getEndereco())
             );
         }
 
@@ -319,31 +316,30 @@ public class PedidoControllerTests {
         void criarPedidoValidoEnderecoEspecifico() throws Exception {
             // Arrange
             pedidoPostPutRequestDTO.setEndereco(EnderecoDTO.builder()
-                    .cep("12312300")
-                    .bairro("Bairro")
-                    .cidade("Cidade nova")
-                    .rua("Rua A")
-                    .numero("455")
-                    .build());
+                .cep("12312300")
+                .bairro("Bairro")
+                .cidade("Cidade nova")
+                .rua("Rua A")
+                .numero("455")
+                .build());
 
             // Act
             String responseJsonString = driver.perform(post(URI_PEDIDOS)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("idCliente", clientePremium.getId().toString())
-                            .param("codigoAcesso", clientePremium.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isCreated())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("idCliente", clientePremium.getId().toString())
+                    .param("codigoAcesso", clientePremium.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>(){});
 
             // Assert
             EnderecoDTO enderecoCliente = new EnderecoDTO(clientePremium.getEndereco());
             assertAll(
-                    () -> assertNotEquals(enderecoCliente, resultado.getEndereco()),
-                    () -> assertEquals(pedidoPostPutRequestDTO.getEndereco(), resultado.getEndereco())
+                () -> assertNotEquals(enderecoCliente, resultado.getEndereco()),
+                () -> assertEquals(pedidoPostPutRequestDTO.getEndereco(), resultado.getEndereco())
             );
         }
 
@@ -352,13 +348,13 @@ public class PedidoControllerTests {
         void criarPedidoClienteInexistente() throws Exception {
             // Act
             String responseJsonString = driver.perform(post(URI_PEDIDOS)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("idCliente", "9999999999")
-                            .param("codigoAcesso", clientePremium.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("idCliente", "9999999999")
+                    .param("codigoAcesso", clientePremium.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -371,13 +367,13 @@ public class PedidoControllerTests {
         void criarPedidoCodigoAccessoInvalido() throws Exception {
             // Act
             String responseJsonString = driver.perform(post(URI_PEDIDOS)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("idCliente", cliente.getId().toString())
-                            .param("codigoAcesso", "invalido"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", "invalido"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -393,13 +389,13 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(post(URI_PEDIDOS)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("idCliente", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -415,13 +411,13 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(post(URI_PEDIDOS)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("idCliente", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -437,13 +433,13 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(post(URI_PEDIDOS)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("idCliente", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -461,13 +457,13 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(post(URI_PEDIDOS)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("idCliente", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -480,30 +476,29 @@ public class PedidoControllerTests {
         void atualizarPedidoValido() throws Exception {
             // Arrange
             pedidoPostPutRequestDTO.setEndereco(EnderecoDTO.builder()
-                    .cep("44440000")
-                    .bairro("Lagoinhas")
-                    .cidade("Cidade Grande")
-                    .rua("Rua central")
-                    .numero("123")
-                    .build());
+                .cep("44440000")
+                .bairro("Lagoinhas")
+                .cidade("Cidade Grande")
+                .rua("Rua central")
+                .numero("123")
+                .build());
 
             // Act
             String responseJsonString = driver.perform(put(URI_PEDIDOS + "/" + pedido.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("id", pedido.getCliente().getId().toString())
-                            .param("codigo", pedido.getCliente().getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("id", pedido.getCliente().getId().toString())
+                    .param("codigo", pedido.getCliente().getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>(){});
 
             // Assert
             assertAll(
-                    () -> assertEquals("Lagoinhas", resultado.getEndereco().getBairro())
+                () -> assertEquals("Lagoinhas", resultado.getEndereco().getBairro())
             );
         }
 
@@ -512,30 +507,29 @@ public class PedidoControllerTests {
         void atualizarPedidoValidoPeloFornecedor() throws Exception {
             // Arrange
             pedidoPostPutRequestDTO.setEndereco(EnderecoDTO.builder()
-                    .cep("44440000")
-                    .bairro("Lagoinhas")
-                    .cidade("Cidade Grande")
-                    .rua("Rua central")
-                    .numero("123")
-                    .build());
+                .cep("44440000")
+                .bairro("Lagoinhas")
+                .cidade("Cidade Grande")
+                .rua("Rua central")
+                .numero("123")
+                .build());
 
             // Act
             String responseJsonString = driver.perform(put(URI_PEDIDOS + "/" + pedido.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("id", fornecedor.getId().toString())
-                            .param("codigo", fornecedor.getCodigo())
-                            .param("isFornecedor", "true"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("id", fornecedor.getId().toString())
+                    .param("codigo", fornecedor.getCodigo())
+                    .param("isFornecedor", "true"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>(){});
 
             // Assert
             assertAll(
-                    () -> assertEquals("Lagoinhas", resultado.getEndereco().getBairro())
+                () -> assertEquals("Lagoinhas", resultado.getEndereco().getBairro())
             );
         }
 
@@ -544,14 +538,14 @@ public class PedidoControllerTests {
         void atualizarPedidoInexistente() throws Exception {
             // Act
             String responseJsonString = driver.perform(put(URI_PEDIDOS + "/99999")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("id", pedido.getCliente().getId().toString())
-                            .param("codigo", pedido.getCliente().getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("id", pedido.getCliente().getId().toString())
+                    .param("codigo", pedido.getCliente().getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -567,14 +561,14 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(put(URI_PEDIDOS + "/" + pedido.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("id", pedido.getCliente().getId().toString())
-                            .param("codigo", pedido.getCliente().getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("id", pedido.getCliente().getId().toString())
+                    .param("codigo", pedido.getCliente().getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -587,14 +581,14 @@ public class PedidoControllerTests {
         void atualizarPedidoClienteErrado() throws Exception {
             // Act
             String responseJsonString = driver.perform(put(URI_PEDIDOS + "/" + pedido.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("id", clientePremium.getId().toString())
-                            .param("codigo", clientePremium.getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("id", clientePremium.getId().toString())
+                    .param("codigo", clientePremium.getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -607,14 +601,14 @@ public class PedidoControllerTests {
         void atualizarPedidoFornecedorErrado() throws Exception {
             // Act
             String responseJsonString = driver.perform(put(URI_PEDIDOS + "/" + pedido.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("id", fornecedorOutro.getId().toString())
-                            .param("codigo", fornecedorOutro.getCodigo())
-                            .param("isFornecedor", "true"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("id", fornecedorOutro.getId().toString())
+                    .param("codigo", fornecedorOutro.getCodigo())
+                    .param("isFornecedor", "true"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -632,14 +626,14 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(put(URI_PEDIDOS + "/" + pedido.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
-                            .param("id", pedido.getCliente().getId().toString())
-                            .param("codigo", pedido.getCliente().getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO))
+                    .param("id", pedido.getCliente().getId().toString())
+                    .param("codigo", pedido.getCliente().getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -652,12 +646,12 @@ public class PedidoControllerTests {
         void excluirPedidoValido() throws Exception {
             // Act
             String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId())
-                            .param("id", pedido.getCliente().getId().toString())
-                            .param("codigo", pedido.getCliente().getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isNoContent())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", pedido.getCliente().getId().toString())
+                    .param("codigo", pedido.getCliente().getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andReturn().getResponse().getContentAsString();
 
             // Assert
             assertTrue(responseJsonString.isBlank());
@@ -668,12 +662,12 @@ public class PedidoControllerTests {
         void excluirPedidoValidoPeloFornecedor() throws Exception {
             // Act
             String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId())
-                            .param("id", fornecedor.getId().toString())
-                            .param("codigo", fornecedor.getCodigo())
-                            .param("isFornecedor", "true"))
-                    .andDo(print())
-                    .andExpect(status().isNoContent())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", fornecedor.getId().toString())
+                    .param("codigo", fornecedor.getCodigo())
+                    .param("isFornecedor", "true"))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andReturn().getResponse().getContentAsString();
 
             // Assert
             assertTrue(responseJsonString.isBlank());
@@ -684,12 +678,12 @@ public class PedidoControllerTests {
         void excluirPedidoInexistente() throws Exception {
             // Act
             String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/99999")
-                            .param("id", pedido.getCliente().getId().toString())
-                            .param("codigo", pedido.getCliente().getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", pedido.getCliente().getId().toString())
+                    .param("codigo", pedido.getCliente().getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -702,12 +696,12 @@ public class PedidoControllerTests {
         void excluirPedidoClienteErrado() throws Exception {
             // Act
             String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId())
-                            .param("id", clientePremium.getId().toString())
-                            .param("codigo", clientePremium.getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", clientePremium.getId().toString())
+                    .param("codigo", clientePremium.getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -720,12 +714,12 @@ public class PedidoControllerTests {
         void excluirPedidoFornecedorErrado() throws Exception {
             // Act
             String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId())
-                            .param("id", fornecedorOutro.getId().toString())
-                            .param("codigo", fornecedorOutro.getCodigo())
-                            .param("isFornecedor", "true"))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", fornecedorOutro.getId().toString())
+                    .param("codigo", fornecedorOutro.getCodigo())
+                    .param("isFornecedor", "true"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -738,18 +732,17 @@ public class PedidoControllerTests {
         void pagarPedidoValido() throws Exception {
             // Act
             String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/pagar")
-                            .param("idCliente", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>(){});
 
             // Assert
             assertAll(
-                    () -> assertTrue(resultado.isPago())
+                () -> assertTrue(resultado.isPago())
             );
         }
 
@@ -761,11 +754,11 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/pagar")
-                            .param("idCliente", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -778,11 +771,11 @@ public class PedidoControllerTests {
         void pagarPedidoClienteErrado() throws Exception {
             // Act
             String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/pagar")
-                            .param("idCliente", clientePremium.getId().toString())
-                            .param("codigoAcesso", clientePremium.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("idCliente", clientePremium.getId().toString())
+                    .param("codigoAcesso", clientePremium.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
@@ -803,15 +796,14 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + pedido.getId())
-                            .param("id", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
 
             // Assert
             assertEquals(25.0, resultado.getValor());
@@ -826,15 +818,14 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + pedido.getId())
-                            .param("id", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
 
             // Assert
             assertEquals(25.0 * 0.975, resultado.getValor());
@@ -849,15 +840,14 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + pedido.getId())
-                            .param("id", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo())
-                            .param("isFornecedor", "false"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("id", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo())
+                    .param("isFornecedor", "false"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
 
             // Assert
             assertEquals(25.0 * 0.95, resultado.getValor());
@@ -871,23 +861,22 @@ public class PedidoControllerTests {
         @DisplayName("Quando confirmamos a entrega de um pedido")
         void pedidoEntregue() throws Exception {
             Pedido pedido1 = pedidoRepository.save(Pedido.builder()
-                    .cafe(cafe)
-                    .endereco(cliente.getEndereco())
-                    .cliente(cliente)
-                    .status(StatusPedidoEnum.EM_ENTREGA)
-                    .pago(true)
-                    .tipoPagamento(TipoPagamento.CREDITO)
-                    .build());
+                .cafe(cafe)
+                .endereco(cliente.getEndereco())
+                .cliente(cliente)
+                .status(StatusPedidoEnum.EM_ENTREGA)
+                .pago(true)
+                .tipoPagamento(TipoPagamento.CREDITO)
+                .build());
 
             String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/confirmarEntrega")
-                            .param("idCliente", cliente.getId().toString())
-                            .param("codigoAcesso", cliente.getCodigo()))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+                    .param("idCliente", cliente.getId().toString())
+                    .param("codigoAcesso", cliente.getCodigo()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
 
             assertEquals(StatusPedidoEnum.ENTREGUE, resultado.getStatus());
         }
