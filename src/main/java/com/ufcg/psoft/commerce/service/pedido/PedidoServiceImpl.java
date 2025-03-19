@@ -85,6 +85,17 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    public void cancelarPedido(Long idPedido, Long idCliente, String codigoAcesso) {
+        Pedido pedido = verificaPedido(idPedido, idCliente, codigoAcesso, false);
+
+        if(pedido.getStatus().equals(StatusPedidoEnum.RECEBIDO) || pedido.getStatus().equals(StatusPedidoEnum.PREPARACAO)){
+            pedidoRepository.delete(pedido);
+        }else{
+            throw new CommerceException("Pedido nao pode mais ser cancelado!");
+        }
+    }
+
+    @Override
     public List<PedidoResponseDTO> listar(Long id, String codigo, boolean isFornecedor) {
         List<Pedido> pedidos;
 
