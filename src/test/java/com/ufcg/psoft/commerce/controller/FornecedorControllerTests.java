@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @DisplayName("Testes do controller de fornecedores")
 public class FornecedorControllerTests {
@@ -103,7 +105,7 @@ public class FornecedorControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertEquals("MicroCoffee", resultado.getNomeEmpresa());
         }
@@ -122,7 +124,7 @@ public class FornecedorControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertEquals("Cofflee", resultado.getNomeEmpresa());
         }
@@ -184,7 +186,7 @@ public class FornecedorControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertEquals("12.345.678/0001-22", resultado.getCnpj());
         }
@@ -203,7 +205,7 @@ public class FornecedorControllerTests {
                                 .andDo(print())
                                 .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertEquals("12.345.678/0001-23", resultado.getCnpj());
         }
@@ -415,8 +417,7 @@ public class FornecedorControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            List<Fornecedor> resultado = objectMapper.readValue(response, new TypeReference<>() {
-            });
+            List<FornecedorResponseDTO> resultado = objectMapper.readValue(response, new TypeReference<>() {});
 
             assertAll(
                     () -> assertEquals(3, resultado.size())
@@ -472,7 +473,7 @@ public class FornecedorControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(responseJsonString, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(responseJsonString, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertAll(
                     () -> assertNotNull(resultado.getId()),
@@ -496,7 +497,7 @@ public class FornecedorControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Fornecedor resultado = objectMapper.readValue(response, Fornecedor.FornecedorBuilder.class).build();
+            FornecedorResponseDTO resultado = objectMapper.readValue(response, FornecedorResponseDTO.FornecedorResponseDTOBuilder.class).build();
 
             assertAll(
                     () -> assertEquals(resultado.getId().longValue(), fornecedorId),

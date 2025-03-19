@@ -1,40 +1,45 @@
 package com.ufcg.psoft.commerce.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
-
+import com.ufcg.psoft.commerce.enums.TipoPagamento;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cliente {
+
+public class Pedido {
     @JsonProperty("id")
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @JsonProperty("nome")
-    @Column(nullable = false)
-    private String nome;
+    @ManyToOne
+    private Cafe cafe;
 
     @JsonProperty("endereco")
     @Embedded
     private Endereco endereco;
 
-    @JsonIgnore
+    @ManyToOne
+    private Cliente cliente;
+
+    @JsonProperty("pago")
     @Column(nullable = false)
-    private String codigo;
+    @Builder.Default
+    private boolean pago = false;
+
+    @JsonProperty("tipoPagamento")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoPagamento tipoPagamento;
 
     @JsonProperty("assinatura")
     @Enumerated(EnumType.STRING)
@@ -42,9 +47,7 @@ public class Cliente {
     @Builder.Default
     private TipoAssinatura assinatura = TipoAssinatura.NORMAL;
 
-    @JsonProperty("cafesDeInteresse")
-    @Builder.Default
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name="interesse_cliente_cafe")
-    private List<Cafe> cafesDeInteresse = new ArrayList<Cafe>();
+    public double getValor() {
+        return this.cafe.getPreco() * this.tipoPagamento.getDesconto();
+    }
 }

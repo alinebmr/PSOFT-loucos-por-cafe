@@ -2,6 +2,7 @@ package com.ufcg.psoft.commerce.dto.cliente;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.dto.EnderecoDTO;
+import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.model.Cliente;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +13,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -35,10 +40,17 @@ public class ClienteResponseDTO {
     @JsonProperty("assinatura")
     private TipoAssinatura assinatura;
 
+    @JsonProperty("cafesDeInteresse")
+    @Builder.Default
+    private List<CafeResponseDTO> cafesDeInteresse = new ArrayList<CafeResponseDTO>();
+
     public ClienteResponseDTO(Cliente cliente) {
         this.id = cliente.getId();
         this.nome = cliente.getNome();
         this.endereco = new EnderecoDTO(cliente.getEndereco());
         this.assinatura = cliente.getAssinatura();
+        this.cafesDeInteresse = cliente.getCafesDeInteresse().stream()
+                .map(CafeResponseDTO::new)
+                .collect(Collectors.toList());
     }
 }

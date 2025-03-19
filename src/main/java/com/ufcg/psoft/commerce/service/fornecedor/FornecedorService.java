@@ -2,6 +2,7 @@ package com.ufcg.psoft.commerce.service.fornecedor;
 
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorResponseDTO;
 import com.ufcg.psoft.commerce.dto.fornecedor.*;
+import com.ufcg.psoft.commerce.model.Fornecedor;
 
 import java.util.List;
 
@@ -12,6 +13,10 @@ public interface FornecedorService {
     List<FornecedorResponseDTO> listar();
 
     FornecedorResponseDTO recuperar(Long id);
+
+    Fornecedor verificaFornecedor(Long id, String codigoAcesso);
+
+    Fornecedor verificaFornecedor(Long idFornecedor);
 
     FornecedorResponseDTO criar(Long adminId, FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO);
 

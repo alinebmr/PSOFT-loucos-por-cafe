@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
 import com.ufcg.psoft.commerce.enums.TipoGraoCafe;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -53,4 +54,9 @@ public class CafePostPutRequestDTO {
     @Min(value = 0L, message = "Tamanho da embalagem deve ser maior que 0")
     @NotNull(message = "Tamanho da embalagem obrigatorio")
     private Integer tamanhoEmbalagem;
+
+    @JsonProperty("disponivel")
+    @Nullable
+    private boolean disponivel;
+
 }

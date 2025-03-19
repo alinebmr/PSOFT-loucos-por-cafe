@@ -73,4 +73,59 @@ public class CafeController {
                 .status(HttpStatus.OK)
                 .body(cafeService.listar());
     }
+
+    @GetMapping("/catalogo")
+    public ResponseEntity<?> listarCafeFiltradoQualidade(
+            @RequestParam Long idCliente,
+            @RequestParam(required = false, defaultValue = "") String tipoCafe,
+            @RequestParam(required = false, defaultValue = "") String origem,
+            @RequestParam(required = false, defaultValue = "") String perfil) {
+
+        if(!tipoCafe.isBlank() || !perfil.isBlank() || !origem.isBlank()) {
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(cafeService.listarFiltro(idCliente, tipoCafe, origem, perfil));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(cafeService.listarFiltraQualidade(idCliente));
+    }
+
+    @PutMapping("/{idCliente}/interesse/{idCafe}")
+    public ResponseEntity<?> demonstrarInteresse(
+            @PathVariable Long idCliente,
+            @PathVariable Long idCafe,
+            @RequestParam String codigo) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(cafeService.demonstrarInteresse(idCliente,codigo,idCafe));
+
+    }
+
+    @DeleteMapping("/{idCliente}/interesse/{idCafe}")
+    public ResponseEntity<?> removerInteresseClienteCafe(
+            @PathVariable Long idCliente,
+            @PathVariable Long idCafe,
+            @RequestParam String codigo){
+        cafeService.removerInteresseClienteCafe(idCliente,codigo,idCafe);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
+    }
+
+    @GetMapping("/{idCliente}/interesse")
+    public ResponseEntity<?> listarCafeInteresseCliente(
+            @PathVariable Long idCliente,
+            @RequestParam String codigo){
+        return ResponseEntity.status(HttpStatus.OK).body(cafeService.listarCafesInteresseCliente(idCliente,codigo));
+    }
+
+    @PatchMapping("/{id}/alteraDisponibilidade")
+    public ResponseEntity<?> alteraDisponibilidade(
+        @PathVariable Long id,
+        @RequestParam Long idFornecedor,
+        @RequestParam String codigo,
+        @RequestParam boolean disponibilidade) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(cafeService.alterarDisponibilidadeCafe(id, idFornecedor, codigo, disponibilidade));
+    }
 }

@@ -2,10 +2,9 @@ package com.ufcg.psoft.commerce.service.fornecedor;
 
 import com.ufcg.psoft.commerce.exception.FornecedorNaoExisteException;
 import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
-import com.ufcg.psoft.commerce.exception.AdminInvalidoException;
 import com.ufcg.psoft.commerce.repository.FornecedorRepository;
+import com.ufcg.psoft.commerce.service.admin.AdminService;
 import com.ufcg.psoft.commerce.service.entregador.EntregadorService;
-import com.ufcg.psoft.commerce.repository.AdminRepository;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorResponseDTO;
 import com.ufcg.psoft.commerce.dto.fornecedor.*;
 import com.ufcg.psoft.commerce.model.Fornecedor;
@@ -22,7 +21,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Autowired
     FornecedorRepository fornecedorRepository;
     @Autowired
-    AdminRepository adminRepository;
+    AdminService adminService;
     @Autowired
     EntregadorService entregadorService;
     @Autowired
@@ -30,10 +29,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 
     @Override
     public FornecedorResponseDTO alterar(Long id, String codigoAcesso, FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO) {
-        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(FornecedorNaoExisteException::new);
-        if (!fornecedor.getCodigo().equals(codigoAcesso)) {
-            throw new CodigoDeAcessoInvalidoException();
-        }
+        Fornecedor fornecedor = verificaFornecedor(id, codigoAcesso);
         modelMapper.map(fornecedorPostPutRequestDTO, fornecedor);
         fornecedorRepository.save(fornecedor);
         return modelMapper.map(fornecedor, FornecedorResponseDTO.class);
@@ -41,9 +37,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 
     @Override
     public FornecedorResponseDTO criar(Long adminId, FornecedorPostPutRequestDTO fornecedorPostPutRequestDTO) {
-        if(!adminRepository.existsById(adminId)) {
-            throw new AdminInvalidoException();
-        }
+        adminService.recuperar(adminId);
         Fornecedor fornecedor = modelMapper.map(fornecedorPostPutRequestDTO, Fornecedor.class);
         fornecedorRepository.save(fornecedor);
         return modelMapper.map(fornecedor, FornecedorResponseDTO.class);
@@ -51,10 +45,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 
     @Override
     public void remover(Long id, String codigoAcesso) {
-        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(FornecedorNaoExisteException::new);
-        if (!fornecedor.getCodigo().equals(codigoAcesso)) {
-            throw new CodigoDeAcessoInvalidoException();
-        }
+        Fornecedor fornecedor = verificaFornecedor(id, codigoAcesso);
         fornecedorRepository.delete(fornecedor);
     }
 
@@ -83,10 +74,23 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Override
     public EntregadorResponseDTO alterarAprovacaoEntregador(Long fornecedorId, String codigoAcesso, Long entregadorId,
         boolean aprovado) {
-        Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId).orElseThrow(FornecedorNaoExisteException::new);
-        if (!fornecedor.getCodigo().equals(codigoAcesso)) {
+        verificaFornecedor(fornecedorId, codigoAcesso);
+        return entregadorService.alterarAprovacao(entregadorId, aprovado);
+    }
+
+    @Override
+    public Fornecedor verificaFornecedor(Long id, String codigoAcesso) {
+        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(FornecedorNaoExisteException::new);
+
+        if(!fornecedor.getCodigo().equals(codigoAcesso)) {
             throw new CodigoDeAcessoInvalidoException();
         }
-        return entregadorService.alterarAprovacao(entregadorId, aprovado);
+
+        return fornecedor;
+    }
+
+    @Override
+    public Fornecedor verificaFornecedor(Long id) {
+        return fornecedorRepository.findById(id).orElseThrow(FornecedorNaoExisteException::new);
     }
 }
