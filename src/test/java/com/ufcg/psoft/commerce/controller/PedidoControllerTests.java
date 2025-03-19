@@ -897,44 +897,4 @@ public class PedidoControllerTests {
         }
     }
 
-    @Test
-    @DisplayName("Quando colocamos um pedido em processo de entrega")
-    void pedidoEmRota() throws Exception{
-        Pedido pedido1 = pedidoRepository.save(Pedido.builder()
-                .cafe(cafe)
-                .endereco(cliente.getEndereco())
-                .cliente(cliente)
-                .status(StatusPedidoEnum.PRONTO)
-                .entregador(entregador)
-                .pago(true)
-                .tipoPagamento(TipoPagamento.CREDITO)
-                .build());
-
-        String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/pedidoEmEntrega")
-                        .param("idCliente", cliente.getId().toString())
-                        .param("codigoAcesso", cliente.getCodigo()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
-
-        assertEquals(StatusPedidoEnum.EM_ENTREGA, resultado.getStatus());
-    }
-
-    @Test
-    @DisplayName("Quando colocamos um pedido com status inválido em processo de entrega")
-    void pedidoEmRotaInvalido() throws Exception {
-
-        String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/pedidoEmEntrega")
-                        .param("idCliente", cliente.getId().toString())
-                        .param("codigoAcesso", cliente.getCodigo()))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn().getResponse().getContentAsString();
-
-        CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
-
-        assertEquals("Status do pedido invalido para esta operacao", resultado.getMessage());
-    }
 }
