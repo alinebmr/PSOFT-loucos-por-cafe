@@ -192,6 +192,7 @@ public class PedidoControllerTests {
             .cafe(cafe)
             .endereco(cliente.getEndereco())
             .cliente(cliente)
+            .status(StatusPedidoEnum.PREPARACAO)
             .tipoPagamento(TipoPagamento.CREDITO)
             .build());
 
@@ -897,4 +898,123 @@ public class PedidoControllerTests {
         }
     }
 
+    @Nested
+    @DisplayName("Conjunto de casos de cancelamento de pedido")
+    class CancelamentoPedido {
+
+        @Test
+        @DisplayName("Quando cancelamos um pedido válido com status (RECEBIDO)")
+        void cancelarPedidoValidoStatusRecebido() throws Exception {
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .status(StatusPedidoEnum.RECEBIDO)
+                    .pago(true)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + cliente.getId() + "/" + pedido1.getId() + "/" + "cancelarPedido")
+                            .param("codigoAcesso", pedido.getCliente().getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isNoContent())
+                    .andReturn().getResponse().getContentAsString();
+
+            // Assert
+            assertTrue(responseJsonString.isBlank());
+        }
+
+        @Test
+        @DisplayName("Quando cancelamos um pedido válido com status (PREPARACAO)")
+        void cancelarPedidoValidoStatusPreparacao() throws Exception {
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .status(StatusPedidoEnum.PREPARACAO)
+                    .pago(true)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + cliente.getId() + "/" + pedido1.getId() + "/" + "cancelarPedido")
+                            .param("codigoAcesso", pedido.getCliente().getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isNoContent())
+                    .andReturn().getResponse().getContentAsString();
+
+            // Assert
+            assertTrue(responseJsonString.isBlank());
+        }
+
+        @Test
+        @DisplayName("Quando cancelamos um pedido inválido (PRONTO)")
+        void cancelarPedidoInvalidoStatusPronto() throws Exception {
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .status(StatusPedidoEnum.PRONTO)
+                    .pago(true)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + cliente.getId() + "/" + pedido1.getId() + "/" + "cancelarPedido")
+                            .param("codigoAcesso", pedido.getCliente().getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+            assertEquals("Pedido nao pode mais ser cancelado!", resultado.getMessage());
+        }
+
+        @Test
+        @DisplayName("Quando cancelamos um pedido inválido (EM ENTREGA)")
+        void cancelarPedidoInvalidoStatusEmEntrega() throws Exception {
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .status(StatusPedidoEnum.EM_ENTREGA)
+                    .pago(true)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + cliente.getId() + "/" + pedido1.getId() + "/" + "cancelarPedido")
+                            .param("codigoAcesso", pedido.getCliente().getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+            assertEquals("Pedido nao pode mais ser cancelado!", resultado.getMessage());
+        }
+
+        @Test
+        @DisplayName("Quando cancelamos um pedido inválido (ENTREGUE)")
+        void cancelarPedidoInvalidoStatusEntregue() throws Exception {
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .status(StatusPedidoEnum.ENTREGUE)
+                    .pago(true)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + cliente.getId() + "/" + pedido1.getId() + "/" + "cancelarPedido")
+                            .param("codigoAcesso", pedido.getCliente().getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+            assertEquals("Pedido nao pode mais ser cancelado!", resultado.getMessage());
+        }
+    }
 }

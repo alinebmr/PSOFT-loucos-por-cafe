@@ -96,4 +96,15 @@ public class PedidoController {
                 .status(HttpStatus.NO_CONTENT)
                 .body("");
     }
+
+    @DeleteMapping("{idCliente}/{idPedido}/cancelarPedido")
+    public  ResponseEntity<?> cancelarPedido(
+            @PathVariable Long idPedido,
+            @PathVariable Long idCliente,
+            @RequestParam String codigoAcesso){
+        pedidoService.cancelarPedido(idPedido,idCliente,codigoAcesso);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body("");
+    }
 }
