@@ -125,6 +125,19 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    public PedidoResponseDTO pedidoEmRota(Long idPedido) {
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
+
+        if(!pedido.getStatus().equals(StatusPedidoEnum.PRONTO)) {
+            throw new StatusPedidoInvalidoException();
+        }
+
+        pedido.nextState();
+
+        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+    }
+
+    @Override
     public PedidoResponseDTO confirmarEntrega(Long idPedido, Long idCliente, String codigoAcesso) {
         Pedido pedido = verificaPedido(idPedido, idCliente, codigoAcesso, false);
 

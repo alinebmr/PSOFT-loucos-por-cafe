@@ -19,4 +19,6 @@ public interface PedidoService {
     PedidoResponseDTO confirmarPagamento(Long idPedido, Long idCliente, String codigoAcesso);
 
     PedidoResponseDTO confirmarEntrega(Long idPedido, Long idCliente, String codigoAcesso);
+
+    PedidoResponseDTO pedidoEmRota(Long idPedid);
 }
