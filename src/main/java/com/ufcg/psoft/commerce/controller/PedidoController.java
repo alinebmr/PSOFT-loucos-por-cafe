@@ -1,7 +1,6 @@
 package com.ufcg.psoft.commerce.controller;
 
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
-import com.ufcg.psoft.commerce.enums.TipoPagamento;
 import com.ufcg.psoft.commerce.service.pedido.PedidoService;
 import jakarta.validation.Valid;
 
@@ -85,16 +84,14 @@ public class PedidoController {
                 .body(pedidoService.confirmarEntrega(idPedido, idCliente, codigoAcesso));
     }
 
-    @DeleteMapping("/{idPedido}")
-    public ResponseEntity<?> excluirPedido(
+    @PatchMapping("/{idPedido}/pedidoPronto")
+    public ResponseEntity<?> pedidoPronto(
             @PathVariable Long idPedido,
-            @RequestParam Long id,
-            @RequestParam String codigo,
-            @RequestParam boolean isFornecedor) {
-        pedidoService.remover(id, codigo, idPedido, isFornecedor);
+            @RequestParam Long idFornecedor,
+            @RequestParam String codigoAcesso) {
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body("");
+                .status(HttpStatus.OK)
+                .body(pedidoService.pedidoPronto(idPedido, idFornecedor, codigoAcesso));
     }
 
     @DeleteMapping("{idCliente}/{idPedido}/cancelarPedido")

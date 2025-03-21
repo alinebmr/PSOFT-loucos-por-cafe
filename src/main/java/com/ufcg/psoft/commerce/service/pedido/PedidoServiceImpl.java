@@ -78,13 +78,6 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public void remover(Long id, String codigo, Long idPedido, boolean isFornecedor) {
-        Pedido pedido = verificaPedido(idPedido, id, codigo, isFornecedor);
-
-        pedidoRepository.delete(pedido);
-    }
-
-    @Override
     public void cancelarPedido(Long idPedido, Long idCliente, String codigoAcesso) {
         Pedido pedido = verificaPedido(idPedido, idCliente, codigoAcesso, false);
 
@@ -130,6 +123,7 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.setPago(true);
+        pedido.nextState();
         pedidoRepository.save(pedido);
 
         return new PedidoResponseDTO(pedido);
@@ -140,6 +134,19 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
 
         if(!pedido.getStatus().equals(StatusPedidoEnum.PRONTO)) {
+            throw new StatusPedidoInvalidoException();
+        }
+
+        pedido.nextState();
+
+        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+    }
+
+    @Override
+    public PedidoResponseDTO pedidoPronto(Long idPedido, Long idFornecedor, String codigoAcesso) {
+        Pedido pedido = verificaPedido(idPedido, idFornecedor, codigoAcesso, true);
+
+        if(!pedido.getStatus().equals(StatusPedidoEnum.PREPARACAO)) {
             throw new StatusPedidoInvalidoException();
         }
 

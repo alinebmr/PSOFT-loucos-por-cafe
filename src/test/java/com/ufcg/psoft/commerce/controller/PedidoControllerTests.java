@@ -192,7 +192,6 @@ public class PedidoControllerTests {
             .cafe(cafe)
             .endereco(cliente.getEndereco())
             .cliente(cliente)
-            .status(StatusPedidoEnum.PREPARACAO)
             .tipoPagamento(TipoPagamento.CREDITO)
             .build());
 
@@ -642,92 +641,6 @@ public class PedidoControllerTests {
         }
 
         @Test
-        @DisplayName("Quando excluimos um pedido")
-        void excluirPedidoValido() throws Exception {
-            // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId())
-                    .param("id", pedido.getCliente().getId().toString())
-                    .param("codigo", pedido.getCliente().getCodigo())
-                    .param("isFornecedor", "false"))
-                .andDo(print())
-                .andExpect(status().isNoContent())
-                .andReturn().getResponse().getContentAsString();
-
-            // Assert
-            assertTrue(responseJsonString.isBlank());
-        }
-
-        @Test
-        @DisplayName("Quando excluimos um pedido pelo fornecedor")
-        void excluirPedidoValidoPeloFornecedor() throws Exception {
-            // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId())
-                    .param("id", fornecedor.getId().toString())
-                    .param("codigo", fornecedor.getCodigo())
-                    .param("isFornecedor", "true"))
-                .andDo(print())
-                .andExpect(status().isNoContent())
-                .andReturn().getResponse().getContentAsString();
-
-            // Assert
-            assertTrue(responseJsonString.isBlank());
-        }
-
-        @Test
-        @DisplayName("Quando excluimos um pedido inexistente")
-        void excluirPedidoInexistente() throws Exception {
-            // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/99999")
-                    .param("id", pedido.getCliente().getId().toString())
-                    .param("codigo", pedido.getCliente().getCodigo())
-                    .param("isFornecedor", "false"))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn().getResponse().getContentAsString();
-
-            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
-
-            // Assert
-            assertEquals("O pedido consultado nao existe!", resultado.getMessage());
-        }
-
-        @Test
-        @DisplayName("Quando excluimos um pedido com cliente errado")
-        void excluirPedidoClienteErrado() throws Exception {
-            // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId())
-                    .param("id", clientePremium.getId().toString())
-                    .param("codigo", clientePremium.getCodigo())
-                    .param("isFornecedor", "false"))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn().getResponse().getContentAsString();
-
-            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
-
-            // Assert
-            assertEquals("Cliente invalido!", resultado.getMessage());
-        }
-
-        @Test
-        @DisplayName("Quando excluimos um pedido com fornecedor errado")
-        void excluirPedidoFornecedorErrado() throws Exception {
-            // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId())
-                    .param("id", fornecedorOutro.getId().toString())
-                    .param("codigo", fornecedorOutro.getCodigo())
-                    .param("isFornecedor", "true"))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn().getResponse().getContentAsString();
-
-            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
-
-            // Assert
-            assertEquals("Fornecedor invalido!", resultado.getMessage());
-        }
-
-        @Test
         @DisplayName("Quando pagamos um pedido valido")
         void pagarPedidoValido() throws Exception {
             // Act
@@ -742,7 +655,8 @@ public class PedidoControllerTests {
 
             // Assert
             assertAll(
-                () -> assertTrue(resultado.isPago())
+                () -> assertTrue(resultado.isPago()),
+                () -> assertEquals(StatusPedidoEnum.PREPARACAO, resultado.getStatus())
             );
         }
 
@@ -895,6 +809,91 @@ public class PedidoControllerTests {
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
             assertEquals("Status do pedido invalido para esta operacao", resultado.getMessage());
+        }
+
+        @Test
+        @DisplayName("Quando o fornecedor confirma que o pedido está pronto")
+        void pedidoProntoValido() throws Exception {
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .status(StatusPedidoEnum.PREPARACAO)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/pedidoPronto")
+                            .param("idFornecedor", fornecedor.getId().toString())
+                            .param("codigoAcesso", fornecedor.getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            assertEquals(StatusPedidoEnum.PRONTO, resultado.getStatus());
+        }
+
+        @Test
+        @DisplayName("Quando o fornecedor invalido tenta confirmar que o pedido está pronto")
+        void pedidoProntoInvalido() throws Exception {
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .status(StatusPedidoEnum.PREPARACAO)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/pedidoPronto")
+                            .param("idFornecedor", fornecedorOutro.getId().toString())
+                            .param("codigoAcesso", fornecedorOutro.getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            assertEquals("Fornecedor invalido!", resultado.getMessage());
+        }
+
+        @Test
+        @DisplayName("Quando o fornecedor tenta confirmar que o pedido está pronto com status invalido")
+        void pedidoProntoStatusInvalido() throws Exception {
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .status(StatusPedidoEnum.PRONTO)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/pedidoPronto")
+                            .param("idFornecedor", fornecedor.getId().toString())
+                            .param("codigoAcesso", fornecedor.getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            assertEquals("Status do pedido invalido para esta operacao", resultado.getMessage());
+        }
+
+        @Test
+        @DisplayName("Quando o fornecedor tenta confirmar que um pedido inexistente está pronto")
+        void pedidoProntoPedidoInvalido() throws Exception {
+
+            String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + 9999L + "/pedidoPronto")
+                            .param("idFornecedor", fornecedor.getId().toString())
+                            .param("codigoAcesso", fornecedor.getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            assertEquals("O pedido consultado nao existe!", resultado.getMessage());
         }
     }
 
