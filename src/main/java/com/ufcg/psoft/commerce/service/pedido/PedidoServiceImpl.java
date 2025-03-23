@@ -164,6 +164,10 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.nextState();
+        
+        Cafe cafePedido = pedido.getCafe();
+        Fornecedor fornecedor = cafePedido.getFornecedor();
+        fornecedor.notificaPedidoEntregue(pedido);
 
         return new PedidoResponseDTO(pedidoRepository.save(pedido));
     }
