@@ -634,7 +634,8 @@ public class FornecedorControllerTests {
                 EntregadorResponseDTO.EntregadorResponseDTOBuilder.class).build();
 
             assertAll(
-                () -> assertEquals(true, resultado.isAprovado())
+                () -> assertEquals(true, resultado.isAprovado()),
+                () -> assertEquals(false, resultado.isDisponivel())
             );
         }
 
