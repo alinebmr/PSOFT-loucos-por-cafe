@@ -88,8 +88,7 @@ public class EntregadorControllerTests {
                     .getResponse()
                     .getContentAsString();
 
-            Entregador resultado = objectMapper.readValue(responseJsonString, Entregador.EntregadorBuilder.class)
-                    .build();
+            EntregadorResponseDTO resultado = objectMapper.readValue(responseJsonString, EntregadorResponseDTO.class);
 
             assertEquals("Jose Farias", resultado.getNome());
 
@@ -109,8 +108,7 @@ public class EntregadorControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Entregador resultado = objectMapper.readValue(responseJsonString, Entregador.EntregadorBuilder.class)
-                    .build();
+            EntregadorResponseDTO resultado = objectMapper.readValue(responseJsonString, EntregadorResponseDTO.class);
 
             // Assert
             assertEquals("Jose Farias Alterado", resultado.getNome());
@@ -833,7 +831,7 @@ public class EntregadorControllerTests {
                             .param("codigo", entregador.getCodigo())
                             .param("disponivel", "true"))
                     .andDo(print())
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             EntregadorResponseDTO resultado = objectMapper.readValue(responseJsonString, EntregadorResponseDTO.class);
