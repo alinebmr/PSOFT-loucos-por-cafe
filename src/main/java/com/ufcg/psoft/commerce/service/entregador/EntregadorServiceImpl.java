@@ -33,10 +33,7 @@ public class EntregadorServiceImpl implements EntregadorService {
 
     @Override
     public EntregadorResponseDTO alterar(Long id, String codigoAcesso, EntregadorPostPutRequestDTO entregadorPostPutRequestDTO) {
-        Entregador entregador = entregadorRespository.findById(id).orElseThrow(EntregadorNaoExisteException::new);
-        if (!entregador.getCodigo().equals(codigoAcesso)) {
-            throw new CodigoDeAcessoInvalidoException();
-        }
+        Entregador entregador = verificaEntregador(id, codigoAcesso);
         modelMapper.map(entregadorPostPutRequestDTO, entregador);
         entregadorRespository.save(entregador);
         return modelMapper.map(entregador, EntregadorResponseDTO.class);
@@ -58,10 +55,7 @@ public class EntregadorServiceImpl implements EntregadorService {
 
     @Override
     public void remover(Long id, String codigoAcesso) {
-        Entregador entregador = entregadorRespository.findById(id).orElseThrow(EntregadorNaoExisteException::new);
-        if (!entregador.getCodigo().equals(codigoAcesso)) {
-            throw new CodigoDeAcessoInvalidoException();
-        }
+        Entregador entregador = verificaEntregador(id, codigoAcesso);
         entregadorRespository.delete(entregador);
     }
 
@@ -86,15 +80,22 @@ public class EntregadorServiceImpl implements EntregadorService {
 
     @Override
     public EntregadorResponseDTO modificarDisponibilidade(Long id, String codigoAcesso, boolean disponivel) {
-        Entregador entregador = entregadorRespository.findById(id).orElseThrow(EntregadorNaoExisteException::new);
-        if (!entregador.getCodigo().equals(codigoAcesso)) {
-            throw new CodigoDeAcessoInvalidoException();
-        }
+        Entregador entregador = verificaEntregador(id, codigoAcesso);
         if (!entregador.isAprovado()) {
             throw new EntregadorNaoAprovadoException();
         }
         entregador.setDisponivel(disponivel);
         entregador = entregadorRespository.save(entregador);
         return new EntregadorResponseDTO(entregador);
+    }
+
+    private Entregador verificaEntregador(Long id, String codigoAcesso) {
+        Entregador entregador = entregadorRespository.findById(id).orElseThrow(EntregadorNaoExisteException::new);
+
+        if (!entregador.getCodigo().equals(codigoAcesso)) {
+            throw new CodigoDeAcessoInvalidoException();
+        }
+
+        return entregador;
     }
 }
