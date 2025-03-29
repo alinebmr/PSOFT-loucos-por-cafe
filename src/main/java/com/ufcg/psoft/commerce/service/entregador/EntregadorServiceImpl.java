@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorResponseDTO;
 import com.ufcg.psoft.commerce.exception.CodigoDeAcessoInvalidoException;
+import com.ufcg.psoft.commerce.exception.EntregadorNaoAprovadoException;
 import com.ufcg.psoft.commerce.exception.EntregadorNaoExisteException;
 import com.ufcg.psoft.commerce.model.Entregador;
 import com.ufcg.psoft.commerce.repository.EntregadorRespository;
@@ -76,6 +77,23 @@ public class EntregadorServiceImpl implements EntregadorService {
     public EntregadorResponseDTO alterarAprovacao(Long id, boolean aprovado) {
         Entregador entregador = entregadorRespository.findById(id).orElseThrow(EntregadorNaoExisteException::new);
         entregador.setAprovado(aprovado);
+        if (aprovado) {
+            entregador.setDisponivel(false);
+        }
+        entregador = entregadorRespository.save(entregador);
+        return new EntregadorResponseDTO(entregador);
+    }
+
+    @Override
+    public EntregadorResponseDTO modificarDisponibilidade(Long id, String codigoAcesso, boolean disponivel) {
+        Entregador entregador = entregadorRespository.findById(id).orElseThrow(EntregadorNaoExisteException::new);
+        if (!entregador.getCodigo().equals(codigoAcesso)) {
+            throw new CodigoDeAcessoInvalidoException();
+        }
+        if (!entregador.isAprovado()) {
+            throw new EntregadorNaoAprovadoException();
+        }
+        entregador.setDisponivel(disponivel);
         entregador = entregadorRespository.save(entregador);
         return new EntregadorResponseDTO(entregador);
     }

@@ -45,4 +45,8 @@ public class Entregador {
     @Column(nullable = false)
     @Builder.Default
     private boolean aprovado = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean disponivel = false;
 }

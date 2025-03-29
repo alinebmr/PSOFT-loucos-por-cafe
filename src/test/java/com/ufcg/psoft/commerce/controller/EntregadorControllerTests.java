@@ -184,6 +184,26 @@ public class EntregadorControllerTests {
     }
 
     @Nested
+    @DisplayName("Conjunto de casos para disponibilidade")
+    class EntregadorStatusDisponivel {
+        @Test
+        @DisplayName("Verificar disponibilidade inicial")
+        void statusInicial() throws Exception {
+            String responseJsonString = driver.perform(get(URI_ENTREGADORES + "/" + entregador.getId()))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+            EntregadorResponseDTO resultado = objectMapper.readValue(responseJsonString,
+                EntregadorResponseDTO.EntregadorResponseDTOBuilder.class).build();
+
+            assertFalse(resultado.isDisponivel());
+        }
+    }
+
+    @Nested
     @DisplayName("Conjunto de casos de verificação da placa do veículo")
     class EntregadorVerificacaoPlacaVeiculo {
 
@@ -641,8 +661,7 @@ public class EntregadorControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Entregador resultado = objectMapper.readValue(responseJsonString, Entregador.EntregadorBuilder.class)
-                    .build();
+            EntregadorResponseDTO resultado = objectMapper.readValue(responseJsonString, EntregadorResponseDTO.class);
 
             // Assert
             assertAll(
@@ -666,8 +685,7 @@ public class EntregadorControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Entregador resultado = objectMapper.readValue(responseJsonString, Entregador.EntregadorBuilder.class)
-                    .build();
+            EntregadorResponseDTO resultado = objectMapper.readValue(responseJsonString, EntregadorResponseDTO.class);
 
             // Assert
             assertAll(
@@ -777,6 +795,53 @@ public class EntregadorControllerTests {
             // Assert
             assertAll(
                     () -> assertEquals("Codigo de acesso invalido!", resultado.getMessage()));
+        }
+
+        @Test
+        @DisplayName("Quando alteramos a disponibilidade de um entregador não aprovado")
+        void quandoAlteramosDisponibilidadeNaoAprovado() throws Exception {
+            // Arrange
+            entregador.setAprovado(false);
+            entregadorRespository.save(entregador);
+
+            // Act
+            String responseJsonString = driver.perform(patch(URI_ENTREGADORES + "/" + entregador.getId() + "/disponivel")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", entregador.getCodigo())
+                            .param("disponivel", "true"))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+            CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+            // Assert
+            assertAll(
+                    () -> assertEquals("Entregador nao aprovado!", resultado.getMessage()));
+        }
+
+        @Test
+        @DisplayName("Quando alteramos a disponibilidade de um entregador aprovado")
+        void quandoAlteramosDisponibilidadeAprovado() throws Exception {
+            // Arrange
+            entregador.setAprovado(true);
+            entregadorRespository.save(entregador);
+
+            // Act
+            String responseJsonString = driver.perform(patch(URI_ENTREGADORES + "/" + entregador.getId() + "/disponivel")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", entregador.getCodigo())
+                            .param("disponivel", "true"))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+            EntregadorResponseDTO resultado = objectMapper.readValue(responseJsonString, EntregadorResponseDTO.class);
+
+            // Assert
+            assertAll(
+                () -> assertTrue(resultado.isDisponivel())
+            );
         }
     }
 }

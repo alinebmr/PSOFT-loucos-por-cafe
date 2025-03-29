@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -72,6 +73,16 @@ public class EntregadorController {
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .body("");
+    }
+
+    @PatchMapping("/{id}/disponivel")
+    public ResponseEntity<?> modificarDisponibilidade(
+        @PathVariable Long id,
+        @RequestParam String codigo,
+        @RequestParam Boolean disponivel) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(entregadorService.modificarDisponibilidade(id, codigo, disponivel));
     }
 
 }

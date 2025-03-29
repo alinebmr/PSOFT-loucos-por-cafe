@@ -43,6 +43,9 @@ public class EntregadorResponseDTO {
     @JsonProperty("aprovado")
     private boolean aprovado;
 
+    @JsonProperty("disponivel")
+    private boolean disponivel;
+
     public EntregadorResponseDTO(Entregador entregador) {
         this.id = entregador.getId();
         this.nome = entregador.getNome();
@@ -50,6 +53,7 @@ public class EntregadorResponseDTO {
         this.tipoVeiculo = entregador.getTipoVeiculo();
         this.corVeiculo = entregador.getCorVeiculo();
         this.aprovado = entregador.isAprovado();
+        this.disponivel = entregador.isDisponivel();
     }
 
 }
