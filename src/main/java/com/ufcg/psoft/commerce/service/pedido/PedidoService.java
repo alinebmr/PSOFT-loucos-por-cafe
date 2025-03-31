@@ -18,8 +18,6 @@ public interface PedidoService {
 
     PedidoResponseDTO confirmarEntrega(Long idPedido, Long idCliente, String codigoAcesso);
 
-    PedidoResponseDTO pedidoEmRota(Long idPedido);
-
     PedidoResponseDTO pedidoPronto(Long idPedido, Long idFornecedor, String codigoAcesso);
 
     void cancelarPedido(Long idPedido, Long idCliente, String codigoAcesso);

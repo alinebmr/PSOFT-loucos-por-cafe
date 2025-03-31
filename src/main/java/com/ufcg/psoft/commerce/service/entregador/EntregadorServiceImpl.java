@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ufcg.psoft.commerce.service.util.InterService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class EntregadorServiceImpl implements EntregadorService {
 
     @Autowired
     ModelMapper modelMapper;
+
+    @Autowired
+    InterService interService;
 
     @Override
     public List<EntregadorResponseDTO> listar() {
@@ -88,6 +92,11 @@ public class EntregadorServiceImpl implements EntregadorService {
         }
         entregador.setDisponivel(disponivel);
         entregador = entregadorRespository.save(entregador);
+
+        if(disponivel) {
+            interService.atribuirEntregador();
+        }
+
         return new EntregadorResponseDTO(entregador);
     }
 

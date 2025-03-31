@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class InterService {
@@ -22,11 +23,42 @@ public class InterService {
 
     public void atribuirEntregador() {
         List<Pedido> pedidosProntos = pedidoRepository.findByStatusPedidoEnum(StatusPedidoEnum.PRONTO);
+
+        for(Pedido p : pedidosProntos) {
+            Entregador entregador = getEntregadorDisponivel();
+
+            if(entregador == null) {
+                break;
+            }
+
+            p.setEntregador(entregador);
+            p.nextState();
+            pedidoRepository.save(p);
+        }
     }
 
-    private Entregador getEntregadoresDisponiveis() {
+    public boolean atribuirEntregador(Pedido pedido) {
+        Entregador entregador = getEntregadorDisponivel();
+
+        if(entregador == null) {
+            return false;
+        }
+
+        pedido.setEntregador(entregador);
+        pedido.nextState();
+
+        pedidoRepository.save(pedido);
+
+        return true;
+    }
+
+    private Entregador getEntregadorDisponivel() {
         List<Entregador> entregadores = entregadorRespository.findByDisponivel(true);
 
-        return Collections.min(entregadores, Comparator.comparing(Entregador::getUltimaEntrega));
+        try {
+            return Collections.min(entregadores, Comparator.comparing(Entregador::getUltimaEntrega));
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 }
