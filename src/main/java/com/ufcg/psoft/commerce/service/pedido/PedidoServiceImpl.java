@@ -11,6 +11,7 @@ import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.repository.PedidoRepository;
 import com.ufcg.psoft.commerce.service.cafe.CafeService;
 import com.ufcg.psoft.commerce.service.cliente.ClienteService;
+import com.ufcg.psoft.commerce.service.entregador.EntregadorService;
 import com.ufcg.psoft.commerce.service.fornecedor.FornecedorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class PedidoServiceImpl implements PedidoService {
     ModelMapper modelMapper;
     @Autowired
     CafeService cafeService;
+    @Autowired
+    EntregadorService entregadorService;
 
     @Override
     public PedidoResponseDTO criar(Long idCliente, String codigoCliente, PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
@@ -167,9 +170,11 @@ public class PedidoServiceImpl implements PedidoService {
         
         Cafe cafePedido = pedido.getCafe();
         Fornecedor fornecedor = cafePedido.getFornecedor();
+        pedido = pedidoRepository.save(pedido);
+        entregadorService.atualizaUltimaEntrega(pedido.getEntregador().getId());
         fornecedor.notificaPedidoEntregue(pedido);
 
-        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+        return new PedidoResponseDTO(pedido);
     }
 
     private void verificaQualidadeAssinatura(QualidadeCafe cafe, TipoAssinatura assinatura) {

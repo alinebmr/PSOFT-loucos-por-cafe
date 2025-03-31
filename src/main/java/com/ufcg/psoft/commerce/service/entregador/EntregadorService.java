@@ -23,4 +23,6 @@ public interface EntregadorService {
     EntregadorResponseDTO alterarAprovacao(Long id, boolean aprovado);
 
     EntregadorResponseDTO modificarDisponibilidade(Long id, String codigoAcesso, boolean disponivel);
+
+    void atualizaUltimaEntrega(Long id);
 }

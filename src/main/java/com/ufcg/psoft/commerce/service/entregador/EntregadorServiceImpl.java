@@ -1,5 +1,6 @@
 package com.ufcg.psoft.commerce.service.entregador;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,6 +74,7 @@ public class EntregadorServiceImpl implements EntregadorService {
         entregador.setAprovado(aprovado);
         if (aprovado) {
             entregador.setDisponivel(false);
+            entregador.setUltimaEntrega(LocalDateTime.now());
         }
         entregador = entregadorRespository.save(entregador);
         return new EntregadorResponseDTO(entregador);
@@ -87,6 +89,15 @@ public class EntregadorServiceImpl implements EntregadorService {
         entregador.setDisponivel(disponivel);
         entregador = entregadorRespository.save(entregador);
         return new EntregadorResponseDTO(entregador);
+    }
+
+    @Override
+    public void atualizaUltimaEntrega(Long id) {
+        Entregador entregador = entregadorRespository.findById(id).orElseThrow(EntregadorNaoExisteException::new);
+
+        entregador.setUltimaEntrega(LocalDateTime.now());
+
+        entregadorRespository.save(entregador);
     }
 
     private Entregador verificaEntregador(Long id, String codigoAcesso) {
