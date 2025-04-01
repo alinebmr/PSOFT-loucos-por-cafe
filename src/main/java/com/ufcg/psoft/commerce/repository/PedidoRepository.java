@@ -14,5 +14,5 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     List<Pedido> findByCafeFornecedor(Fornecedor fornecedor);
 
-    List<Pedido> findByStatusPedidoEnum(StatusPedidoEnum status);
+    List<Pedido> findByStatus(StatusPedidoEnum status);
 }

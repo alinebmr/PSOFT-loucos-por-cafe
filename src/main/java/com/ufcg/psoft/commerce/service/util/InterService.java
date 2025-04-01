@@ -22,7 +22,7 @@ public class InterService {
     PedidoRepository pedidoRepository;
 
     public void atribuirEntregador() {
-        List<Pedido> pedidosProntos = pedidoRepository.findByStatusPedidoEnum(StatusPedidoEnum.PRONTO);
+        List<Pedido> pedidosProntos = pedidoRepository.findByStatus(StatusPedidoEnum.PRONTO);
 
         for(Pedido p : pedidosProntos) {
             Entregador entregador = getEntregadorDisponivel();
