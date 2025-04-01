@@ -64,7 +64,7 @@ public class PedidoResponseDTO {
         this.fornecedor = new FornecedorResponseDTO(pedido.getCafe().getFornecedor());
         this.cliente = new ClienteResponseDTO(pedido.getCliente());
         this.cafe = new CafeResponseDTO(pedido.getCafe());
-        this.endereco = new EnderecoDTO(pedido.getEndereco() != null ? pedido.getEndereco() : pedido.getCliente().getEndereco());
+        this.endereco = new EnderecoDTO(pedido.getEndereco());
         this.pago = pedido.isPago();
         this.assinatura = pedido.getAssinatura();
         this.valor = pedido.getValor();
