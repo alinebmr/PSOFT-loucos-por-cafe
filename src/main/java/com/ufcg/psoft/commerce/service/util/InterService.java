@@ -8,10 +8,7 @@ import com.ufcg.psoft.commerce.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class InterService {
@@ -53,12 +50,6 @@ public class InterService {
     }
 
     private Entregador getEntregadorDisponivel() {
-        List<Entregador> entregadores = entregadorRespository.findByDisponivel(true);
-
-        try {
-            return Collections.min(entregadores, Comparator.comparing(Entregador::getUltimaEntrega));
-        } catch (NoSuchElementException e) {
-            return null;
-        }
+        return entregadorRespository.findFirstByDisponivelTrueOrderByUltimaEntregaAsc();
     }
 }

@@ -1070,6 +1070,18 @@ public class PedidoControllerTests {
         @Test
         @DisplayName("Entregador atribuído quando a disponibilidade dele é alterada e há pedidos prontos")
         void entregadorAtribuidoDisponivel() throws Exception {
+            Entregador entregador1 = entregadorRespository.save(Entregador.builder()
+                    .nome("Alfred")
+                    .placaVeiculo("AAA-2345")
+                    .tipoVeiculo("Caminhão")
+                    .corVeiculo("Verde")
+                    .codigo("123123")
+                    .aprovado(true)
+                    .ultimaEntrega(LocalDateTime.now())
+                    .disponivel(true)
+                    .build()
+            );
+
             Pedido pedido1 = pedidoRepository.save(Pedido.builder()
                     .cafe(cafe)
                     .endereco(cliente.getEndereco())
@@ -1114,7 +1126,7 @@ public class PedidoControllerTests {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-            PedidoResponseDTO result = objectMapper.readValue(responseJsonString, PedidoResponseDTO.class);
+            PedidoResponseDTO result = objectMapper.readValue(responseJsonString, PedidoResponseDTO.PedidoResponseDTOBuilder.class).build();
 
             assertEquals(StatusPedidoEnum.PRONTO, result.getStatus());
         }

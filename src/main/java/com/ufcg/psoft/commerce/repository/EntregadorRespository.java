@@ -10,5 +10,5 @@ public interface EntregadorRespository extends JpaRepository<Entregador, Long> {
 
     List<Entregador> findByNomeContaining(String nome);
 
-    List<Entregador> findByDisponivel(Boolean disponivel);
+    Entregador findFirstByDisponivelTrueOrderByUltimaEntregaAsc();
 }
