@@ -11,7 +11,9 @@ import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.repository.PedidoRepository;
 import com.ufcg.psoft.commerce.service.cafe.CafeService;
 import com.ufcg.psoft.commerce.service.cliente.ClienteService;
+import com.ufcg.psoft.commerce.service.entregador.EntregadorService;
 import com.ufcg.psoft.commerce.service.fornecedor.FornecedorService;
+import com.ufcg.psoft.commerce.service.util.InterService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,10 @@ public class PedidoServiceImpl implements PedidoService {
     ModelMapper modelMapper;
     @Autowired
     CafeService cafeService;
+    @Autowired
+    EntregadorService entregadorService;
+    @Autowired
+    InterService interService;
 
     @Override
     public PedidoResponseDTO criar(Long idCliente, String codigoCliente, PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
@@ -130,19 +136,6 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public PedidoResponseDTO pedidoEmRota(Long idPedido) {
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
-
-        if(!pedido.getStatus().equals(StatusPedidoEnum.PRONTO)) {
-            throw new StatusPedidoInvalidoException();
-        }
-
-        pedido.nextState();
-
-        return new PedidoResponseDTO(pedidoRepository.save(pedido));
-    }
-
-    @Override
     public PedidoResponseDTO pedidoPronto(Long idPedido, Long idFornecedor, String codigoAcesso) {
         Pedido pedido = verificaPedido(idPedido, idFornecedor, codigoAcesso, true);
 
@@ -152,7 +145,13 @@ public class PedidoServiceImpl implements PedidoService {
 
         pedido.nextState();
 
-        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+        pedido = pedidoRepository.save(pedido);
+
+        if(interService.atribuirEntregador(pedido)) {
+            pedido = pedidoRepository.findById(pedido.getId()).orElseThrow(PedidoNaoExisteException::new);
+        }
+
+        return new PedidoResponseDTO(pedido);
     }
 
     @Override
@@ -167,9 +166,11 @@ public class PedidoServiceImpl implements PedidoService {
         
         Cafe cafePedido = pedido.getCafe();
         Fornecedor fornecedor = cafePedido.getFornecedor();
+        pedido = pedidoRepository.save(pedido);
+        entregadorService.atualizaUltimaEntrega(pedido.getEntregador().getId());
         fornecedor.notificaPedidoEntregue(pedido);
 
-        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+        return new PedidoResponseDTO(pedido);
     }
 
     private void verificaQualidadeAssinatura(QualidadeCafe cafe, TipoAssinatura assinatura) {
