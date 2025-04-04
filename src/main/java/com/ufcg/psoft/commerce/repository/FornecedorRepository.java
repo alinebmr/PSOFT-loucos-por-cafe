@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface FornecedorRepository extends JpaRepository<Fornecedor, Long> {
     
-    List<Fornecedor> findByNomeEmpresaContaining(String nomeEmpresa);
+    List<Fornecedor> findByNomeEmpresaContainingIgnoreCase(String nomeEmpresa);
 }

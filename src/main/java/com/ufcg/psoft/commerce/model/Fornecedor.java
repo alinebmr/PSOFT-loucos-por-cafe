@@ -39,5 +39,10 @@ public class Fornecedor {
     @JsonProperty("tiposPagamento")
     @Builder.Default
     @ElementCollection(targetClass = TipoPagamento.class)
+    @Enumerated(EnumType.STRING)
     private Set<TipoPagamento> tiposPagamento = new HashSet<>();
+
+    public void notificaPedidoEntregue(Pedido pedido) {
+        System.out.println("Fornecedor " + this.getNomeEmpresa() + ", o pedido solicitado por " + pedido.getCliente().getNome() + " foi devidamente entregue.");
+    }
 }

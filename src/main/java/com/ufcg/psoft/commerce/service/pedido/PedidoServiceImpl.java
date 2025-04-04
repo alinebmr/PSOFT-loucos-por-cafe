@@ -3,6 +3,7 @@ package com.ufcg.psoft.commerce.service.pedido;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.enums.QualidadeCafe;
+import com.ufcg.psoft.commerce.enums.StatusPedidoEnum;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
 import com.ufcg.psoft.commerce.enums.TipoPagamento;
 import com.ufcg.psoft.commerce.exception.*;
@@ -77,10 +78,14 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public void remover(Long id, String codigo, Long idPedido, boolean isFornecedor) {
-        Pedido pedido = verificaPedido(idPedido, id, codigo, isFornecedor);
+    public void cancelarPedido(Long idPedido, Long idCliente, String codigoAcesso) {
+        Pedido pedido = verificaPedido(idPedido, idCliente, codigoAcesso, false);
 
-        pedidoRepository.delete(pedido);
+        if(pedido.getStatus().equals(StatusPedidoEnum.RECEBIDO) || pedido.getStatus().equals(StatusPedidoEnum.PREPARACAO)){
+            pedidoRepository.delete(pedido);
+        }else{
+            throw new CommerceException("Pedido nao pode mais ser cancelado!");
+        }
     }
 
     @Override
@@ -118,9 +123,53 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.setPago(true);
+        pedido.nextState();
         pedidoRepository.save(pedido);
 
         return new PedidoResponseDTO(pedido);
+    }
+
+    @Override
+    public PedidoResponseDTO pedidoEmRota(Long idPedido) {
+        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
+
+        if(!pedido.getStatus().equals(StatusPedidoEnum.PRONTO)) {
+            throw new StatusPedidoInvalidoException();
+        }
+
+        pedido.nextState();
+
+        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+    }
+
+    @Override
+    public PedidoResponseDTO pedidoPronto(Long idPedido, Long idFornecedor, String codigoAcesso) {
+        Pedido pedido = verificaPedido(idPedido, idFornecedor, codigoAcesso, true);
+
+        if(!pedido.getStatus().equals(StatusPedidoEnum.PREPARACAO)) {
+            throw new StatusPedidoInvalidoException();
+        }
+
+        pedido.nextState();
+
+        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+    }
+
+    @Override
+    public PedidoResponseDTO confirmarEntrega(Long idPedido, Long idCliente, String codigoAcesso) {
+        Pedido pedido = verificaPedido(idPedido, idCliente, codigoAcesso, false);
+
+        if(!pedido.getStatus().equals(StatusPedidoEnum.EM_ENTREGA)) {
+            throw new StatusPedidoInvalidoException();
+        }
+
+        pedido.nextState();
+        
+        Cafe cafePedido = pedido.getCafe();
+        Fornecedor fornecedor = cafePedido.getFornecedor();
+        fornecedor.notificaPedidoEntregue(pedido);
+
+        return new PedidoResponseDTO(pedidoRepository.save(pedido));
     }
 
     private void verificaQualidadeAssinatura(QualidadeCafe cafe, TipoAssinatura assinatura) {

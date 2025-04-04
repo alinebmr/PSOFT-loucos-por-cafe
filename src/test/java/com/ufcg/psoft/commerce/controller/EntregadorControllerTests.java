@@ -548,6 +548,41 @@ public class EntregadorControllerTests {
         }
 
         @Test
+        @DisplayName("Quando buscamos entregadores por nome")
+        void quandoBuscamosEntregadoresPorNome() throws Exception {
+            // Arrange
+            entregadorRespository.save(Entregador.builder()
+                .nome("Jose Freitas")
+                .codigo("123456")
+                .placaVeiculo("EFI-2345")
+                .tipoVeiculo("Carro")
+                .corVeiculo("Branco")
+                .build());
+
+            entregadorRespository.save(Entregador.builder()
+                .nome("Adriana Silva")
+                .codigo("123456")
+                .placaVeiculo("EFI-2345")
+                .tipoVeiculo("Carro")
+                .corVeiculo("Branco")
+                .build());
+
+            // Act
+            String responseJsonString = driver.perform(get(URI_ENTREGADORES)
+                            .param("nome", "Jose")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk()) // Codigo 200
+                    .andReturn().getResponse().getContentAsString();
+
+            List<EntregadorResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            // Assert
+            assertAll(
+                () -> assertEquals(2, resultado.size())
+            );
+        }
+
+        @Test
         @DisplayName("Quando buscamos um entregador salvo pelo id")
         void quandoBuscamosPorUmEntregadorSalvo() throws Exception {
             // Arrange
