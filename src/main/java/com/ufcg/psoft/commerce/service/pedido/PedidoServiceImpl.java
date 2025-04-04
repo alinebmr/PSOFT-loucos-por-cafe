@@ -144,11 +144,12 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.nextState();
-
         pedido = pedidoRepository.save(pedido);
 
         if(interService.atribuirEntregador(pedido)) {
             pedido = pedidoRepository.findById(pedido.getId()).orElseThrow(PedidoNaoExisteException::new);
+        }else{
+            pedido.getCliente().notificaPedidoNaoPodeSerAtribuidoParaEntrega(pedido);
         }
 
         return new PedidoResponseDTO(pedido);

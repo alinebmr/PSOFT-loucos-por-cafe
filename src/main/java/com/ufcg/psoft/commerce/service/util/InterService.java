@@ -43,7 +43,6 @@ public class InterService {
 
         pedido.setEntregador(entregador);
         pedido.nextState();
-
         pedidoRepository.save(pedido);
 
         return true;
