@@ -61,7 +61,7 @@ public class Cliente {
 
     public void notificaPedidoNaoPodeSerAtribuidoParaEntrega(Pedido pedido){
         System.out.println("O pedido " + pedido.toString() + " do cliente "+ this.nome + " não pôde ser atribuido para entrega " +
-                "por conta da indisponibildade de entregadores");
+                "por conta da indisponibilidade de entregadores");
     }
 
 }
