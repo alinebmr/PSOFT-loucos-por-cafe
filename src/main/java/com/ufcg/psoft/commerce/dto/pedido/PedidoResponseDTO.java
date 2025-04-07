@@ -1,5 +1,7 @@
 package com.ufcg.psoft.commerce.dto.pedido;
 
+import java.time.LocalDateTime;
+import org.springframework.data.annotation.CreatedDate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.dto.EnderecoDTO;
 import com.ufcg.psoft.commerce.dto.cafe.CafeResponseDTO;
@@ -28,6 +30,10 @@ public class PedidoResponseDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+
+    @JsonProperty("createdAt")
+    @CreatedDate
+    private LocalDateTime createdAt;
 
     @JsonProperty("fornecedor")
     @NotNull(message = "Fornecedor obrigatorio")

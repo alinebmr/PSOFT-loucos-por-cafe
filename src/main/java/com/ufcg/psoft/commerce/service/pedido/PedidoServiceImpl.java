@@ -18,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,8 +96,20 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public List<PedidoResponseDTO> listar(Long id, String codigo, boolean isFornecedor) {
+    public List<PedidoResponseDTO> listarPorStatus(Long id, String codigo,StatusPedidoEnum status){
         List<Pedido> pedidos;
+        Cliente cliente = clienteService.verificaCliente(id, codigo);
+
+        pedidos = pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(status, cliente);
+
+        return pedidos.stream()
+        .map(PedidoResponseDTO::new)
+        .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PedidoResponseDTO> listar(Long id, String codigo, boolean isFornecedor) {
+        List<Pedido> pedidos = new ArrayList<Pedido>();
 
         if(isFornecedor) {
             Fornecedor fornecedor = fornecedorService.verificaFornecedor(id, codigo);
@@ -105,7 +118,12 @@ public class PedidoServiceImpl implements PedidoService {
         } else {
             Cliente cliente = clienteService.verificaCliente(id, codigo);
 
-            pedidos = pedidoRepository.findByCliente(cliente);
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.RECEBIDO, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.PREPARACAO, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.PRONTO, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.EM_ENTREGA, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.ENTREGUE, cliente));
+
         }
 
         return pedidos.stream()

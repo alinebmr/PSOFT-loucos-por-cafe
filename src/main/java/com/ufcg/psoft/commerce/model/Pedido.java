@@ -1,5 +1,7 @@
 package com.ufcg.psoft.commerce.model;
 
+import java.time.LocalDateTime;
+import org.springframework.data.annotation.CreatedDate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.enums.StatusPedidoEnum;
 import com.ufcg.psoft.commerce.enums.TipoAssinatura;
@@ -28,6 +30,10 @@ public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+
+    @JsonProperty("createdAt")
+    @CreatedDate
+    private LocalDateTime createdAt;
 
     @ManyToOne
     private Cafe cafe;
