@@ -118,11 +118,11 @@ public class PedidoServiceImpl implements PedidoService {
         } else {
             Cliente cliente = clienteService.verificaCliente(id, codigo);
 
-            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.ENTREGUE, cliente));
-            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.EM_ENTREGA, cliente));
-            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.PRONTO, cliente));
-            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.PREPARACAO, cliente));
             pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.RECEBIDO, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.PREPARACAO, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.PRONTO, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.EM_ENTREGA, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.ENTREGUE, cliente));
 
         }
 

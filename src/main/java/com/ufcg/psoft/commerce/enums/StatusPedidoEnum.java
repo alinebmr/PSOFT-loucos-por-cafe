@@ -6,4 +6,10 @@ public enum StatusPedidoEnum {
     PRONTO,
     EM_ENTREGA,
     ENTREGUE;
+
+    @Override
+    public String toString() {
+        return name(); 
+    }
+
 }

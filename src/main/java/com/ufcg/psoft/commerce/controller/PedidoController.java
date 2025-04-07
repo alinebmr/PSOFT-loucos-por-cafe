@@ -32,7 +32,7 @@ public class PedidoController {
                 .body(pedidoService.listar(id, codigoAcesso, isFornecedor));
     }
 
-    @GetMapping("/{idCliente}/pedidos")
+    @GetMapping("/status/{idCliente}")
     public ResponseEntity<?> listarPorStatus(
             @PathVariable Long idCliente,
             @RequestParam String codigoAcesso,

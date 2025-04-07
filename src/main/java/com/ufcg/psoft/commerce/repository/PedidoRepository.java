@@ -17,7 +17,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     List<Pedido> findByStatus(StatusPedidoEnum status);
 
-    @Query("SELECT p FROM Pedido p WHERE p.status = :status AND p.cliente = :cliente ORDER BY p.createdAt DESC")
+    @Query("SELECT p FROM Pedido p WHERE p.status = :status AND p.cliente = :cliente ORDER BY p.createdAt ASC")
     List<Pedido> findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum status, Cliente cliente);
 
 }
