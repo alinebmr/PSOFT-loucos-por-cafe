@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorPostPutRequestDTO;
 import com.ufcg.psoft.commerce.enums.*;
+import com.ufcg.psoft.commerce.exception.PedidoNaoExisteException;
 import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.repository.*;
 import org.junit.jupiter.api.AfterEach;
@@ -39,6 +40,7 @@ import com.ufcg.psoft.commerce.service.pedido.PedidoService;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
@@ -176,17 +178,10 @@ public class PedidoControllerTests {
                 .tipoVeiculo("Caminhão")
                 .corVeiculo("Verde")
                 .codigo("123123")
-                .aprovado(false)
+                .aprovado(true)
+                .ultimaEntrega(LocalDateTime.now())
                 .build()
         );
-
-        entregadorPostPutRequestDTO = EntregadorPostPutRequestDTO.builder()
-                .nome(entregador.getNome())
-                .placaVeiculo(entregador.getPlacaVeiculo())
-                .tipoVeiculo(entregador.getTipoVeiculo())
-                .corVeiculo(entregador.getCorVeiculo())
-                .codigo(entregador.getCodigo())
-                .build();
 
         pedido = pedidoRepository.save(Pedido.builder()
             .cafe(cafe)
@@ -208,6 +203,7 @@ public class PedidoControllerTests {
         cafeRepository.deleteAll();
         fornecedorRepository.deleteAll();
         clienteRepository.deleteAll();
+        entregadorRespository.deleteAll();
     }
 
     @Nested
@@ -774,8 +770,20 @@ public class PedidoControllerTests {
         @Test
         @DisplayName("Quando confirmamos a entrega de um pedido")
         void pedidoEntregue() throws Exception {
+            Entregador entregador1 = entregadorRespository.save(Entregador.builder()
+                    .nome("Leticia Fretes")
+                    .placaVeiculo("AAA-2345")
+                    .tipoVeiculo("Caminhão")
+                    .corVeiculo("Verde")
+                    .codigo("123123")
+                    .aprovado(true)
+                    .disponivel(true)
+                    .build()
+            );
+
             Pedido pedido1 = pedidoRepository.save(Pedido.builder()
                 .cafe(cafe)
+                .entregador(entregador1)
                 .endereco(cliente.getEndereco())
                 .cliente(cliente)
                 .status(StatusPedidoEnum.EM_ENTREGA)
@@ -1014,6 +1022,319 @@ public class PedidoControllerTests {
 
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
             assertEquals("Pedido nao pode mais ser cancelado!", resultado.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("Conjunto de casos de cliente verificando histórico")
+    class atribuiEntregador {
+        @Test
+        @DisplayName("Entregador atribuído quando o status do pedido é alterado para pronto")
+        void entregadorAtribuidoStatusPronto() throws Exception {
+            Entregador entregador1 = entregadorRespository.save(Entregador.builder()
+                    .nome("Alfred")
+                    .placaVeiculo("AAA-2345")
+                    .tipoVeiculo("Caminhão")
+                    .corVeiculo("Verde")
+                    .codigo("123123")
+                    .aprovado(true)
+                    .ultimaEntrega(LocalDateTime.now())
+                    .disponivel(true)
+                    .build()
+            );
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .pago(true)
+                    .status(StatusPedidoEnum.PREPARACAO)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/pedidoPronto")
+                            .param("idFornecedor", fornecedor.getId().toString())
+                            .param("codigoAcesso", fornecedor.getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            PedidoResponseDTO result = objectMapper.readValue(responseJsonString, PedidoResponseDTO.class);
+
+            assertAll(
+                    () -> assertEquals(entregador1.getNome(), result.getEntregador().getNome()),
+                    () -> assertEquals(StatusPedidoEnum.EM_ENTREGA, result.getStatus())
+            );
+        }
+
+        @Test
+        @DisplayName("Entregador atribuído quando a disponibilidade dele é alterada e há pedidos prontos")
+        void entregadorAtribuidoDisponivel() throws Exception {
+            Entregador entregador1 = entregadorRespository.save(Entregador.builder()
+                    .nome("Alfred")
+                    .placaVeiculo("AAA-2345")
+                    .tipoVeiculo("Caminhão")
+                    .corVeiculo("Verde")
+                    .codigo("123123")
+                    .aprovado(true)
+                    .ultimaEntrega(LocalDateTime.now())
+                    .disponivel(true)
+                    .build()
+            );
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .pago(true)
+                    .status(StatusPedidoEnum.PRONTO)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            driver.perform(patch("/entregadores/" + entregador.getId() + "/disponivel")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("codigo", entregador.getCodigo())
+                            .param("disponivel", "true"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            PedidoResponseDTO result = new PedidoResponseDTO(pedidoRepository.findById(pedido1.getId()).orElseThrow(PedidoNaoExisteException::new));
+
+            assertAll(
+                    () -> assertEquals(entregador.getNome(), result.getEntregador().getNome()),
+                    () -> assertEquals(StatusPedidoEnum.EM_ENTREGA, result.getStatus())
+            );
+        }
+
+        @Test
+        @DisplayName("Sem entregador disponível para atribuir ao pedido")
+        void entregadorNaoAtribuido() throws Exception {
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .pago(true)
+                    .status(StatusPedidoEnum.PREPARACAO)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/pedidoPronto")
+                            .param("idFornecedor", fornecedor.getId().toString())
+                            .param("codigoAcesso", fornecedor.getCodigo()))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            PedidoResponseDTO result = objectMapper.readValue(responseJsonString, PedidoResponseDTO.PedidoResponseDTOBuilder.class).build();
+
+            assertEquals(StatusPedidoEnum.PRONTO, result.getStatus());
+        }
+    }
+
+    @Nested
+    @DisplayName("Conjunto de casos de listar histórico de pedidos de cliente")
+    class HistoricoPedidos {
+        @Test
+        @DisplayName("Cliente recupera historico de pedidos com status diferentes")
+        void historicoCliente() throws Exception {
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .pago(true)
+                    .status(StatusPedidoEnum.RECEBIDO)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            Pedido pedido2 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.PRONTO)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            Pedido pedido3 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.EM_ENTREGA)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            Pedido pedido4 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.PREPARACAO)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            Pedido pedido5 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.ENTREGUE)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            String responseJsonString = driver.perform(get(URI_PEDIDOS)
+                            .param("id", cliente.getId().toString())
+                            .param("codigoAcesso", "123123")
+                            .param("isFornecedor", "false"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            List<PedidoResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            // Assert
+            assertEquals(6, resultado.size());
+            assertEquals(pedido.getStatus(), resultado.get(0).getStatus());
+            assertEquals(pedido1.getStatus(), resultado.get(1).getStatus());
+            assertEquals(pedido4.getStatus(), resultado.get(2).getStatus());
+            assertEquals(pedido2.getStatus(), resultado.get(3).getStatus());
+            assertEquals(pedido3.getStatus(), resultado.get(4).getStatus());
+            assertEquals(pedido5.getStatus(), resultado.get(5).getStatus());
+        }
+
+        @Test
+        @DisplayName("Cliente recupera historico de pedidos de mesmo status")
+        void historicoClienteOrdem() throws Exception {
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .pago(true)
+                    .status(StatusPedidoEnum.RECEBIDO)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            Pedido pedido2 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.RECEBIDO)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            Pedido pedido4 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.RECEBIDO)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            Pedido pedido3 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.RECEBIDO)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            Pedido pedido5 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.RECEBIDO)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            String responseJsonString = driver.perform(get(URI_PEDIDOS)
+                            .param("id", cliente.getId().toString())
+                            .param("codigoAcesso", "123123")
+                            .param("isFornecedor", "false"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            List<PedidoResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            // Assert
+            assertEquals(6, resultado.size());
+            assertEquals(pedido.getId(), resultado.get(0).getId());
+            assertEquals(pedido1.getId(), resultado.get(1).getId());
+            assertEquals(pedido2.getId(), resultado.get(2).getId());
+            assertEquals(pedido4.getId(), resultado.get(3).getId());
+            assertEquals(pedido3.getId(), resultado.get(4).getId());
+            assertEquals(pedido5.getId(), resultado.get(5).getId());
+        }
+
+        @Test
+        @DisplayName("Cliente recupera historico com filtro de status")
+        void historicoClienteFiltro() throws Exception {
+
+            Pedido pedido1 = pedidoRepository.save(Pedido.builder()
+                    .cafe(cafe)
+                    .endereco(cliente.getEndereco())
+                    .cliente(cliente)
+                    .pago(true)
+                    .status(StatusPedidoEnum.RECEBIDO)
+                    .tipoPagamento(TipoPagamento.CREDITO)
+                    .build());
+
+            Pedido pedido2 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.PRONTO)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            Pedido pedido3 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.EM_ENTREGA)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            Pedido pedido4 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.PREPARACAO)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            Pedido pedido5 = pedidoRepository.save(Pedido.builder()
+            .cafe(cafe)
+            .endereco(cliente.getEndereco())
+            .cliente(cliente)
+            .pago(true)
+            .status(StatusPedidoEnum.ENTREGUE)
+            .tipoPagamento(TipoPagamento.CREDITO)
+            .build());
+
+            String responseJsonString = driver.perform(get(URI_PEDIDOS + "/status/" + cliente.getId())
+                            .param("codigoAcesso", "123123")
+                            .param("status", "RECEBIDO"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            List<PedidoResponseDTO> resultado = objectMapper.readValue(responseJsonString, new TypeReference<>() {});
+
+            // Assert
+            assertEquals(2, resultado.size());
+            assertEquals(pedido.getId(), resultado.get(0).getId());
+            assertEquals(pedido1.getId(), resultado.get(1).getId());
         }
     }
 }

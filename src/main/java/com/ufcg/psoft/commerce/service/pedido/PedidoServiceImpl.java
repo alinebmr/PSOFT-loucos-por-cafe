@@ -11,11 +11,14 @@ import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.repository.PedidoRepository;
 import com.ufcg.psoft.commerce.service.cafe.CafeService;
 import com.ufcg.psoft.commerce.service.cliente.ClienteService;
+import com.ufcg.psoft.commerce.service.entregador.EntregadorService;
 import com.ufcg.psoft.commerce.service.fornecedor.FornecedorService;
+import com.ufcg.psoft.commerce.service.util.InterService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,10 @@ public class PedidoServiceImpl implements PedidoService {
     ModelMapper modelMapper;
     @Autowired
     CafeService cafeService;
+    @Autowired
+    EntregadorService entregadorService;
+    @Autowired
+    InterService interService;
 
     @Override
     public PedidoResponseDTO criar(Long idCliente, String codigoCliente, PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
@@ -89,8 +96,20 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public List<PedidoResponseDTO> listar(Long id, String codigo, boolean isFornecedor) {
+    public List<PedidoResponseDTO> listarPorStatus(Long id, String codigo,StatusPedidoEnum status){
         List<Pedido> pedidos;
+        Cliente cliente = clienteService.verificaCliente(id, codigo);
+
+        pedidos = pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(status, cliente);
+
+        return pedidos.stream()
+        .map(PedidoResponseDTO::new)
+        .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PedidoResponseDTO> listar(Long id, String codigo, boolean isFornecedor) {
+        List<Pedido> pedidos = new ArrayList<Pedido>();
 
         if(isFornecedor) {
             Fornecedor fornecedor = fornecedorService.verificaFornecedor(id, codigo);
@@ -99,7 +118,12 @@ public class PedidoServiceImpl implements PedidoService {
         } else {
             Cliente cliente = clienteService.verificaCliente(id, codigo);
 
-            pedidos = pedidoRepository.findByCliente(cliente);
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.RECEBIDO, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.PREPARACAO, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.PRONTO, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.EM_ENTREGA, cliente));
+            pedidos.addAll(pedidoRepository.findByStatusAndClienteOrderedByCreatedAt(StatusPedidoEnum.ENTREGUE, cliente));
+
         }
 
         return pedidos.stream()
@@ -130,19 +154,6 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public PedidoResponseDTO pedidoEmRota(Long idPedido) {
-        Pedido pedido = pedidoRepository.findById(idPedido).orElseThrow(PedidoNaoExisteException::new);
-
-        if(!pedido.getStatus().equals(StatusPedidoEnum.PRONTO)) {
-            throw new StatusPedidoInvalidoException();
-        }
-
-        pedido.nextState();
-
-        return new PedidoResponseDTO(pedidoRepository.save(pedido));
-    }
-
-    @Override
     public PedidoResponseDTO pedidoPronto(Long idPedido, Long idFornecedor, String codigoAcesso) {
         Pedido pedido = verificaPedido(idPedido, idFornecedor, codigoAcesso, true);
 
@@ -151,8 +162,15 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.nextState();
+        pedido = pedidoRepository.save(pedido);
 
-        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+        if(interService.atribuirEntregador(pedido)) {
+            pedido = pedidoRepository.findById(pedido.getId()).orElseThrow(PedidoNaoExisteException::new);
+        }else{
+            pedido.getCliente().notificaPedidoNaoPodeSerAtribuidoParaEntrega(pedido);
+        }
+
+        return new PedidoResponseDTO(pedido);
     }
 
     @Override
@@ -167,9 +185,11 @@ public class PedidoServiceImpl implements PedidoService {
         
         Cafe cafePedido = pedido.getCafe();
         Fornecedor fornecedor = cafePedido.getFornecedor();
+        pedido = pedidoRepository.save(pedido);
+        entregadorService.atualizaUltimaEntrega(pedido.getEntregador().getId());
         fornecedor.notificaPedidoEntregue(pedido);
 
-        return new PedidoResponseDTO(pedidoRepository.save(pedido));
+        return new PedidoResponseDTO(pedido);
     }
 
     private void verificaQualidadeAssinatura(QualidadeCafe cafe, TipoAssinatura assinatura) {

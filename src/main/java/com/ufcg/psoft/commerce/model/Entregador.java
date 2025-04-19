@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @Builder
@@ -45,4 +47,13 @@ public class Entregador {
     @Column(nullable = false)
     @Builder.Default
     private boolean aprovado = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean disponivel = false;
+
+    @Column()
+    @Builder.Default
+    private LocalDateTime ultimaEntrega = null;
+
 }

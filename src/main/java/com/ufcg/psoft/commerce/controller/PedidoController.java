@@ -1,6 +1,7 @@
 package com.ufcg.psoft.commerce.controller;
 
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
+import com.ufcg.psoft.commerce.enums.StatusPedidoEnum;
 import com.ufcg.psoft.commerce.service.pedido.PedidoService;
 import jakarta.validation.Valid;
 
@@ -29,6 +30,16 @@ public class PedidoController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(pedidoService.listar(id, codigoAcesso, isFornecedor));
+    }
+
+    @GetMapping("/status/{idCliente}")
+    public ResponseEntity<?> listarPorStatus(
+            @PathVariable Long idCliente,
+            @RequestParam String codigoAcesso,
+            @RequestParam StatusPedidoEnum status) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(pedidoService.listarPorStatus(idCliente, codigoAcesso, status));
     }
 
     @GetMapping("/{idPedido}")
